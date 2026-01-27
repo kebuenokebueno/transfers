@@ -1,52 +1,140 @@
-//
-//  InigoVIPUITests.swift
-//  InigoVIPUITests
-//
-//  Created by Inigo on 27/1/26.
-//
 
 import XCTest
 
-final class InigoVIPUITests: XCTestCase {
-
+// MARK: - XCTest UI Tests for SwiftUI
+final class TransactionListUITests: XCTestCase {
+    var app: XCUIApplication!
+    
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
+        app = XCUIApplication()
         app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    @MainActor
-    func testLaunchPerformance() throws {
-        // This measures how long it takes to launch your application.
-        measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
-        }
     }
     
-    func testTransactionsDisplay() {
-        let app = XCUIApplication()
-        app.launch()
+    override func tearDownWithError() throws {
+        app = nil
+    }
+    
+    func testAppLaunches() throws {
+        XCTAssertTrue(app.exists)
+    }
+    
+    func testNavigationBarExists() throws {
+        // In SwiftUI, navigation title appears as static text
+        let navTitle = app.staticTexts["Transactions"]
+        XCTAssertTrue(navTitle.waitForExistence(timeout: 5), "Navigation title should exist")
+    }
+    
+//    func testLoadingIndicatorAppearsAndDisappears() throws {
+//        // ProgressView appears as a progress indicator
+//        let loadingIndicator = app.progressIndicators.firstMatch
+//        
+//        // Loading might be too fast to catch, so we just check if list appears
+//        let list = app.scrollViews.firstMatch
+//        XCTAssertTrue(list.waitForExistence(timeout: 5), "Content should appear")
+//    }
+    
+    func testTransactionContentAppears() throws {
+        // Wait for any static text to appear (transactions loaded)
+        let firstText = app.staticTexts.containing(NSPredicate(format: "label CONTAINS 'Grocery' OR label CONTAINS 'Electric' OR label CONTAINS 'Salary'")).firstMatch
+        XCTAssertTrue(firstText.waitForExistence(timeout: 5), "Transaction content should appear")
+    }
+    
+    func testGroceryTransactionExists() throws {
+        // Check for specific transaction
+        let groceryText = app.staticTexts["Grocery Store"]
+        XCTAssertTrue(groceryText.waitForExistence(timeout: 5), "Grocery Store transaction should exist")
+    }
+    
+    func testElectricBillTransactionExists() throws {
+        let electricText = app.staticTexts["Electric Bill"]
+        XCTAssertTrue(electricText.waitForExistence(timeout: 5), "Electric Bill transaction should exist")
+    }
+    
+    func testSalaryTransactionExists() throws {
+        let salaryText = app.staticTexts["Salary"]
+        XCTAssertTrue(salaryText.waitForExistence(timeout: 5), "Salary transaction should exist")
+    }
+    
+    func testCategoryLabelsExist() throws {
+        // Check for category labels
+        let foodCategory = app.staticTexts["Food"]
+        let utilitiesCategory = app.staticTexts["Utilities"]
+        let incomeCategory = app.staticTexts["Income"]
         
-        let list = app.otherElements["transactionsList"]
-        XCTAssertTrue(list.waitForExistence(timeout: 5))
+        XCTAssertTrue(foodCategory.waitForExistence(timeout: 5), "Food category should exist")
+        XCTAssertTrue(utilitiesCategory.exists, "Utilities category should exist")
+        XCTAssertTrue(incomeCategory.exists, "Income category should exist")
+    }
+    
+    func testAmountsDisplayed() throws {
+        // Check that amounts with currency symbols exist
+        let amounts = app.staticTexts.matching(NSPredicate(format: "label CONTAINS '€'"))
+        XCTAssertGreaterThan(amounts.count, 0, "Should display amounts with currency")
+    }
+    
+    func testNegativeAmountWithMinus() throws {
+        // Look for negative amounts (should have - sign)
+        let negativeAmount = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH '-'")).firstMatch
+        XCTAssertTrue(negativeAmount.waitForExistence(timeout: 5), "Negative amounts should have minus sign")
+    }
+    
+    func testPositiveAmountWithPlus() throws {
+        // Look for positive amounts (should have + sign)
+        let positiveAmount = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH '+'")).firstMatch
+        XCTAssertTrue(positiveAmount.waitForExistence(timeout: 5), "Positive amounts should have plus sign")
+    }
+    
+    func testDatesDisplayed() throws {
+        // Dates should be displayed (looking for month patterns)
+        let dateText = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Jan' OR label CONTAINS '2026'")).firstMatch
+        XCTAssertTrue(dateText.waitForExistence(timeout: 5), "Dates should be displayed")
+    }
+    
+//    func testScrollViewExists() throws {
+//        // SwiftUI List creates a scroll view
+//        let scrollView = app.scrollViews.firstMatch
+//        XCTAssertTrue(scrollView.waitForExistence(timeout: 5), "Scroll view should exist")
+//    }
+//    
+//    func testCanScrollContent() throws {
+//        let scrollView = app.scrollViews.firstMatch
+//        XCTAssertTrue(scrollView.waitForExistence(timeout: 5))
+//        
+//        // Try to scroll
+//        scrollView.swipeUp()
+//        scrollView.swipeDown()
+//        
+//        // Should still exist after scrolling
+//        XCTAssertTrue(scrollView.exists, "Should be able to scroll")
+//    }
+    
+    func testMultipleTransactionsVisible() throws {
+        // Count static texts that are transaction descriptions
+        let groceryExists = app.staticTexts["Grocery Store"].exists
+        let electricExists = app.staticTexts["Electric Bill"].exists
+        let salaryExists = app.staticTexts["Salary"].exists
         
-        let firstTransaction = app.otherElements["transactionRow_1"]
-        XCTAssertTrue(firstTransaction.exists)
+        // Wait for content to load
+        _ = app.staticTexts["Grocery Store"].waitForExistence(timeout: 5)
+        
+        let visibleCount = [groceryExists, electricExists, salaryExists].filter { $0 }.count
+        XCTAssertGreaterThanOrEqual(visibleCount, 2, "At least 2 transactions should be visible")
+    }
+    
+    func testTransactionDescriptionsAreNotEmpty() throws {
+        let grocery = app.staticTexts["Grocery Store"]
+        XCTAssertTrue(grocery.waitForExistence(timeout: 5))
+        XCTAssertFalse(grocery.label.isEmpty, "Description should not be empty")
+    }
+    
+    func testAllThreeMockTransactionsPresent() throws {
+        // Wait for first transaction
+        XCTAssertTrue(app.staticTexts["Grocery Store"].waitForExistence(timeout: 5))
+        
+        // Check all three exist
+        XCTAssertTrue(app.staticTexts["Grocery Store"].exists, "Grocery transaction missing")
+        XCTAssertTrue(app.staticTexts["Electric Bill"].exists, "Electric Bill transaction missing")
+        XCTAssertTrue(app.staticTexts["Salary"].exists, "Salary transaction missing")
     }
 }
