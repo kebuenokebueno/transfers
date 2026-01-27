@@ -11,7 +11,7 @@ import SwiftUI
 struct InigoVIPApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TransactionListView()
         }
     }
 }
