@@ -55,9 +55,7 @@ struct TransactionRow: View {
             
             Spacer()
             
-            Text(transaction.isPositive ? "+" : "-")
-                .foregroundColor(transaction.isPositive ? .green : .red)
-//                + Text(transaction.amount)
+            Text("\(transaction.isPositive ? "+" : "-")\(transaction.amount)")
                 .foregroundColor(transaction.isPositive ? .green : .red)
                 .font(.headline)
                 .accessibilityIdentifier("transactionAmount")

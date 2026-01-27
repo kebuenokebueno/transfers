@@ -1,37 +1,23 @@
-//
-//  TransactionListPresenterTests.swift.swift
-//  InigoVIP
-//
-//  Created by Inigo on 27/1/26.
-//
+// MARK: - Presenter Tests
 
+import Foundation
+import SwiftUI
 import Testing
 @testable import InigoVIP
-import XCTest
 
-// MARK: - Presenter Tests
-class TransactionListPresenterTests: XCTestCase {
-    var sut: TransactionListPresenter!
-    var mockViewController: MockTransactionListViewController!
+
+@Suite("TransactionList Presenter Tests")
+struct TransactionListPresenterTests {
     
     @MainActor
-    override func setUp() {
-        super.setUp()
-        sut = TransactionListPresenter()
-        mockViewController = MockTransactionListViewController()
-        sut.viewController = mockViewController
-    }
-    
-    override func tearDown() {
-        sut = nil
-        mockViewController = nil
-        super.tearDown()
-    }
-    
-    @MainActor
-    func testPresentTransactionsFormatsCorrectly() {
+    @Test("Present transactions formats data correctly")
+    func presentTransactionsFormatsCorrectly() {
         // Given
-        let transaction = Transaction(
+        let sut = TransactionListPresenter()
+        let mockViewController = MockTransactionListViewController()
+        sut.viewController = mockViewController
+        
+        let transaction = Transfer(
             id: "1",
             amount: -50.50,
             description: "Test Transaction",
@@ -44,14 +30,65 @@ class TransactionListPresenterTests: XCTestCase {
         sut.presentTransactions(response: response)
         
         // Then
-        XCTAssertTrue(mockViewController.displayTransactionsCalled)
-        XCTAssertEqual(mockViewController.receivedViewModel?.transactions.count, 1)
+        #expect(mockViewController.displayTransactionsCalled == true)
+        #expect(mockViewController.receivedViewModel?.transactions.count == 1)
         
         let displayedTransaction = mockViewController.receivedViewModel?.transactions.first
-        XCTAssertEqual(displayedTransaction?.id, "1")
-        XCTAssertEqual(displayedTransaction?.description, "Test Transaction")
-        XCTAssertFalse(displayedTransaction?.isPositive ?? true)
-        XCTAssertTrue(displayedTransaction?.amount.contains("50") ?? false)
+        #expect(displayedTransaction?.id == "1")
+        #expect(displayedTransaction?.description == "Test Transaction")
+        #expect(displayedTransaction?.isPositive == false)
+        #expect(displayedTransaction?.amount.contains("50") == true)
+    }
+    
+    @MainActor
+    @Test("Present positive transaction shows correct sign")
+    func presentPositiveTransaction() {
+        // Given
+        let sut = TransactionListPresenter()
+        let mockViewController = MockTransactionListViewController()
+        sut.viewController = mockViewController
+        
+        let transaction = Transfer(
+            id: "2",
+            amount: 2500.00,
+            description: "Salary",
+            date: Date(),
+            category: "Income"
+        )
+        let response = TransactionList.FetchTransactions.Response(transactions: [transaction])
+        
+        // When
+        sut.presentTransactions(response: response)
+        
+        // Then
+        let displayedTransaction = mockViewController.receivedViewModel?.transactions.first
+        #expect(displayedTransaction?.isPositive == true)
+        #expect(displayedTransaction?.category == "Income")
+    }
+    
+    @MainActor
+    @Test("Present empty transactions list")
+    func presentEmptyTransactions() {
+        // Given
+        let sut = TransactionListPresenter()
+        let mockViewController = MockTransactionListViewController()
+        sut.viewController = mockViewController
+        
+        let response = TransactionList.FetchTransactions.Response(transactions: [])
+        
+        // When
+        sut.presentTransactions(response: response)
+        
+        // Then
+        #expect(mockViewController.displayTransactionsCalled == true)
+        #expect(mockViewController.receivedViewModel?.transactions.isEmpty == true)
+    }
+}
+
+// Helper extension for MockWorker
+extension MockTransactionWorker {
+    func setShouldFail(_ value: Bool) {
+        self.shouldFail = value
     }
 }
 
@@ -59,12 +96,5 @@ class TransactionListPresenterTests: XCTestCase {
 struct TransactionListView_Previews: PreviewProvider {
     static var previews: some View {
         TransactionListView()
-    }
-}
-
-// Helper extension for MockWorker
-extension MockTransactionWorker {
-    func setMockTransactions(_ transactions: [Transaction]) {
-        self.mockTransactions = transactions
     }
 }

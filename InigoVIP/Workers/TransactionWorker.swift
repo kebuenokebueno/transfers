@@ -8,11 +8,11 @@
 import Foundation
 
 protocol TransactionWorkerProtocol: Sendable {
-    func fetchTransactions() async throws -> [Transaction]
+    func fetchTransactions() async throws -> [Transfer]
 }
 
 actor TransactionWorker: TransactionWorkerProtocol {
-    func fetchTransactions() async throws -> [Transaction] {
+    func fetchTransactions() async throws -> [Transfer] {
         // Simulate API call
         try await Task.sleep(nanoseconds: 1_000_000_000)
         
@@ -20,21 +20,21 @@ actor TransactionWorker: TransactionWorkerProtocol {
         formatter.dateFormat = "yyyy-MM-dd"
         
         return [
-            Transaction(
+            Transfer(
                 id: "1",
                 amount: -45.50,
                 description: "Grocery Store",
                 date: formatter.date(from: "2026-01-25")!,
                 category: "Food"
             ),
-            Transaction(
+            Transfer(
                 id: "2",
                 amount: -120.00,
                 description: "Electric Bill",
                 date: formatter.date(from: "2026-01-24")!,
                 category: "Utilities"
             ),
-            Transaction(
+            Transfer(
                 id: "3",
                 amount: 2500.00,
                 description: "Salary",

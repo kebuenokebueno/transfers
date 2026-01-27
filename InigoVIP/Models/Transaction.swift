@@ -8,7 +8,7 @@
 import Foundation
 
 
-struct Transaction: Identifiable, Codable, Equatable {
+struct Transfer: Identifiable, Codable, Equatable {
     let id: String
     let amount: Double
     let description: String

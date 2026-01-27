@@ -38,4 +38,15 @@ final class InigoVIPUITests: XCTestCase {
             XCUIApplication().launch()
         }
     }
+    
+    func testTransactionsDisplay() {
+        let app = XCUIApplication()
+        app.launch()
+        
+        let list = app.otherElements["transactionsList"]
+        XCTAssertTrue(list.waitForExistence(timeout: 5))
+        
+        let firstTransaction = app.otherElements["transactionRow_1"]
+        XCTAssertTrue(firstTransaction.exists)
+    }
 }

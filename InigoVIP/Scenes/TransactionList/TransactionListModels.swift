@@ -11,7 +11,7 @@ enum TransactionList {
         struct Request {}
         
         struct Response {
-            let transactions: [Transaction]
+            let transactions: [Transfer]
         }
         
         struct ViewModel {

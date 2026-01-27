@@ -1,24 +1,23 @@
-//
-//  InigoVIPTests.swift
-//  InigoVIPTests
-//
-//  Created by Inigo on 27/1/26.
-//
-
+// MARK: - Unit Tests with Swift Testing
 import Testing
+import SwiftUI
 @testable import InigoVIP
-import XCTest
+
 
 // Mock Worker for testing
 actor MockTransactionWorker: TransactionWorkerProtocol {
     var shouldFail = false
-    var mockTransactions: [Transaction] = []
+    var mockTransactions: [Transfer] = []
     
-    func fetchTransactions() async throws -> [Transaction] {
+    func fetchTransactions() async throws -> [Transfer] {
         if shouldFail {
             throw NSError(domain: "test", code: -1)
         }
         return mockTransactions
+    }
+    
+    func setMockTransactions(_ transactions: [Transfer]) {
+        self.mockTransactions = transactions
     }
 }
 
@@ -47,32 +46,20 @@ class MockTransactionListViewController: TransactionListViewControllerProtocol {
 }
 
 // MARK: - Interactor Tests
-class TransactionListInteractorTests: XCTestCase {
-    var sut: TransactionListInteractor!
-    var mockWorker: MockTransactionWorker!
-    var mockPresenter: MockTransactionListPresenter!
+@Suite("TransactionList Interactor Tests")
+struct TransactionListInteractorTests {
     
     @MainActor
-    override func setUp() {
-        super.setUp()
-        mockWorker = MockTransactionWorker()
-        sut = TransactionListInteractor(worker: mockWorker)
-        mockPresenter = MockTransactionListPresenter()
-        sut.presenter = mockPresenter
-    }
-    
-    override func tearDown() {
-        sut = nil
-        mockWorker = nil
-        mockPresenter = nil
-        super.tearDown()
-    }
-    
-    @MainActor
-    func testFetchTransactionsSuccess() async {
+    @Test("Fetch transactions successfully")
+    func fetchTransactionsSuccess() async throws {
         // Given
+        let mockWorker = MockTransactionWorker()
+        let sut = TransactionListInteractor(worker: mockWorker)
+        let mockPresenter = MockTransactionListPresenter()
+        sut.presenter = mockPresenter
+        
         let expectedTransactions = [
-            Transaction(id: "1", amount: 100, description: "Test", date: Date(), category: "Test")
+            Transfer(id: "1", amount: 100, description: "Test", date: Date(), category: "Test")
         ]
         await mockWorker.setMockTransactions(expectedTransactions)
         
@@ -80,8 +67,26 @@ class TransactionListInteractorTests: XCTestCase {
         await sut.fetchTransactions()
         
         // Then
-        XCTAssertTrue(mockPresenter.presentTransactionsCalled)
-        XCTAssertEqual(mockPresenter.receivedResponse?.transactions.count, 1)
-        XCTAssertEqual(mockPresenter.receivedResponse?.transactions.first?.id, "1")
+        #expect(mockPresenter.presentTransactionsCalled == true)
+        #expect(mockPresenter.receivedResponse?.transactions.count == 1)
+        #expect(mockPresenter.receivedResponse?.transactions.first?.id == "1")
+    }
+    
+    @MainActor
+    @Test("Fetch transactions handles error gracefully")
+    func fetchTransactionsHandlesError() async throws {
+        // Given
+        let mockWorker = MockTransactionWorker()
+        await mockWorker.setShouldFail(true)
+        
+        let sut = TransactionListInteractor(worker: mockWorker)
+        let mockPresenter = MockTransactionListPresenter()
+        sut.presenter = mockPresenter
+        
+        // When
+        await sut.fetchTransactions()
+        
+        // Then
+        #expect(mockPresenter.presentTransactionsCalled == false)
     }
 }
