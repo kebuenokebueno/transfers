@@ -4,6 +4,20 @@ import SwiftUI
 @testable import InigoVIP
 
 
+// Mock Analytics Worker for testing
+actor MockAnalyticsWorker: AnalyticsWorkerProtocol {
+    var trackedEvents: [String] = []
+    
+    func trackEvent(_ event: String) async {
+        trackedEvents.append(event)
+    }
+    
+    func trackScreenView(_ screenName: String) async {
+        trackedEvents.append("screen_view: \(screenName)")
+    }
+}
+
+
 // Mock Worker for testing
 actor MockTransactionWorker: TransactionWorkerProtocol {
     var shouldFail = false
@@ -18,6 +32,10 @@ actor MockTransactionWorker: TransactionWorkerProtocol {
     
     func setMockTransactions(_ transactions: [Transfer]) {
         self.mockTransactions = transactions
+    }
+    
+    func setShouldFail(_ value: Bool) {
+        self.shouldFail = value
     }
 }
 
@@ -54,7 +72,11 @@ struct TransactionListInteractorTests {
     func fetchTransactionsSuccess() async throws {
         // Given
         let mockWorker = MockTransactionWorker()
-        let sut = TransactionListInteractor(worker: mockWorker)
+        let mockAnalyticsWorker = MockAnalyticsWorker()
+        let sut = TransactionListInteractor(
+            transactionWorker: mockWorker,
+            analyticsWorker: mockAnalyticsWorker
+        )
         let mockPresenter = MockTransactionListPresenter()
         sut.presenter = mockPresenter
         
@@ -79,7 +101,11 @@ struct TransactionListInteractorTests {
         let mockWorker = MockTransactionWorker()
         await mockWorker.setShouldFail(true)
         
-        let sut = TransactionListInteractor(worker: mockWorker)
+        let mockAnalyticsWorker = MockAnalyticsWorker()
+        let sut = TransactionListInteractor(
+            transactionWorker: mockWorker,
+            analyticsWorker: mockAnalyticsWorker
+        )
         let mockPresenter = MockTransactionListPresenter()
         sut.presenter = mockPresenter
         

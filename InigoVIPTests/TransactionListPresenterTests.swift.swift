@@ -6,6 +6,7 @@ import Testing
 @testable import InigoVIP
 
 
+// MARK: - Presenter Tests
 @Suite("TransactionList Presenter Tests")
 struct TransactionListPresenterTests {
     
@@ -82,13 +83,6 @@ struct TransactionListPresenterTests {
         // Then
         #expect(mockViewController.displayTransactionsCalled == true)
         #expect(mockViewController.receivedViewModel?.transactions.isEmpty == true)
-    }
-}
-
-// Helper extension for MockWorker
-extension MockTransactionWorker {
-    func setShouldFail(_ value: Bool) {
-        self.shouldFail = value
     }
 }
 
