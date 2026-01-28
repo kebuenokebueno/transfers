@@ -5,8 +5,8 @@
 //  Created by Inigo on 28/1/26.
 //
 
+import Foundation
 import SwiftUI
-
 
 struct UserHeaderView: View {
     @Environment(AuthService.self) private var authService
@@ -30,9 +30,16 @@ struct UserHeaderView: View {
                             .foregroundColor(.white)
                             .font(.headline)
                     )
+                    // ✅ VoiceOver: Profile image description
+                    .accessibilityLabel("Profile picture, \(user.name)")
             }
             .padding()
             .background(Color(.systemGray6))
+            // ✅ VoiceOver: Combine elements into one announcement
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Welcome back, \(user.name)")
+            // ✅ AssistiveAccess: Minimum touch target
+            .frame(minHeight: 44)
         }
     }
 }

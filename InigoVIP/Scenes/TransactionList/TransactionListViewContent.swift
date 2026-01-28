@@ -19,25 +19,28 @@ struct TransactionListViewContent: View {
     var body: some View {
 
         NavigationStack {
-            Group {
-                if viewController.isLoading {
-                    ProgressView("Loading transactions...")
+            VStack(spacing: 0) {
+                UserHeaderView()
+                Group {
+                    if viewController.isLoading {
+                        ProgressView("Loading transactions...")
                         // ✅ VoiceOver: Announce loading state
-                        .accessibilityLabel("Loading your transactions")
-                        .accessibilityAddTraits(.updatesFrequently)
-                } else if !viewController.displayedTransactions.isEmpty {
-                    TransactionListContent(
-                        transactions: viewController.displayedTransactions,
-                        analyticsService: analyticsService
-                    )
-                } else {
-                    ContentUnavailableView(
-                        "No Transactions",
-                        systemImage: "list.bullet.rectangle",
-                        description: Text("Pull to refresh")
-                    )
-                    // ✅ VoiceOver: Clear hint for action
-                    .accessibilityHint("Swipe down to refresh and load transactions")
+                            .accessibilityLabel("Loading your transactions")
+                            .accessibilityAddTraits(.updatesFrequently)
+                    } else if !viewController.displayedTransactions.isEmpty {
+                        TransactionListContent(
+                            transactions: viewController.displayedTransactions,
+                            analyticsService: analyticsService
+                        )
+                    } else {
+                        ContentUnavailableView(
+                            "No Transactions",
+                            systemImage: "list.bullet.rectangle",
+                            description: Text("Pull to refresh")
+                        )
+                        // ✅ VoiceOver: Clear hint for action
+                        .accessibilityHint("Swipe down to refresh and load transactions")
+                    }
                 }
             }
             .navigationTitle("Transactions")
