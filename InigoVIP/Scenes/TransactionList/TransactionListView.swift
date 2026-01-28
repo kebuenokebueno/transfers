@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TransactionListView: View {
-    @StateObject private var viewController = TransactionListViewController()
+    @State private var viewController = TransactionListViewController()
     
     var body: some View {
         NavigationView {

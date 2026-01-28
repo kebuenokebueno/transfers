@@ -16,7 +16,8 @@ protocol TransactionListViewControllerProtocol: AnyObject {
 
 // MARK: - View Controller (ViewModel for SwiftUI)
 @MainActor
-class TransactionListViewController: ObservableObject, TransactionListViewControllerProtocol {
+@Observable
+class TransactionListViewController: TransactionListViewControllerProtocol {
     @Published var displayedTransactions: [TransactionList.FetchTransactions.ViewModel.DisplayedTransaction] = []
     @Published var isLoading = false
     
