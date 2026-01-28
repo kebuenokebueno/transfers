@@ -15,11 +15,16 @@ protocol TransactionListViewControllerProtocol: AnyObject {
 
 
 // MARK: - View (acts as ViewController)
+
+// MARK: - View (acts as ViewController)
 @MainActor
 @Observable
 class TransactionListViewController: TransactionListViewControllerProtocol {
     var displayedTransactions: [TransactionList.FetchTransactions.ViewModel.DisplayedTransaction] = []
     var isLoading = false
+    
+    // ✅ Add a simple counter to force UI updates
+    private(set) var updateTrigger: Int = 0
     
     var interactor: TransactionListInteractorProtocol?
     
@@ -57,15 +62,26 @@ class TransactionListViewController: TransactionListViewControllerProtocol {
     }
     
     func loadTransactions() {
+        print("🔵 ViewController: loadTransactions() called")
         isLoading = true
+        print("🔵 ViewController: isLoading set to true")
         Task {
+            print("🔵 ViewController: About to call interactor.fetchTransactions()")
             await interactor?.fetchTransactions()
+            print("🔵 ViewController: interactor.fetchTransactions() completed")
             // Note: isLoading will be set to false in displayTransactions()
         }
     }
     
     func displayTransactions(viewModel: TransactionList.FetchTransactions.ViewModel) {
+        print("🟢 ViewController: displayTransactions called with \(viewModel.transactions.count) transactions")
         displayedTransactions = viewModel.transactions
+        print("🟢 ViewController: displayedTransactions now has \(displayedTransactions.count) items")
         isLoading = false
+        print("🟢 ViewController: isLoading set to false")
+        
+        // ✅ Force SwiftUI to detect the change
+        updateTrigger += 1
+        print("🟢 ViewController: updateTrigger incremented to \(updateTrigger)")
     }
 }

@@ -49,6 +49,7 @@
 			membershipExceptions = (
 				Scenes/TransactionList/TransactionEditView.swift,
 				Scenes/TransactionList/TransactionListContent.swift,
+				Scenes/TransactionList/TransactionListViewContent.swift,
 			);
 			target = 6AABCC372F2938C8009E5D12 /* InigoVIPTests */;
 		};
@@ -57,6 +58,7 @@
 			membershipExceptions = (
 				Scenes/TransactionList/TransactionEditView.swift,
 				Scenes/TransactionList/TransactionListContent.swift,
+				Scenes/TransactionList/TransactionListViewContent.swift,
 			);
 			target = 6AABCC412F2938C8009E5D12 /* InigoVIPUITests */;
 		};
