@@ -15,8 +15,6 @@ struct TransactionListViewContent: View {
     
     // ✅ VoiceOver: Dynamic Type support
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    // ✅ Assistive Access: Reduced motion
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     
     var body: some View {
 
