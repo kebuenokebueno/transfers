@@ -11,10 +11,7 @@ struct TransactionListView: View {
     @Environment(AuthService.self) private var authService
     @Environment(AnalyticsService.self) private var analyticsService
     @State private var viewController: TransactionListViewController?
-    
-    // ✅ VoiceOver: Dynamic Type support
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    
+
     var body: some View {
         Group {
             if let viewController = viewController {
