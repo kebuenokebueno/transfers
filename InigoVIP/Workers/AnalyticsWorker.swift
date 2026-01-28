@@ -21,10 +21,10 @@ actor AnalyticsWorker: AnalyticsWorkerProtocol {
     }
     
     func trackEvent(_ event: String) async {
-        analyticsService.track(event: event)
+        await analyticsService.track(event: event)
     }
     
     func trackScreenView(_ screenName: String) async {
-        analyticsService.trackScreenView(screenName)
+        await analyticsService.trackScreenView(screenName)
     }
 }

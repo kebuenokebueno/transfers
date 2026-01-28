@@ -74,7 +74,8 @@ struct EditTransactionView: View {
             }
             // ✅ Assistive Access: Set focus when view appears
             .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 500_000_000)
                     isAmountFieldFocused = true
                 }
             }
