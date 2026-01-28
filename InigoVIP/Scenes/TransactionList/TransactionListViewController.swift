@@ -22,10 +22,7 @@ protocol TransactionListViewControllerProtocol: AnyObject {
 class TransactionListViewController: TransactionListViewControllerProtocol {
     var displayedTransactions: [TransactionList.FetchTransactions.ViewModel.DisplayedTransaction] = []
     var isLoading = false
-    
-    // ✅ Add a simple counter to force UI updates
-    private(set) var updateTrigger: Int = 0
-    
+      
     var interactor: TransactionListInteractorProtocol?
     
     // ✅ ViewController doesn't use Services directly
@@ -79,9 +76,5 @@ class TransactionListViewController: TransactionListViewControllerProtocol {
         print("🟢 ViewController: displayedTransactions now has \(displayedTransactions.count) items")
         isLoading = false
         print("🟢 ViewController: isLoading set to false")
-        
-        // ✅ Force SwiftUI to detect the change
-        updateTrigger += 1
-        print("🟢 ViewController: updateTrigger incremented to \(updateTrigger)")
     }
 }

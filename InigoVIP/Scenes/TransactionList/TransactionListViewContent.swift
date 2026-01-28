@@ -19,8 +19,7 @@ struct TransactionListViewContent: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     
     var body: some View {
-        let _ = print("🔷 ViewContent: body called - isLoading: \(viewController.isLoading), transactions count: \(viewController.displayedTransactions.count), updateTrigger: \(viewController.updateTrigger)")
-        
+
         NavigationStack {
             Group {
                 if viewController.isLoading {
