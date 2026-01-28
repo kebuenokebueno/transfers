@@ -32,7 +32,6 @@ struct TransactionListView: View {
         .task {
             // Initialize with the actual analyticsService from Environment
             if viewController == nil {
-                print("🔷 View: Initializing ViewController")
                 let vc = TransactionListViewController(analyticsService: analyticsService)
                 viewController = vc
                 vc.loadTransactions()

@@ -59,22 +59,14 @@ class TransactionListViewController: TransactionListViewControllerProtocol {
     }
     
     func loadTransactions() {
-        print("🔵 ViewController: loadTransactions() called")
         isLoading = true
-        print("🔵 ViewController: isLoading set to true")
         Task {
-            print("🔵 ViewController: About to call interactor.fetchTransactions()")
             await interactor?.fetchTransactions()
-            print("🔵 ViewController: interactor.fetchTransactions() completed")
-            // Note: isLoading will be set to false in displayTransactions()
         }
     }
     
     func displayTransactions(viewModel: TransactionList.FetchTransactions.ViewModel) {
-        print("🟢 ViewController: displayTransactions called with \(viewModel.transactions.count) transactions")
         displayedTransactions = viewModel.transactions
-        print("🟢 ViewController: displayedTransactions now has \(displayedTransactions.count) items")
         isLoading = false
-        print("🟢 ViewController: isLoading set to false")
     }
 }

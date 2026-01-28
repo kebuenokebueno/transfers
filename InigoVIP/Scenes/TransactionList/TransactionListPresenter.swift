@@ -19,7 +19,6 @@ class TransactionListPresenter: TransactionListPresenterProtocol {
     weak var viewController: TransactionListViewControllerProtocol?
     
     func presentTransactions(response: TransactionList.FetchTransactions.Response) {
-        print("🟠 Presenter: presentTransactions() called with \(response.transactions.count) transactions")
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
         
@@ -37,16 +36,11 @@ class TransactionListPresenter: TransactionListPresenterProtocol {
                 isPositive: transaction.amount >= 0
             )
         }
-        
-        print("🟠 Presenter: Formatted \(displayedTransactions.count) displayed transactions")
-        
+                
         let viewModel = TransactionList.FetchTransactions.ViewModel(
             transactions: displayedTransactions
         )
         
-        print("🟠 Presenter: About to call viewController.displayTransactions()")
-        print("🟠 Presenter: viewController is \(viewController == nil ? "nil" : "not nil")")
         viewController?.displayTransactions(viewModel: viewModel)
-        print("🟠 Presenter: viewController.displayTransactions() completed")
     }
 }
