@@ -1,14 +1,14 @@
 //
-//  EditTransactionView.swift
+//  TransactionEditView.swift
 //  InigoVIP
 //
 //  Created by Inigo on 28/1/26.
 //
 
+import Foundation
 import SwiftUI
 
-
-struct EditTransactionView: View {
+struct TransactionEditView: View {
     @Environment(\.dismiss) private var dismiss
     let description: String
     let amount: String

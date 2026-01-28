@@ -17,7 +17,17 @@ struct CategoryPicker: View {
         Picker("Category", selection: $selectedCategory) {
             ForEach(categories, id: \.self) { category in
                 Text(category).tag(category)
+                    // ✅ VoiceOver: Each option is clearly labeled
+                    .accessibilityLabel("\(category) category")
             }
         }
+        // ✅ VoiceOver: Describe picker purpose
+        .accessibilityLabel("Transaction category")
+        .accessibilityValue(selectedCategory)
+        .accessibilityHint("Select a category for this transaction")
+        // ✅ VoiceControl: Named picker
+        .accessibilityIdentifier("categoryPicker")
+        // ✅ Assistive Access: Wheel picker is easier than menu
+        .pickerStyle(.wheel)
     }
 }

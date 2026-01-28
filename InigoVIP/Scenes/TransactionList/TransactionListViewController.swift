@@ -8,13 +8,13 @@
 import Foundation
 internal import Combine
 
-
 @MainActor
 protocol TransactionListViewControllerProtocol: AnyObject {
     func displayTransactions(viewModel: TransactionList.FetchTransactions.ViewModel)
 }
 
 
+// MARK: - View (acts as ViewController)
 @MainActor
 @Observable
 class TransactionListViewController: TransactionListViewControllerProtocol {
@@ -60,11 +60,12 @@ class TransactionListViewController: TransactionListViewControllerProtocol {
         isLoading = true
         Task {
             await interactor?.fetchTransactions()
-            isLoading = false
+            // Note: isLoading will be set to false in displayTransactions()
         }
     }
     
     func displayTransactions(viewModel: TransactionList.FetchTransactions.ViewModel) {
         displayedTransactions = viewModel.transactions
+        isLoading = false
     }
 }

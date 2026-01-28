@@ -44,11 +44,31 @@
 			);
 			target = 6AABCC412F2938C8009E5D12 /* InigoVIPUITests */;
 		};
+		6AABCCA62F2A25CC009E5D12 /* Exceptions for "InigoVIP" folder in "InigoVIPTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Scenes/TransactionList/TransactionEditView.swift,
+				Scenes/TransactionList/TransactionListContent.swift,
+			);
+			target = 6AABCC372F2938C8009E5D12 /* InigoVIPTests */;
+		};
+		6AABCCA72F2A25CC009E5D12 /* Exceptions for "InigoVIP" folder in "InigoVIPUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Scenes/TransactionList/TransactionEditView.swift,
+				Scenes/TransactionList/TransactionListContent.swift,
+			);
+			target = 6AABCC412F2938C8009E5D12 /* InigoVIPUITests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6AABCC2D2F2938C6009E5D12 /* InigoVIP */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6AABCCA62F2A25CC009E5D12 /* Exceptions for "InigoVIP" folder in "InigoVIPTests" target */,
+				6AABCCA72F2A25CC009E5D12 /* Exceptions for "InigoVIP" folder in "InigoVIPUITests" target */,
+			);
 			path = InigoVIP;
 			sourceTree = "<group>";
 		};
