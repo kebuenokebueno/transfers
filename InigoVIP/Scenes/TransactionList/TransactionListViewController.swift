@@ -8,12 +8,13 @@
 import Foundation
 internal import Combine
 
+
 @MainActor
 protocol TransactionListViewControllerProtocol: AnyObject {
     func displayTransactions(viewModel: TransactionList.FetchTransactions.ViewModel)
 }
 
-// MARK: - View Controller (ViewModel for SwiftUI)
+
 @MainActor
 @Observable
 class TransactionListViewController: TransactionListViewControllerProtocol {
@@ -22,12 +23,32 @@ class TransactionListViewController: TransactionListViewControllerProtocol {
     
     var interactor: TransactionListInteractorProtocol?
     
-    init(analyticsService: AnalyticsService? = nil) {
+    // ✅ ViewController doesn't use Services directly
+    // Services are injected into Workers
+    init(analyticsService: AnalyticsService) {
         setupVIP(analyticsService: analyticsService)
     }
     
-    private func setupVIP(analyticsService: AnalyticsService?) {
-        let interactor = TransactionListInteractor(analyticsService: analyticsService)
+    private func setupVIP(analyticsService: AnalyticsService) {
+        // ✅ Create Workers with Services
+        let networkService = NetworkService()
+        let cacheService = CacheService()
+        
+        let transactionWorker = TransactionWorker(
+            networkService: networkService,
+            cacheService: cacheService
+        )
+        
+        let analyticsWorker = AnalyticsWorker(
+            analyticsService: analyticsService
+        )
+        
+        // ✅ Create Interactor with Workers (not Services)
+        let interactor = TransactionListInteractor(
+            transactionWorker: transactionWorker,
+            analyticsWorker: analyticsWorker
+        )
+        
         let presenter = TransactionListPresenter()
         
         self.interactor = interactor

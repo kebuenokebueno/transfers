@@ -8,10 +8,8 @@
 import SwiftUI
 
 
-
 struct EditTransactionView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(AnalyticsService.self) private var analyticsService
     
     let description: String
     let amount: String
@@ -33,7 +31,9 @@ struct EditTransactionView: View {
             Form {
                 Section("Transaction Details") {
                     LabeledContent("Description", value: description)
+                    
                     AmountEditor(amount: $editedAmount)
+                    
                     CategoryPicker(selectedCategory: $editedCategory)
                 }
             }
@@ -42,14 +42,15 @@ struct EditTransactionView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
-                        analyticsService.trackButtonTap("edit_cancel")
+                        // ✅ In real VIP, this would trigger ViewController action
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        analyticsService.trackButtonTap("edit_save")
-                        // In real app, would update through VIP
+                        // ✅ In real VIP, this would go through:
+                        // View -> ViewController -> Interactor -> Worker
+                        // Worker would use AnalyticsService internally
                         dismiss()
                     }
                 }

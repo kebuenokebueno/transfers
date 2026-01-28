@@ -7,40 +7,35 @@
 
 import Foundation
 
+
 protocol TransactionWorkerProtocol: Sendable {
     func fetchTransactions() async throws -> [Transfer]
 }
 
+
 actor TransactionWorker: TransactionWorkerProtocol {
+    // ✅ Worker consume Services
+    let networkService: NetworkService
+    let cacheService: CacheService
+    
+    init(networkService: NetworkService = NetworkService(),
+         cacheService: CacheService = CacheService()) {
+        self.networkService = networkService
+        self.cacheService = cacheService
+    }
+    
     func fetchTransactions() async throws -> [Transfer] {
-        // Simulate API call
-        try await Task.sleep(nanoseconds: 1_000_000_000)
+        // Check cache first
+        if let cached: [Transfer] = await cacheService.get(key: "transactions") {
+            return cached
+        }
         
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
+        // Simulate API call using NetworkService
+        let transactions = try await networkService.fetchTransactions()
         
-        return [
-            Transfer(
-                id: "1",
-                amount: -45.50,
-                description: "Grocery Store",
-                date: formatter.date(from: "2026-01-25")!,
-                category: "Food"
-            ),
-            Transfer(
-                id: "2",
-                amount: -120.00,
-                description: "Electric Bill",
-                date: formatter.date(from: "2026-01-24")!,
-                category: "Utilities"
-            ),
-            Transfer(
-                id: "3",
-                amount: 2500.00,
-                description: "Salary",
-                date: formatter.date(from: "2026-01-20")!,
-                category: "Income"
-            )
-        ]
+        // Save to cache
+        await cacheService.set(key: "transactions", value: transactions)
+        
+        return transactions
     }
 }
