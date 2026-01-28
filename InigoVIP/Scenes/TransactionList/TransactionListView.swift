@@ -8,58 +8,58 @@
 import SwiftUI
 
 struct TransactionListView: View {
-    @State private var viewController = TransactionListViewController()
+    @State private var viewController: TransactionListViewController
+    @Environment(AuthService.self) private var authService
+    @Environment(AnalyticsService.self) private var analyticsService
+    
+    init() {
+        // We'll inject analytics in onAppear since we can't access @Environment in init
+        _viewController = State(initialValue: TransactionListViewController())
+    }
     
     var body: some View {
         NavigationView {
-            ZStack {
-                if viewController.isLoading {
-                    ProgressView()
-                        .accessibilityIdentifier("loadingIndicator")
-                } else {
-                    List(viewController.displayedTransactions) { transaction in
-                        TransactionRow(transaction: transaction)
-                            .accessibilityIdentifier("transactionRow_\(transaction.id)")
+            VStack {
+                // User info header using @Environment
+                UserHeaderView()
+                
+                ZStack {
+                    if viewController.isLoading {
+                        ProgressView()
+                            .accessibilityIdentifier("loadingIndicator")
+                    } else {
+                        List(viewController.displayedTransactions) { transaction in
+                            TransactionRow(transaction: transaction)
+                                .accessibilityIdentifier("transactionRow_\(transaction.id)")
+                                .onTapGesture {
+                                    analyticsService.trackButtonTap("transaction_\(transaction.id)")
+                                }
+                        }
+                        .accessibilityIdentifier("transactionsList")
                     }
-                    .accessibilityIdentifier("transactionsList")
                 }
             }
             .navigationTitle("Transactions")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        analyticsService.trackButtonTap("logout")
+                        authService.logout()
+                    }) {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                    }
+                }
+            }
             .onAppear {
+                analyticsService.trackScreenView("TransactionList")
+                // Inject analytics service into the interactor
+                if let interactor = viewController.interactor as? TransactionListInteractor {
+                    viewController = TransactionListViewController(analyticsService: analyticsService)
+                }
                 viewController.loadTransactions()
             }
         }
     }
 }
 
-struct TransactionRow: View {
-    let transaction: TransactionList.FetchTransactions.ViewModel.DisplayedTransaction
-    
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(transaction.description)
-                    .font(.headline)
-                    .accessibilityIdentifier("transactionDescription")
-                
-                Text(transaction.date)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .accessibilityIdentifier("transactionDate")
-                
-                Text(transaction.category)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .accessibilityIdentifier("transactionCategory")
-            }
-            
-            Spacer()
-            
-            Text("\(transaction.isPositive ? "+" : "-")\(transaction.amount)")
-                .foregroundColor(transaction.isPositive ? .green : .red)
-                .font(.headline)
-                .accessibilityIdentifier("transactionAmount")
-        }
-        .padding(.vertical, 4)
-    }
-}
+

@@ -8,7 +8,6 @@
 import Foundation
 internal import Combine
 
-// MARK: - View Controller Protocol
 @MainActor
 protocol TransactionListViewControllerProtocol: AnyObject {
     func displayTransactions(viewModel: TransactionList.FetchTransactions.ViewModel)
@@ -18,17 +17,17 @@ protocol TransactionListViewControllerProtocol: AnyObject {
 @MainActor
 @Observable
 class TransactionListViewController: TransactionListViewControllerProtocol {
-    @Published var displayedTransactions: [TransactionList.FetchTransactions.ViewModel.DisplayedTransaction] = []
-    @Published var isLoading = false
+    var displayedTransactions: [TransactionList.FetchTransactions.ViewModel.DisplayedTransaction] = []
+    var isLoading = false
     
     var interactor: TransactionListInteractorProtocol?
     
-    init() {
-        setupVIP()
+    init(analyticsService: AnalyticsService? = nil) {
+        setupVIP(analyticsService: analyticsService)
     }
     
-    private func setupVIP() {
-        let interactor = TransactionListInteractor()
+    private func setupVIP(analyticsService: AnalyticsService?) {
+        let interactor = TransactionListInteractor(analyticsService: analyticsService)
         let presenter = TransactionListPresenter()
         
         self.interactor = interactor

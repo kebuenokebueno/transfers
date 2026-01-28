@@ -10,8 +10,9 @@ import Foundation
 
 struct Transfer: Identifiable, Codable, Equatable {
     let id: String
-    let amount: Double
-    let description: String
+    var amount: Double
+    var description: String
     let date: Date
-    let category: String
+    var category: String
+    var isEditing: Bool = false
 }

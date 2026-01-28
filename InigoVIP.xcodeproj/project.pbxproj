@@ -29,6 +29,23 @@
 		6AABCC422F2938C8009E5D12 /* InigoVIPUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InigoVIPUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6AABCC8D2F29F027009E5D12 /* Exceptions for "InigoVIPTests" folder in "InigoVIPTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				InigoVIPUITests.swift,
+			);
+			target = 6AABCC372F2938C8009E5D12 /* InigoVIPTests */;
+		};
+		6AABCC8E2F29F027009E5D12 /* Exceptions for "InigoVIPTests" folder in "InigoVIPUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				InigoVIPUITests.swift,
+			);
+			target = 6AABCC412F2938C8009E5D12 /* InigoVIPUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6AABCC2D2F2938C6009E5D12 /* InigoVIP */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -37,12 +54,11 @@
 		};
 		6AABCC3B2F2938C8009E5D12 /* InigoVIPTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6AABCC8D2F29F027009E5D12 /* Exceptions for "InigoVIPTests" folder in "InigoVIPTests" target */,
+				6AABCC8E2F29F027009E5D12 /* Exceptions for "InigoVIPTests" folder in "InigoVIPUITests" target */,
+			);
 			path = InigoVIPTests;
-			sourceTree = "<group>";
-		};
-		6AABCC452F2938C8009E5D12 /* InigoVIPUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = InigoVIPUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -77,7 +93,6 @@
 			children = (
 				6AABCC2D2F2938C6009E5D12 /* InigoVIP */,
 				6AABCC3B2F2938C8009E5D12 /* InigoVIPTests */,
-				6AABCC452F2938C8009E5D12 /* InigoVIPUITests */,
 				6AABCC2C2F2938C6009E5D12 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -152,9 +167,6 @@
 			);
 			dependencies = (
 				6AABCC442F2938C8009E5D12 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				6AABCC452F2938C8009E5D12 /* InigoVIPUITests */,
 			);
 			name = InigoVIPUITests;
 			packageProductDependencies = (
