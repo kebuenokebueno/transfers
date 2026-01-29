@@ -7,7 +7,11 @@
 import Foundation
 
 
-actor NetworkService {
+public protocol NetworkServiceProtocol {
+    func fetchTransactions() async throws -> [Transfer]
+}
+
+actor NetworkService: NetworkServiceProtocol{
     func fetchTransactions() async throws -> [Transfer] {
         // Llamada real a JSONPlaceholder Photos API
         let url = URL(string: "https://jsonplaceholder.typicode.com/photos?_limit=20")!

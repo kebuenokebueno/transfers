@@ -8,8 +8,8 @@
 import Foundation
 
 
-struct Transfer: Identifiable, Codable, Equatable {
-    let id: String
+public struct Transfer: Identifiable, Codable, Equatable {
+    public let id: String
     var amount: Double
     var description: String
     let date: Date
