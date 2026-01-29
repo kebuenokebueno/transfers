@@ -15,6 +15,7 @@ extension Tag {
     @Tag static var presenter: Self
     @Tag static var integration: Self
     @Tag static var performance: Self
+    @Tag static var network: Self
 }
 
 
@@ -55,6 +56,49 @@ actor MockNetworkService: NetworkServiceProtocol {
         mockResponse = Self.successResponse()
         shouldFail = false
     }
+    
+    static func emptyResponse() -> [Transfer] {
+        []
+    }
+    
+    static func largeResponse(count: Int = 1000) -> [Transfer] {
+        (1...count).map { index in
+            Transfer(
+                id: "\(index)",
+                amount: Double.random(in: -200...2000),
+                description: "Transaction \(index)",
+                date: Date(),
+                category: ["Food", "Utilities", "Income", "Transport"][index % 4],
+                thumbnailUrl: "https://example.com/image\(index).jpg"
+            )
+        }
+    }
+    
+    func setDelay(milliseconds: UInt64) async {
+        delayMilliseconds = milliseconds
+    }
+    
+    func setEmptyResponse() async {
+        mockResponse = Self.emptyResponse()
+        shouldFail = false
+    }
+    
+    func setLargeResponse(count: Int = 1000) async {
+        mockResponse = Self.largeResponse(count: count)
+        shouldFail = false
+    }
+    
+    func setFailure() async {
+        shouldFail = true
+    }
+    
+    func reset() async {
+        mockResponse = []
+        shouldFail = false
+        delayMilliseconds = 0
+        callCount = 0
+    }
+
 }
 
 // MARK: - Mock Objects
@@ -180,9 +224,10 @@ struct TestDataBuilder {
 
 // MARK: - Custom Error Types
 
-enum NetworkError: Error {
+enum NetworkError: Error, Equatable {
     case connectionFailed
     case timeout
-    case unauthorized
-    case serverError
+    case invalidResponse
+    case serverError(statusCode: Int)
+    case decodingError
 }

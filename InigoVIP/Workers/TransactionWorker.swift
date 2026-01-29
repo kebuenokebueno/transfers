@@ -14,11 +14,10 @@ protocol TransactionWorkerProtocol: Sendable {
 
 
 actor TransactionWorker: TransactionWorkerProtocol {
-    // ✅ Worker consume Services
-    let networkService: NetworkService
+    let networkService: NetworkServiceProtocol  // ← Use protocol instead of concrete type
     let cacheService: CacheService
     
-    init(networkService: NetworkService = NetworkService(),
+    init(networkService: NetworkServiceProtocol = NetworkService(),  // ← Default to real
          cacheService: CacheService = CacheService()) {
         self.networkService = networkService
         self.cacheService = cacheService
@@ -27,13 +26,14 @@ actor TransactionWorker: TransactionWorkerProtocol {
     func fetchTransactions() async throws -> [Transfer] {
         // Check cache first
         if let cached: [Transfer] = await cacheService.get(key: "transactions") {
+            print("📦 TransactionWorker: Cache hit")
             return cached
         }
         
-        // Simulate API call using NetworkService
-        let transactions = try await networkService.fetchTransactions()
+        print("🌐 TransactionWorker: Fetching from network")
+        let transactions = try await networkService.fetchTransactions()  // ← Uses protocol
         
-        // Save to cache
+        // Cache results
         await cacheService.set(key: "transactions", value: transactions)
         
         return transactions
