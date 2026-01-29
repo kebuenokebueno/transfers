@@ -4,18 +4,6 @@ import SwiftUI
 @testable import InigoVIP
 
 
-// Mock Analytics Worker for testing
-actor MockAnalyticsWorker: AnalyticsWorkerProtocol {
-    var trackedEvents: [String] = []
-    
-    func trackEvent(_ event: String) async {
-        trackedEvents.append(event)
-    }
-    
-    func trackScreenView(_ screenName: String) async {
-        trackedEvents.append("screen_view: \(screenName)")
-    }
-}
 
 
 // Mock Worker for testing
@@ -30,12 +18,25 @@ actor MockTransactionWorker: TransactionWorkerProtocol {
         return mockTransactions
     }
     
-    func setMockTransactions(_ transactions: [Transfer]) {
+    func setMockTransactions(_ transactions: [Transfer]) async {
         self.mockTransactions = transactions
     }
-    
-    func setShouldFail(_ value: Bool) {
+
+    func setShouldFail(_ value: Bool) async {
         self.shouldFail = value
+    }
+}
+
+// Mock Analytics Worker for testing
+actor MockAnalyticsWorker: AnalyticsWorkerProtocol {
+    var trackedEvents: [String] = []
+    
+    func trackEvent(_ event: String) async {
+        trackedEvents.append(event)
+    }
+    
+    func trackScreenView(_ screenName: String) async {
+        trackedEvents.append("screen_view: \(screenName)")
     }
 }
 
@@ -52,16 +53,6 @@ class MockTransactionListPresenter: TransactionListPresenterProtocol {
 }
 
 // Mock ViewController for testing Presenter
-@MainActor
-class MockTransactionListViewController: TransactionListViewControllerProtocol {
-    var displayTransactionsCalled = false
-    var receivedViewModel: TransactionList.FetchTransactions.ViewModel?
-    
-    func displayTransactions(viewModel: TransactionList.FetchTransactions.ViewModel) {
-        displayTransactionsCalled = true
-        receivedViewModel = viewModel
-    }
-}
 
 // MARK: - Interactor Tests
 @Suite("TransactionList Interactor Tests")
@@ -81,7 +72,7 @@ struct TransactionListInteractorTests {
         sut.presenter = mockPresenter
         
         let expectedTransactions = [
-            Transfer(id: "1", amount: 100, description: "Test", date: Date(), category: "Test")
+            Transfer(id: "1", amount: 100, description: "Test", date: Date(), category: "Test", thumbnailUrl: nil)
         ]
         await mockWorker.setMockTransactions(expectedTransactions)
         

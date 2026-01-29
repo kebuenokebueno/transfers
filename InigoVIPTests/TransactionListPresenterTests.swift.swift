@@ -5,6 +5,17 @@ import SwiftUI
 import Testing
 @testable import InigoVIP
 
+@MainActor
+class MockTransactionListViewController: TransactionListViewControllerProtocol {
+    var displayTransactionsCalled = false
+    var receivedViewModel: TransactionList.FetchTransactions.ViewModel?
+
+    func displayTransactions(viewModel: TransactionList.FetchTransactions.ViewModel) {
+        displayTransactionsCalled = true
+        receivedViewModel = viewModel
+    }
+}
+
 
 // MARK: - Presenter Tests
 @Suite("TransactionList Presenter Tests")
@@ -23,7 +34,8 @@ struct TransactionListPresenterTests {
             amount: -50.50,
             description: "Test Transaction",
             date: Date(),
-            category: "Food"
+            category: "Food",
+            thumbnailUrl: nil
         )
         let response = TransactionList.FetchTransactions.Response(transactions: [transaction])
         
@@ -54,7 +66,8 @@ struct TransactionListPresenterTests {
             amount: 2500.00,
             description: "Salary",
             date: Date(),
-            category: "Income"
+            category: "Income",
+            thumbnailUrl: nil
         )
         let response = TransactionList.FetchTransactions.Response(transactions: [transaction])
         

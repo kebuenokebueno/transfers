@@ -47,20 +47,56 @@
 		6AABCCA62F2A25CC009E5D12 /* Exceptions for "InigoVIP" folder in "InigoVIPTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Components/AmountEditor.swift,
+				Components/CategoryIcon.swift,
+				Components/CategoryPicker.swift,
+				Components/TransactionRow.swift,
 				Models/PhotoAPI.swift,
+				Models/Transaction.swift,
+				Models/User.swift,
+				Scenes/TransactionList/EditTransactionView.swift,
 				Scenes/TransactionList/TransactionEditView.swift,
 				Scenes/TransactionList/TransactionListContent.swift,
+				Scenes/TransactionList/TransactionListInteractor.swift,
+				Scenes/TransactionList/TransactionListModels.swift,
+				Scenes/TransactionList/TransactionListPresenter.swift,
 				Scenes/TransactionList/TransactionListViewContent.swift,
+				Scenes/TransactionList/TransactionListViewController.swift,
 				Scenes/TransactionList/UserHeaderView.swift,
+				Services/AnalyticsService.swift,
+				Services/AuthService.swift,
+				Services/CacheService.swift,
+				Services/NetworkService.swift,
+				Workers/AnalyticsWorker.swift,
+				Workers/TransactionWorker.swift,
 			);
 			target = 6AABCC372F2938C8009E5D12 /* InigoVIPTests */;
 		};
 		6AABCCA72F2A25CC009E5D12 /* Exceptions for "InigoVIP" folder in "InigoVIPUITests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Components/AmountEditor.swift,
+				Components/CategoryIcon.swift,
+				Components/CategoryPicker.swift,
+				Components/TransactionRow.swift,
+				Models/PhotoAPI.swift,
+				Models/Transaction.swift,
+				Models/User.swift,
+				Scenes/TransactionList/EditTransactionView.swift,
 				Scenes/TransactionList/TransactionEditView.swift,
 				Scenes/TransactionList/TransactionListContent.swift,
+				Scenes/TransactionList/TransactionListInteractor.swift,
+				Scenes/TransactionList/TransactionListModels.swift,
+				Scenes/TransactionList/TransactionListPresenter.swift,
 				Scenes/TransactionList/TransactionListViewContent.swift,
+				Scenes/TransactionList/TransactionListViewController.swift,
+				Scenes/TransactionList/UserHeaderView.swift,
+				Services/AnalyticsService.swift,
+				Services/AuthService.swift,
+				Services/CacheService.swift,
+				Services/NetworkService.swift,
+				Workers/AnalyticsWorker.swift,
+				Workers/TransactionWorker.swift,
 			);
 			target = 6AABCC412F2938C8009E5D12 /* InigoVIPUITests */;
 		};
