@@ -9,34 +9,39 @@ import Foundation
 
 actor NetworkService {
     func fetchTransactions() async throws -> [Transfer] {
-        // Simulate network delay
-        try await Task.sleep(nanoseconds: 1_000_000_000)
+        // Llamada real a JSONPlaceholder Photos API
+        let url = URL(string: "https://jsonplaceholder.typicode.com/photos?_limit=20")!
+        let (data, _) = try await URLSession.shared.data(from: url)
         
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
+        let photos = try JSONDecoder().decode([PhotoAPI].self, from: data)
         
-        return [
-            Transfer(
-                id: "1",
-                amount: -45.50,
-                description: "Grocery Store",
-                date: formatter.date(from: "2026-01-25")!,
-                category: "Food"
-            ),
-            Transfer(
-                id: "2",
-                amount: -120.00,
-                description: "Electric Bill",
-                date: formatter.date(from: "2026-01-24")!,
-                category: "Utilities"
-            ),
-            Transfer(
-                id: "3",
-                amount: 2500.00,
-                description: "Salary",
-                date: formatter.date(from: "2026-01-20")!,
-                category: "Income"
+        // Mapear fotos a transacciones
+        return photos.map { photo in
+            let isIncome = photo.id % 3 == 0  // Cada 3ra es income
+            let amount = isIncome
+                ? Double.random(in: 500...3000)
+                : -Double.random(in: 10...200)
+            
+            let category = mapCategory(for: photo.id)
+            
+            return Transfer(
+                id: "\(photo.id)",
+                amount: amount,
+                description: photo.title.capitalized,
+                date: randomDate(),
+                category: category,
+                thumbnailUrl: photo.thumbnailUrl
             )
-        ]
+        }
+    }
+    
+    private func mapCategory(for id: Int) -> String {
+        let categories = ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"]
+        return categories[id % categories.count]
+    }
+    
+    private func randomDate() -> Date {
+        let daysAgo = Int.random(in: 0...30)
+        return Calendar.current.date(byAdding: .day, value: -daysAgo, to: Date())!
     }
 }

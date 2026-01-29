@@ -14,5 +14,6 @@ struct Transfer: Identifiable, Codable, Equatable {
     var description: String
     let date: Date
     var category: String
+    let thumbnailUrl: String?  // URL de la imagen de la API
     var isEditing: Bool = false
 }

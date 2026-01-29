@@ -10,48 +10,71 @@ import SwiftUI
 
 struct TransactionRow: View {
     let transaction: TransactionList.FetchTransactions.ViewModel.DisplayedTransaction
-    @State private var showEditSheet = false
+    
+    // ✅ Assistive Access: Dynamic Type awareness
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     
     var body: some View {
-        HStack {
+        HStack(alignment: .top, spacing: dynamicTypeSize.isAccessibilitySize ? 16 : 12) {
+            // Mostrar imagen de la API o icono por defecto
+            if let thumbnailUrl = transaction.thumbnailUrl,
+               let url = URL(string: thumbnailUrl) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                            .frame(width: dynamicTypeSize.isAccessibilitySize ? 52 : 44,
+                                   height: dynamicTypeSize.isAccessibilitySize ? 52 : 44)
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: dynamicTypeSize.isAccessibilitySize ? 52 : 44,
+                                   height: dynamicTypeSize.isAccessibilitySize ? 52 : 44)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    case .failure:
+                        CategoryIcon(category: transaction.category)
+                    @unknown default:
+                        CategoryIcon(category: transaction.category)
+                    }
+                }
+                // ✅ VoiceOver: Decorative images should be hidden
+                .accessibilityHidden(true)
+            } else {
+                CategoryIcon(category: transaction.category)
+                    // ✅ VoiceOver: Decorative images should be hidden
+                    .accessibilityHidden(true)
+            }
+            
             VStack(alignment: .leading, spacing: 4) {
                 Text(transaction.description)
                     .font(.headline)
-                    .accessibilityIdentifier("transactionDescription")
+                    // ✅ Dynamic Type: Scale with user preferences
+                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                 
                 Text(transaction.date)
                     .font(.caption)
-                    .foregroundColor(.secondary)
-                    .accessibilityIdentifier("transactionDate")
+                    .foregroundStyle(.secondary)
                 
                 Text(transaction.category)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .accessibilityIdentifier("transactionCategory")
+                    .font(.caption2)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(Color.blue.opacity(0.1))
+                    .foregroundStyle(.blue)
+                    .clipShape(Capsule())
             }
             
-            Spacer()
+            Spacer(minLength: 8)
             
-            VStack(alignment: .trailing) {
-                (Text(transaction.isPositive ? "+" : "-") + Text(transaction.amount))
-                    .foregroundColor(transaction.isPositive ? .green : .red)
-                    .font(.headline)
-                    .accessibilityIdentifier("transactionAmount")
-                
-                Button(action: { showEditSheet = true }) {
-                    Image(systemName: "pencil.circle.fill")
-                        .foregroundColor(.blue)
-                        .font(.caption)
-                }
-            }
+            Text(transaction.amount)
+                .font(.headline)
+                .foregroundStyle(transaction.isPositive ? .green : .primary)
+                // ✅ Dynamic Type: Ensure readability
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         }
-        .padding(.vertical, 4)
-        .sheet(isPresented: $showEditSheet) {
-            EditTransactionView(
-                description: transaction.description,
-                amount: transaction.amount,
-                category: transaction.category
-            )
-        }
+        .padding(.vertical, dynamicTypeSize.isAccessibilitySize ? 8 : 4)
+        // ✅ Assistive Access: Minimum touch target 44x44
+        .frame(minHeight: 44)
     }
 }

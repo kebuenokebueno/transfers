@@ -47,9 +47,11 @@
 		6AABCCA62F2A25CC009E5D12 /* Exceptions for "InigoVIP" folder in "InigoVIPTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Models/PhotoAPI.swift,
 				Scenes/TransactionList/TransactionEditView.swift,
 				Scenes/TransactionList/TransactionListContent.swift,
 				Scenes/TransactionList/TransactionListViewContent.swift,
+				Scenes/TransactionList/UserHeaderView.swift,
 			);
 			target = 6AABCC372F2938C8009E5D12 /* InigoVIPTests */;
 		};

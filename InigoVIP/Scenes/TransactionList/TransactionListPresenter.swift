@@ -8,7 +8,6 @@
 import Foundation
 
 // MARK: - Presenter Protocol
-// MARK: - Presenter Protocol
 protocol TransactionListPresenterProtocol {
     func presentTransactions(response: TransactionList.FetchTransactions.Response)
 }
@@ -33,14 +32,14 @@ class TransactionListPresenter: TransactionListPresenterProtocol {
                 description: transaction.description,
                 date: dateFormatter.string(from: transaction.date),
                 category: transaction.category,
-                isPositive: transaction.amount >= 0
+                isPositive: transaction.amount >= 0,
+                thumbnailUrl: transaction.thumbnailUrl
             )
         }
                 
         let viewModel = TransactionList.FetchTransactions.ViewModel(
             transactions: displayedTransactions
         )
-        
         viewController?.displayTransactions(viewModel: viewModel)
     }
 }

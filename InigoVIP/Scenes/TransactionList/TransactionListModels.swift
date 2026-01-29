@@ -22,6 +22,7 @@ enum TransactionList {
                 let date: String
                 let category: String
                 let isPositive: Bool
+                let thumbnailUrl: String?
             }
             let transactions: [DisplayedTransaction]
         }
