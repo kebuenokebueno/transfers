@@ -16,6 +16,8 @@ extension Tag {
     @Tag static var integration: Self
     @Tag static var performance: Self
     @Tag static var network: Self
+    @Tag static var externalAPI: Self
+    @Tag static var slow: Self
 }
 
 
@@ -99,6 +101,7 @@ actor MockNetworkService: NetworkServiceProtocol {
         callCount = 0
     }
 
+    
 }
 
 // MARK: - Mock Objects

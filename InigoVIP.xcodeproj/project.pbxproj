@@ -108,6 +108,11 @@
 			path = UITests;
 			sourceTree = "<group>";
 		};
+		6AE31AB62F2CAE21004EFB5E /* IntegrationTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = IntegrationTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,8 +144,9 @@
 			isa = PBXGroup;
 			children = (
 				6AABCC2D2F2938C6009E5D12 /* InigoVIP */,
-				6AE31A8D2F2C84C7004EFB5E /* UITests */,
 				6AABCC3B2F2938C8009E5D12 /* UnitTests */,
+				6AE31A8D2F2C84C7004EFB5E /* UITests */,
+				6AE31AB62F2CAE21004EFB5E /* IntegrationTests */,
 				6AABCC2C2F2938C6009E5D12 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -195,6 +201,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				6AABCC3B2F2938C8009E5D12 /* UnitTests */,
+				6AE31AB62F2CAE21004EFB5E /* IntegrationTests */,
 			);
 			name = InigoVIPTests;
 			packageProductDependencies = (
