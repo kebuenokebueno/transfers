@@ -98,14 +98,14 @@
 			path = InigoVIP;
 			sourceTree = "<group>";
 		};
-		6AABCC3B2F2938C8009E5D12 /* InigoVIPTests */ = {
+		6AABCC3B2F2938C8009E5D12 /* UnitTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = InigoVIPTests;
+			path = UnitTests;
 			sourceTree = "<group>";
 		};
-		6AE31A8D2F2C84C7004EFB5E /* InigoVIPUITests */ = {
+		6AE31A8D2F2C84C7004EFB5E /* UITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = InigoVIPUITests;
+			path = UITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -139,8 +139,8 @@
 			isa = PBXGroup;
 			children = (
 				6AABCC2D2F2938C6009E5D12 /* InigoVIP */,
-				6AE31A8D2F2C84C7004EFB5E /* InigoVIPUITests */,
-				6AABCC3B2F2938C8009E5D12 /* InigoVIPTests */,
+				6AE31A8D2F2C84C7004EFB5E /* UITests */,
+				6AABCC3B2F2938C8009E5D12 /* UnitTests */,
 				6AABCC2C2F2938C6009E5D12 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -194,7 +194,7 @@
 				6AABCC3A2F2938C8009E5D12 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				6AABCC3B2F2938C8009E5D12 /* InigoVIPTests */,
+				6AABCC3B2F2938C8009E5D12 /* UnitTests */,
 			);
 			name = InigoVIPTests;
 			packageProductDependencies = (
@@ -217,7 +217,7 @@
 				6AABCC442F2938C8009E5D12 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				6AE31A8D2F2C84C7004EFB5E /* InigoVIPUITests */,
+				6AE31A8D2F2C84C7004EFB5E /* UITests */,
 			);
 			name = InigoVIPUITests;
 			packageProductDependencies = (

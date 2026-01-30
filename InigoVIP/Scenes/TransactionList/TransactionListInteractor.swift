@@ -22,7 +22,7 @@ class TransactionListInteractor: TransactionListInteractorProtocol {
     let analyticsWorker: AnalyticsWorkerProtocol
     
     init(
-        transactionWorker: TransactionWorkerProtocol = TransactionWorker(),
+        transactionWorker: TransactionWorkerProtocol,
         analyticsWorker: AnalyticsWorkerProtocol
     ) {
         self.transactionWorker = transactionWorker
