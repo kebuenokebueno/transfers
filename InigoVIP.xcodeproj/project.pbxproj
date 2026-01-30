@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6A1DA7A52F2CE29C0053E98C /* InlineSnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 6A1DA7A42F2CE29C0053E98C /* InlineSnapshotTesting */; };
+		6A1DA7A72F2CE29C0053E98C /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 6A1DA7A62F2CE29C0053E98C /* SnapshotTesting */; };
+		6A1DA7A92F2CE29C0053E98C /* SnapshotTestingCustomDump in Frameworks */ = {isa = PBXBuildFile; productRef = 6A1DA7A82F2CE29C0053E98C /* SnapshotTestingCustomDump */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		6AABCC392F2938C8009E5D12 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -113,6 +119,11 @@
 			path = IntegrationTests;
 			sourceTree = "<group>";
 		};
+		6AE31AB92F2CCF84004EFB5E /* SnapshotTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SnapshotTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +138,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6A1DA7A92F2CE29C0053E98C /* SnapshotTestingCustomDump in Frameworks */,
+				6A1DA7A52F2CE29C0053E98C /* InlineSnapshotTesting in Frameworks */,
+				6A1DA7A72F2CE29C0053E98C /* SnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,6 +157,7 @@
 		6AABCC222F2938C6009E5D12 = {
 			isa = PBXGroup;
 			children = (
+				6AE31AB92F2CCF84004EFB5E /* SnapshotTests */,
 				6AABCC2D2F2938C6009E5D12 /* InigoVIP */,
 				6AABCC3B2F2938C8009E5D12 /* UnitTests */,
 				6AE31A8D2F2C84C7004EFB5E /* UITests */,
@@ -202,9 +217,13 @@
 			fileSystemSynchronizedGroups = (
 				6AABCC3B2F2938C8009E5D12 /* UnitTests */,
 				6AE31AB62F2CAE21004EFB5E /* IntegrationTests */,
+				6AE31AB92F2CCF84004EFB5E /* SnapshotTests */,
 			);
 			name = InigoVIPTests;
 			packageProductDependencies = (
+				6A1DA7A42F2CE29C0053E98C /* InlineSnapshotTesting */,
+				6A1DA7A62F2CE29C0053E98C /* SnapshotTesting */,
+				6A1DA7A82F2CE29C0053E98C /* SnapshotTestingCustomDump */,
 			);
 			productName = InigoVIPTests;
 			productReference = 6AABCC382F2938C8009E5D12 /* InigoVIPTests.xctest */;
@@ -265,6 +284,9 @@
 			);
 			mainGroup = 6AABCC222F2938C6009E5D12;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6A1DA7A32F2CE29C0053E98C /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6AABCC2C2F2938C6009E5D12 /* Products */;
 			projectDirPath = "";
@@ -648,6 +670,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6A1DA7A32F2CE29C0053E98C /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.18.9;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6A1DA7A42F2CE29C0053E98C /* InlineSnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6A1DA7A32F2CE29C0053E98C /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = InlineSnapshotTesting;
+		};
+		6A1DA7A62F2CE29C0053E98C /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6A1DA7A32F2CE29C0053E98C /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+		6A1DA7A82F2CE29C0053E98C /* SnapshotTestingCustomDump */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6A1DA7A32F2CE29C0053E98C /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTestingCustomDump;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6AABCC232F2938C6009E5D12 /* Project object */;
 }
