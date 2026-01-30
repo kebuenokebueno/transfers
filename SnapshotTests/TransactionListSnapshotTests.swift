@@ -4,7 +4,6 @@ import SnapshotTesting
 import SwiftUI
 @testable import InigoVIP
 
-
 struct SnapshotTestData {
     static func sampleTransaction(
         id: String = "1",
@@ -35,14 +34,9 @@ struct SnapshotTestData {
 }
 
 // MARK: - Transaction Row Snapshot Tests
+var recording = false
 
 final class TransactionRowSnapshotTests: XCTestCase {
-    
-    // To re-record ALL snapshots:
-    // 1. Set recordMode = .all
-    // 2. Run tests
-    // 3. Set back to .missing
-    let recordMode: SnapshotTestingConfiguration.Record = .missing
     
     override func setUp() {
         super.setUp()
@@ -52,14 +46,13 @@ final class TransactionRowSnapshotTests: XCTestCase {
     // MARK: - Basic States
     
     func testTransactionRow_Expense() {
+        
         let transaction = SnapshotTestData.sampleTransaction(amount: -45.50)
         let view = TransactionRow(transaction: transaction)
             .frame(width: 375, height: 80)
             .padding()
         
-        withSnapshotTesting(record: recordMode) {
-            assertSnapshot(of: view, as: .image)
-        }
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     func testTransactionRow_Income() {
@@ -68,7 +61,7 @@ final class TransactionRowSnapshotTests: XCTestCase {
             .frame(width: 375, height: 80)
             .padding()
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     func testTransactionRow_LongDescription() {
@@ -79,7 +72,7 @@ final class TransactionRowSnapshotTests: XCTestCase {
             .frame(width: 375, height: 100)
             .padding()
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     // MARK: - Dark Mode
@@ -91,7 +84,7 @@ final class TransactionRowSnapshotTests: XCTestCase {
             .padding()
             .preferredColorScheme(.dark)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     func testTransactionRow_Income_DarkMode() {
@@ -101,7 +94,7 @@ final class TransactionRowSnapshotTests: XCTestCase {
             .padding()
             .preferredColorScheme(.dark)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     // MARK: - Dynamic Type
@@ -113,7 +106,7 @@ final class TransactionRowSnapshotTests: XCTestCase {
             .padding()
             .environment(\.dynamicTypeSize, .accessibility3)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     func testTransactionRow_ExtraLargeText() {
@@ -123,7 +116,7 @@ final class TransactionRowSnapshotTests: XCTestCase {
             .padding()
             .environment(\.dynamicTypeSize, .accessibility5)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     // MARK: - All Categories
@@ -141,7 +134,7 @@ final class TransactionRowSnapshotTests: XCTestCase {
                 .frame(width: 375, height: 80)
                 .padding()
             
-            assertSnapshot(of: view, as: .image, named: "category_\(category)")
+            assertSnapshot(of: view, as: .image, named: "category_\(category)", record: recording)
         }
     }
 }
@@ -161,7 +154,7 @@ final class TransactionListSnapshotTests: XCTestCase {
         let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
             .frame(width: 375, height: 667)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     func testTransactionList_WithData() {
@@ -171,7 +164,7 @@ final class TransactionListSnapshotTests: XCTestCase {
         let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
             .frame(width: 375, height: 667)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     func testTransactionList_DarkMode() {
@@ -182,7 +175,7 @@ final class TransactionListSnapshotTests: XCTestCase {
             .frame(width: 375, height: 667)
             .preferredColorScheme(.dark)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     func testTransactionList_LargeText() {
@@ -193,7 +186,7 @@ final class TransactionListSnapshotTests: XCTestCase {
             .frame(width: 375, height: 667)
             .environment(\.dynamicTypeSize, .accessibility3)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
 }
 
@@ -214,7 +207,7 @@ final class DeviceSpecificSnapshotTests: XCTestCase {
         let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
             .frame(width: 320, height: 568)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     func testTransactionList_iPhone15() {
@@ -224,7 +217,7 @@ final class DeviceSpecificSnapshotTests: XCTestCase {
         let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
             .frame(width: 375, height: 812)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     func testTransactionList_iPhone15ProMax() {
@@ -234,7 +227,7 @@ final class DeviceSpecificSnapshotTests: XCTestCase {
         let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
             .frame(width: 430, height: 932)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     func testTransactionList_iPadPro() {
@@ -244,7 +237,7 @@ final class DeviceSpecificSnapshotTests: XCTestCase {
         let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
             .frame(width: 1024, height: 1366)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
 }
 
@@ -261,7 +254,7 @@ final class UserHeaderSnapshotTests: XCTestCase {
             .environment(authService)
             .frame(width: 375, height: 100)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     func testUserHeader_LongName() {
@@ -273,7 +266,7 @@ final class UserHeaderSnapshotTests: XCTestCase {
             .environment(authService)
             .frame(width: 375, height: 100)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     func testUserHeader_DarkMode() {
@@ -286,7 +279,7 @@ final class UserHeaderSnapshotTests: XCTestCase {
             .frame(width: 375, height: 100)
             .preferredColorScheme(.dark)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
     
     func testUserHeader_LargeText() {
@@ -299,7 +292,7 @@ final class UserHeaderSnapshotTests: XCTestCase {
             .frame(width: 375, height: 150)
             .environment(\.dynamicTypeSize, .accessibility3)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
 }
 
@@ -315,7 +308,7 @@ final class CategoryIconSnapshotTests: XCTestCase {
                 .frame(width: 100, height: 100)
                 .padding()
             
-            assertSnapshot(of: view, as: .image, named: "icon_\(category)")
+            assertSnapshot(of: view, as: .image, named: "icon_\(category)", record: recording)
         }
     }
     
@@ -328,7 +321,7 @@ final class CategoryIconSnapshotTests: XCTestCase {
                 .padding()
                 .preferredColorScheme(.dark)
             
-            assertSnapshot(of: view, as: .image, named: "icon_\(category)_dark")
+            assertSnapshot(of: view, as: .image, named: "icon_\(category)_dark", record: recording)
         }
     }
     
@@ -338,7 +331,7 @@ final class CategoryIconSnapshotTests: XCTestCase {
             .padding()
             .environment(\.dynamicTypeSize, .accessibility5)
         
-        assertSnapshot(of: view, as: .image)
+        assertSnapshot(of: view, as: .image, record: recording)
     }
 }
 
@@ -361,17 +354,18 @@ final class RegressionSnapshotTests: XCTestCase {
         let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
             .frame(width: 375, height: 812)  // iPhone 15 size
         
-        assertSnapshot(of: view, as: .image, named: "full_screen")
+        assertSnapshot(of: view, as: .image, named: "full_screen", record: recording)
     }
     
     // Test with many transactions (scrolling)
     func testFullScreen_ManyTransactions() {
         var manyTransactions: [TransactionList.FetchTransactions.ViewModel.DisplayedTransaction] = []
         for i in 1...20 {
+            let amount = (i % 3 == 0) ? Double(i * 100) : -Double(i * 10)
             manyTransactions.append(
                 SnapshotTestData.sampleTransaction(
                     id: "\(i)",
-                    amount: Double.random(in: -200...2000),
+                    amount: amount,
                     description: "Transaction \(i)"
                 )
             )
@@ -381,7 +375,7 @@ final class RegressionSnapshotTests: XCTestCase {
         let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
             .frame(width: 375, height: 812)
         
-        assertSnapshot(of: view, as: .image, named: "many_transactions")
+        assertSnapshot(of: view, as: .image, named: "many_transactions", record: recording)
     }
 }
 
@@ -395,7 +389,7 @@ final class PrecisionSnapshotTests: XCTestCase {
         let view = TransactionRow(transaction: transaction)
             .frame(width: 375, height: 80)
         
-        assertSnapshot(of: view, as: .image(precision: 1.0))
+        assertSnapshot(of: view, as: .image(precision: 1.0), record: recording)
     }
     
     // Test with 99% precision (allows tiny variations)
@@ -404,6 +398,6 @@ final class PrecisionSnapshotTests: XCTestCase {
         let view = TransactionRow(transaction: transaction)
             .frame(width: 375, height: 80)
         
-        assertSnapshot(of: view, as: .image(precision: 0.99))
+        assertSnapshot(of: view, as: .image(precision: 0.99), record: recording)
     }
 }
