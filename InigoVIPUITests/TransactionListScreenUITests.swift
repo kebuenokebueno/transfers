@@ -48,14 +48,6 @@ final class TransactionListScreenUITests: BaseUITest {
         )
     }
     
-    // MARK: - UI Interactions (not dependent on specific data)
-    
-    func testNavigationBarIsInteractive() throws {
-        // Test that navigation bar exists and is interactive
-        XCTAssertTrue(transactionListPage.navigationTitle.exists)
-        XCTAssertTrue(transactionListPage.logoutButton.isHittable)
-    }
-    
     func testListIsScrollable() throws {
         // Test that list can be scrolled (regardless of data)
         let list = app.scrollViews.firstMatch
@@ -63,6 +55,12 @@ final class TransactionListScreenUITests: BaseUITest {
         
         // Should be able to interact with list
         XCTAssertTrue(list.exists)
+    }
+    
+    func testNavigationBarIsInteractive() throws {
+        // Test that navigation bar exists and is interactive
+        XCTAssertTrue(transactionListPage.navigationTitle.exists)
+        XCTAssertTrue(transactionListPage.logoutButton.isHittable)
     }
     
     func testScreenLayout() throws {

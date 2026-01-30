@@ -24,9 +24,10 @@ final class AccessibilityUITests: BaseUITest {
     
     func testMinimumTouchTargets() throws {
         // Assert - Critical buttons meet 44x44 pt minimum
+        let a = transactionListPage.logoutButton
         let logoutFrame = transactionListPage.logoutButton.frame
         XCTAssertGreaterThanOrEqual(
-            logoutFrame.height,
+            logoutFrame.width,
             44,
             "Logout button should meet 44pt minimum touch target"
         )

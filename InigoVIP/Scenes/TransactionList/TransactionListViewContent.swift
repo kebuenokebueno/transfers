@@ -58,13 +58,13 @@ struct TransactionListViewContent: View {
                         authService.logout()
                     } label: {
                         Image(systemName: "rectangle.portrait.and.arrow.right")
+                            .frame(minWidth: 44, minHeight: 44)  // ← Frame on the image itself
                     }
                     // ✅ VoiceOver: Descriptive label instead of icon
                     .accessibilityLabel("Log out")
                     .accessibilityHint("Double tap to log out of your account")
                     // ✅ VoiceControl: Named action
                     .accessibilityIdentifier("logoutButton")
-                    .frame(minWidth: 44, minHeight: 44)
                 }
             }
         }
