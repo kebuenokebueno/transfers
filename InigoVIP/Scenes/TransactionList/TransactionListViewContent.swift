@@ -64,6 +64,7 @@ struct TransactionListViewContent: View {
                     .accessibilityHint("Double tap to log out of your account")
                     // ✅ VoiceControl: Named action
                     .accessibilityIdentifier("logoutButton")
+                    .frame(minWidth: 44, minHeight: 44)
                 }
             }
         }

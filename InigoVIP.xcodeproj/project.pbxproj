@@ -30,20 +30,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		6AABCC8D2F29F027009E5D12 /* Exceptions for "InigoVIPTests" folder in "InigoVIPTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				InigoVIPUITests.swift,
-			);
-			target = 6AABCC372F2938C8009E5D12 /* InigoVIPTests */;
-		};
-		6AABCC8E2F29F027009E5D12 /* Exceptions for "InigoVIPTests" folder in "InigoVIPUITests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				InigoVIPUITests.swift,
-			);
-			target = 6AABCC412F2938C8009E5D12 /* InigoVIPUITests */;
-		};
 		6AABCCA62F2A25CC009E5D12 /* Exceptions for "InigoVIP" folder in "InigoVIPTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -114,11 +100,12 @@
 		};
 		6AABCC3B2F2938C8009E5D12 /* InigoVIPTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				6AABCC8D2F29F027009E5D12 /* Exceptions for "InigoVIPTests" folder in "InigoVIPTests" target */,
-				6AABCC8E2F29F027009E5D12 /* Exceptions for "InigoVIPTests" folder in "InigoVIPUITests" target */,
-			);
 			path = InigoVIPTests;
+			sourceTree = "<group>";
+		};
+		6AE31A8D2F2C84C7004EFB5E /* InigoVIPUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = InigoVIPUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -152,6 +139,7 @@
 			isa = PBXGroup;
 			children = (
 				6AABCC2D2F2938C6009E5D12 /* InigoVIP */,
+				6AE31A8D2F2C84C7004EFB5E /* InigoVIPUITests */,
 				6AABCC3B2F2938C8009E5D12 /* InigoVIPTests */,
 				6AABCC2C2F2938C6009E5D12 /* Products */,
 			);
@@ -227,6 +215,9 @@
 			);
 			dependencies = (
 				6AABCC442F2938C8009E5D12 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6AE31A8D2F2C84C7004EFB5E /* InigoVIPUITests */,
 			);
 			name = InigoVIPUITests;
 			packageProductDependencies = (

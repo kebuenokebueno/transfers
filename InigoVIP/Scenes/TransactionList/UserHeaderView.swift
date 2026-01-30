@@ -39,7 +39,7 @@ struct UserHeaderView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Welcome back, \(user.name)")
             // ✅ AssistiveAccess: Minimum touch target
-            .frame(minHeight: 44)
+            .frame(minWidth: 44, minHeight: 44)
         }
     }
 }
