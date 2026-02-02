@@ -11,9 +11,7 @@ import SwiftUI
 struct TransactionListContent: View {
     let transactions: [TransactionList.FetchTransactions.ViewModel.DisplayedTransaction]
     let analyticsService: AnalyticsService
-    
-    @State private var selectedTransaction: TransactionList.FetchTransactions.ViewModel.DisplayedTransaction?
-    @State private var showingEditSheet = false
+    @Environment(Router.self) private var router
     
     // ✅ Assistive Access: Simplify interaction
     @Environment(\.accessibilityEnabled) private var accessibilityEnabled
@@ -25,36 +23,26 @@ struct TransactionListContent: View {
                     .contentShape(Rectangle())
                     .onTapGesture {
                         analyticsService.trackButtonTap("transaction_\(transaction.id)")
-                        selectedTransaction = transaction
-                        showingEditSheet = true
+                        // Navigate to detail view with just the ID
+                        router.navigate(to: .transactionDetail(id: transaction.id))
                     }
                     // ✅ VoiceOver: Combine elements for cleaner navigation
                     .accessibilityElement(children: .combine)
                     // ✅ VoiceOver: Rich accessibility label
                     .accessibilityLabel(transactionAccessibilityLabel(transaction))
                     // ✅ VoiceOver: Action hint
-                    .accessibilityHint("Double tap to edit transaction")
+                    .accessibilityHint("Double tap to view transaction details")
                     // ✅ VoiceControl: Named command
                     .accessibilityIdentifier("transaction_\(transaction.id)")
                     // ✅ VoiceOver: Add action for alternative interaction
-                    .accessibilityAction(named: "Edit Transaction") {
-                        selectedTransaction = transaction
-                        showingEditSheet = true
+                    .accessibilityAction(named: "View Details") {
+                        router.navigate(to: .transactionDetail(id: transaction.id))
                     }
             }
         }
         // ✅ VoiceOver: Announce list context
         .accessibilityLabel("Transaction List")
         .accessibilityHint("List of \(transactions.count) transactions")
-        .sheet(isPresented: $showingEditSheet) {
-            if let transaction = selectedTransaction {
-                TransactionEditView(
-                    description: transaction.description,
-                    amount: transaction.amount,
-                    category: transaction.category
-                )
-            }
-        }
     }
     
     // ✅ Accessibility Helper: Create natural language labels

@@ -10,15 +10,17 @@ import SwiftUI
 struct TransactionListView: View {
     @Environment(AuthService.self) private var authService
     @Environment(AnalyticsService.self) private var analyticsService
+    @Environment(Router.self) private var router
     @State private var viewController: TransactionListViewController?
-
+    
     var body: some View {
         Group {
             if let viewController = viewController {
                 TransactionListViewContent(
                     viewController: viewController,
                     authService: authService,
-                    analyticsService: analyticsService
+                    analyticsService: analyticsService,
+                    router: router
                 )
             } else {
                 ProgressView("Initializing...")

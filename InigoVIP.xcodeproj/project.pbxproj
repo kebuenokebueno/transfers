@@ -46,7 +46,6 @@
 				Models/PhotoAPI.swift,
 				Models/Transaction.swift,
 				Models/User.swift,
-				Scenes/TransactionList/EditTransactionView.swift,
 				Scenes/TransactionList/TransactionEditView.swift,
 				Scenes/TransactionList/TransactionListContent.swift,
 				Scenes/TransactionList/TransactionListInteractor.swift,
@@ -74,7 +73,6 @@
 				Models/PhotoAPI.swift,
 				Models/Transaction.swift,
 				Models/User.swift,
-				Scenes/TransactionList/EditTransactionView.swift,
 				Scenes/TransactionList/TransactionEditView.swift,
 				Scenes/TransactionList/TransactionListContent.swift,
 				Scenes/TransactionList/TransactionListInteractor.swift,
@@ -157,10 +155,10 @@
 		6AABCC222F2938C6009E5D12 = {
 			isa = PBXGroup;
 			children = (
-				6AE31AB92F2CCF84004EFB5E /* SnapshotTests */,
 				6AABCC2D2F2938C6009E5D12 /* InigoVIP */,
 				6AABCC3B2F2938C8009E5D12 /* UnitTests */,
 				6AE31A8D2F2C84C7004EFB5E /* UITests */,
+				6AE31AB92F2CCF84004EFB5E /* SnapshotTests */,
 				6AE31AB62F2CAE21004EFB5E /* IntegrationTests */,
 				6AABCC2C2F2938C6009E5D12 /* Products */,
 			);
