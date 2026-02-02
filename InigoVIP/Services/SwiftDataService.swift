@@ -215,9 +215,9 @@ class SwiftDataService {
         guard let context = modelContext else { throw SwiftDataError.contextNotAvailable }
         
         let descriptor = FetchDescriptor<Transfer>(
-//            predicate: #Predicate {
-//                $0.syncStatus == .pending
-//            }
+            predicate: #Predicate {
+                $0.syncStatus == Transfer.SyncStatus.pending
+            }
         )
         
         let entities = try context.fetch(descriptor)
