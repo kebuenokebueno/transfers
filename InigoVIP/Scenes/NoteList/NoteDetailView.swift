@@ -15,7 +15,7 @@ struct NoteDetailView: View {
     @State private var viewController: NoteListViewController?
     
     let noteId: String
-    @Environment(NoteManager.self) private var noteManager
+    @Environment(NoteWorker.self) private var noteWorker
     
     @State private var displayedNote: NoteScene.FetchNote.ViewModel.DisplayedNote?
     @State private var showDeleteConfirmation = false
