@@ -29,7 +29,7 @@ class TransactionListPresenter: TransactionListPresenterProtocol {
             TransactionList.FetchTransactions.ViewModel.DisplayedTransaction(
                 id: transaction.id,
                 amount: numberFormatter.string(from: NSNumber(value: abs(transaction.amount))) ?? "",
-                description: transaction.description,
+                description: transaction.transactionDescription,
                 date: dateFormatter.string(from: transaction.date),
                 category: transaction.category,
                 isPositive: transaction.amount >= 0,

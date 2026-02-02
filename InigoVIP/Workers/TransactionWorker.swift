@@ -15,27 +15,30 @@ protocol TransactionWorkerProtocol: Sendable {
 
 actor TransactionWorker: TransactionWorkerProtocol {
     let networkService: NetworkServiceProtocol  // ← Use protocol instead of concrete type
-    let cacheService: CacheService
-    
+    private let swiftDataService: SwiftDataService
+
     init(networkService: NetworkServiceProtocol = NetworkService(),  // ← Default to real
-         cacheService: CacheService = CacheService()) {
+         swiftDataService: SwiftDataService) {
         self.networkService = networkService
-        self.cacheService = cacheService
+        self.swiftDataService = swiftDataService
     }
     
     func fetchTransactions() async throws -> [Transfer] {
-        // Check cache first
-        if let cached: [Transfer] = await cacheService.get(key: "transactions") {
-            print("📦 TransactionWorker: Cache hit")
-            return cached
+        // Try local first (offline-first)
+        let localTransactions = try await swiftDataService.fetchTransactions()
+        
+        if !localTransactions.isEmpty {
+            return localTransactions
         }
         
-        print("🌐 TransactionWorker: Fetching from network")
-        let transactions = try await networkService.fetchTransactions()  // ← Uses protocol
+        // Fetch from API if local is empty
+        let remoteTransactions = try await networkService.fetchTransactions()
         
-        // Cache results
-        await cacheService.set(key: "transactions", value: transactions)
+        // Save to local database
+        for transaction in remoteTransactions {
+            try await swiftDataService.saveTransaction(transaction)
+        }
         
-        return transactions
+        return remoteTransactions
     }
 }

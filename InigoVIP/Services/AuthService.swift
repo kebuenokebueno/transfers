@@ -14,6 +14,10 @@ class AuthService {
     var isLoggedIn = true
     var currentUser: User?
     
+    // Reference to SwiftData service
+    weak var swiftDataService: SwiftDataService?
+
+    
     init() {
         currentUser = User(name: "John Doe", email: "john@example.com")
     }
@@ -24,7 +28,15 @@ class AuthService {
     }
     
     func logout() {
-        isLoggedIn = false
-        currentUser = nil
+        Task { @MainActor in
+            // Clear all user data FIRST
+            try? await swiftDataService?.clearAllUserData()
+            
+            // Then clear auth
+            isLoggedIn = false
+            currentUser = nil
+            
+            print("✅ User logged out and all data cleared")
+        }
     }
 }

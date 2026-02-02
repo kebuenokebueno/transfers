@@ -55,12 +55,13 @@ struct EditTransactionView: View {
                 description: "Transaction \(transactionId)",
                 date: Date(),
                 category: "Food",
-                thumbnailUrl: nil
+                thumbnailUrl: nil,
+                userId: "a"
             )
             
             if let transaction = transaction {
                 amount = String(abs(transaction.amount))
-                self.description = transaction.description
+                self.description = transaction.transactionDescription
                 category = transaction.category
             }
         }

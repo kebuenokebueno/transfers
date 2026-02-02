@@ -13,6 +13,7 @@ struct InigoVIPApp: App {
     @State private var authService = AuthService()
     @State private var analyticsService = AnalyticsService()
     @State private var router = Router()
+    @State private var swiftDataService = SwiftDataService()
     
     var body: some Scene {
         WindowGroup {
@@ -22,11 +23,13 @@ struct InigoVIPApp: App {
                         .environment(authService)
                         .environment(analyticsService)
                         .environment(router)
+                        .environment(swiftDataService)
                         .navigationDestination(for: Route.self) { route in
                             RouterView.destination(for: route)
                                 .environment(authService)
                                 .environment(analyticsService)
                                 .environment(router)
+                                .environment(swiftDataService)
                         }
                 }
                 .sheet(item: $router.presentedSheet) { route in
@@ -34,6 +37,7 @@ struct InigoVIPApp: App {
                         .environment(authService)
                         .environment(analyticsService)
                         .environment(router)
+                        .environment(swiftDataService)
                 }
                 .fullScreenCover(item: $router.presentedFullScreen) { route in
                     RouterView.destination(for: route)
@@ -46,6 +50,7 @@ struct InigoVIPApp: App {
                     .environment(authService)
                     .environment(analyticsService)
                     .environment(router)
+                    .environment(swiftDataService)
             }
         }
     }

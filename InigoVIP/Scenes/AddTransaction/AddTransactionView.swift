@@ -13,6 +13,7 @@ import StoreKit
 struct AddTransactionView: View {
     @Environment(Router.self) private var router
     @Environment(AnalyticsService.self) private var analyticsService
+    @Environment(SwiftDataService.self) private var swiftDataService
     @State private var amount = ""
     @State private var description = ""
     @State private var category = "Food"
@@ -59,7 +60,7 @@ struct AddTransactionView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         analyticsService.trackButtonTap("save_new_transaction")
-                        // TODO: Save transaction logic here
+                        saveTransaction()
                         router.dismiss()
                     }
                     .disabled(amount.isEmpty || description.isEmpty)
@@ -68,6 +69,30 @@ struct AddTransactionView: View {
             .onAppear {
                 analyticsService.trackScreenView("add_transaction")
             }
+        }
+    }
+    
+    func saveTransaction() {
+        guard let amountDouble = Double(amount) else { return }
+        Task {
+            let transaction = Transfer(
+                id: UUID().uuidString,
+                amount: isIncome ? amountDouble : -amountDouble,
+                description: description,
+                date: Date(),
+                category: category,
+                thumbnailUrl: nil,
+                userId: "a"
+            )
+            
+            // Save to SwiftData
+            try await swiftDataService.saveTransaction(transaction)
+            
+            // Sync to server in background
+//            syncToServer(transaction)
+            
+            // Close sheet
+            router.dismiss()
         }
     }
 }

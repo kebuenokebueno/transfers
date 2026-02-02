@@ -34,7 +34,8 @@ actor NetworkService: NetworkServiceProtocol{
                 description: photo.title.capitalized,
                 date: randomDate(),
                 category: category,
-                thumbnailUrl: photo.thumbnailUrl
+                thumbnailUrl: photo.thumbnailUrl,
+                userId: "s"
             )
         }
     }

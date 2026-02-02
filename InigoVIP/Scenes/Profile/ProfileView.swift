@@ -11,6 +11,8 @@ import SwiftUI
 struct ProfileView: View {
     @Environment(AuthService.self) private var authService
     @Environment(AnalyticsService.self) private var analyticsService
+    @Environment(SwiftDataService.self) private var swiftDataService
+    @State private var stats: TransactionStatistics?
     
     var body: some View {
         ScrollView {
@@ -51,6 +53,9 @@ struct ProfileView: View {
                 Spacer()
             }
             .padding()
+        }
+        .task {
+            stats = try? await swiftDataService.fetchStatistics()
         }
         .navigationTitle("Profile")
         .onAppear {

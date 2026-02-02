@@ -34,11 +34,11 @@ class TransactionListViewController: TransactionListViewControllerProtocol {
     private func setupVIP(analyticsService: AnalyticsService) {
         // ✅ Create Workers with Services
         let networkService = NetworkService()
-        let cacheService = CacheService()
+        let cacheService = SwiftDataService()
         
         let transactionWorker = TransactionWorker(
             networkService: networkService,
-            cacheService: cacheService
+            swiftDataService: cacheService
         )
         
         let analyticsWorker = AnalyticsWorker(

@@ -35,7 +35,7 @@ struct TransactionDetailView: View {
                     
                     // Details
                     VStack(alignment: .leading, spacing: 16) {
-                        DetailRow(label: "Description", value: transaction.description)
+                        DetailRow(label: "Description", value: transaction.transactionDescription)
                         DetailRow(label: "Date", value: transaction.date.formatted(date: .long, time: .omitted))
                         DetailRow(label: "ID", value: transaction.id)
                     }
@@ -73,7 +73,8 @@ struct TransactionDetailView: View {
                 description: "Transaction \(transactionId)",
                 date: Date(),
                 category: "Food",
-                thumbnailUrl: nil
+                thumbnailUrl: nil,
+                userId: "a"
             )
         }
         .navigationTitle("Transaction Details")
