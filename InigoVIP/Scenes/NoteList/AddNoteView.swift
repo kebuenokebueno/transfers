@@ -99,14 +99,12 @@ struct AddNoteView: View {
     
     private func saveNote() async {
         guard let amountValue = Double(amount) else { return }
-        let x = NoteScene.CreateNote.Request(
-            amount: amountValue,
-            description: description,
-            category: category,
-            isIncome: isIncome
-        )
         await viewController?.interactor?.createNote(
-            request: x
+            request: NoteScene.CreateNote.Request(
+                amount: amountValue,
+                description: description,
+                category: category,
+                isIncome: isIncome)
         )
     }
 }

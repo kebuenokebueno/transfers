@@ -52,7 +52,8 @@ class NoteListInteractor: NoteBusinessLogic {
             amount: request.isIncome ? request.amount : -request.amount,
             description: request.description,
             date: Date(),
-            category: request.category
+            category: request.category,
+            syncStatus: .pending
         )
         
         await noteManager.createNote(note)
@@ -69,13 +70,18 @@ class NoteListInteractor: NoteBusinessLogic {
     func updateNote(request: NoteScene.UpdateNote.Request) async {
         guard let note = noteManager.notes.first(where: { $0.id == request.noteId }) else {
             let response = NoteScene.UpdateNote.Response(
-                note: Note(id: "", amount: 0, description: "", date: Date(), category: ""),
-                success: false
+                note: Note(id: UUID().uuidString,
+                           amount: request.amount,
+                           description: request.description,
+                           date: Date(),
+                           category: request.category),
+                success: false,
+                
             )
             presenter?.presentUpdateResult(response: response)
             return
         }
-        
+        note.syncStatus = "pending"
         note.amount = request.amount
         note.noteDescription = request.description
         note.category = request.category

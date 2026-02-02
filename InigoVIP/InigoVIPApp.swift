@@ -12,7 +12,8 @@ struct InigoVIPApp: App {
     @State private var supabaseService = SupabaseService()
     @State private var noteManager: NoteManager?
     @State private var router = Router()
-    
+    @Environment(\.scenePhase) private var scenePhase
+
     var body: some Scene {
         WindowGroup {
             Group {
@@ -55,6 +56,7 @@ struct InigoVIPApp: App {
                     )
                     print("✅ App initialized successfully")
                 }
+                await noteManager?.syncPendingNotes()
             }
         }
     }

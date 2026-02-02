@@ -169,7 +169,7 @@ final public class Note {
     
     // MARK: - Sync Status Enum
     
-    public enum SyncStatus: String, Codable, CaseIterable {
+    public enum SyncStatus: String, CaseIterable {
         case synced
         case pending
         case failed
@@ -200,7 +200,6 @@ extension Note: Codable {
         try container.encode(date, forKey: .date)
         try container.encode(category, forKey: .category)
         try container.encodeIfPresent(thumbnailUrl, forKey: .thumbnailUrl)
-        try container.encode(syncStatus, forKey: .syncStatus)
         try container.encode(createdAt, forKey: .createdAt)
         try container.encode(updatedAt, forKey: .updatedAt)
     }
@@ -214,8 +213,6 @@ extension Note: Codable {
         let date = try container.decode(Date.self, forKey: .date)
         let category = try container.decode(String.self, forKey: .category)
         let thumbnailUrl = try container.decodeIfPresent(String.self, forKey: .thumbnailUrl)
-        let syncStatusString = try container.decode(String.self, forKey: .syncStatus)
-        let syncStatus = SyncStatus(rawValue: syncStatusString) ?? .pending
         
         self.init(
             id: id,
@@ -224,7 +221,7 @@ extension Note: Codable {
             date: date,
             category: category,
             thumbnailUrl: thumbnailUrl,
-            syncStatus: syncStatus
+            syncStatus: .synced
         )
         
         // Set timestamps if available
@@ -282,19 +279,19 @@ public extension Note {
     }
     
     /// Mark as needing sync
-    public func markForSync() {
+    func markForSync() {
         self.syncStatusEnum = .pending
         self.updatedAt = Date()
     }
     
     /// Mark as synced
-    public func markAsSynced() {
+    func markAsSynced() {
         self.syncStatusEnum = .synced
         self.updatedAt = Date()
     }
     
     /// Mark as failed
-    public func markAsFailed() {
+    func markAsFailed() {
         self.syncStatusEnum = .failed
         self.updatedAt = Date()
     }
