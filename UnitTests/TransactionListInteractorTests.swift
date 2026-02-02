@@ -22,7 +22,7 @@ struct TransactionListInteractorTests {
         let mockNetwork = MockNetworkService()
         await mockNetwork.setSuccessResponse()
         
-        let worker = TransactionWorker(networkService: mockNetwork)  // ← Inject mock
+        let worker = TransactionWorker(networkService: mockNetwork)
         
         // Act
         let transactions = try await worker.fetchTransactions()

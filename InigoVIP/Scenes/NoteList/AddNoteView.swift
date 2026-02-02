@@ -10,20 +10,19 @@ import SwiftUI
 import UIKit
 import StoreKit
 
-
 struct AddNoteView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var viewController: NoteListViewController?
+    @Environment(NoteWorker.self) private var noteWorker
+    @Environment(SwiftDataService.self) private var swiftDataService
     
+    @State private var viewController: NoteListViewController?
     @State private var amount = ""
     @State private var description = ""
     @State private var category = "Food"
     @State private var isIncome = false
-    @Environment(NoteWorker.self) private var noteWorker
-
+    @State private var isSaving = false
     
     let categories = ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"]
-
     
     var body: some View {
         NavigationStack {
@@ -56,15 +55,20 @@ struct AddNoteView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .disabled(isSaving)
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        Task {
-                            await saveNote()
-                        }
+                        saveNote()
                     }
-                    .disabled(amount.isEmpty || description.isEmpty)
+                    .disabled(amount.isEmpty || description.isEmpty || isSaving)
+                }
+            }
+            .disabled(isSaving)
+            .overlay {
+                if isSaving {
+                    ProgressView("Saving...")
                 }
             }
             .alert("Success", isPresented: .constant(viewController?.successMessage != nil)) {
@@ -77,6 +81,15 @@ struct AddNoteView: View {
                     Text(message)
                 }
             }
+            .alert("Error", isPresented: .constant(noteWorker.lastError != nil)) {
+                Button("OK") {
+                    noteWorker.lastError = nil
+                }
+            } message: {
+                if let error = noteWorker.lastError {
+                    Text(error)
+                }
+            }
         }
         .task {
             if viewController == nil {
@@ -86,7 +99,11 @@ struct AddNoteView: View {
     }
     
     private func setupVIP() {
-        let interactor = NoteListInteractor(noteWorker: noteWorker)
+        // ✅ Pass both noteWorker AND swiftDataService
+        let interactor = NoteListInteractor(
+            noteWorker: noteWorker,
+            swiftDataService: swiftDataService
+        )
         let presenter = NoteListPresenter()
         let vc = NoteListViewController()
         
@@ -97,14 +114,26 @@ struct AddNoteView: View {
         viewController = vc
     }
     
-    private func saveNote() async {
+    private func saveNote() {
         guard let amountValue = Double(amount) else { return }
-        await viewController?.interactor?.createNote(
-            request: NoteScene.CreateNote.Request(
-                amount: amountValue,
-                description: description,
-                category: category,
-                isIncome: isIncome)
-        )
+        
+        isSaving = true
+        
+        Task {
+            await viewController?.interactor?.createNote(
+                request: NoteScene.CreateNote.Request(
+                    amount: amountValue,
+                    description: description,
+                    category: category,
+                    isIncome: isIncome
+                )
+            )
+            
+            isSaving = false
+            
+            // Wait a moment then dismiss
+            try? await Task.sleep(for: .milliseconds(500))
+            dismiss()
+        }
     }
 }

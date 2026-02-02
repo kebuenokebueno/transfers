@@ -6,40 +6,73 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct NoteListView: View {
     @Environment(Router.self) private var router
     @Environment(NoteWorker.self) private var noteWorker
-    @State private var viewController: NoteListViewController?
-
+    
+    @Query(sort: \Note.date, order: .reverse) private var notes: [Note]
     
     var body: some View {
-        Group {
-            if let vc = viewController {
-                NoteListContentView(viewController: vc, router: router)
-            } else {
-                ProgressView("Initializing...")
+        List {
+            ForEach(notes) { note in
+                NoteRow(note: note)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        router.navigate(to: .noteDetail(id: note.id))
+                    }
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            deleteNote(note)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+            }
+        }
+        .navigationTitle("Notes")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    router.present(sheet: .addNote)
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .overlay {
+            if noteWorker.isLoading {
+                ProgressView("Loading...")
+            } else if notes.isEmpty {
+                ContentUnavailableView(
+                    "No Notes",
+                    systemImage: "note.text",
+                    description: Text("Tap + to add your first note")
+                )
+            }
+        }
+        .alert("Error", isPresented: .constant(noteWorker.lastError != nil)) {
+            Button("OK") {
+                noteWorker.lastError = nil
+            }
+        } message: {
+            if let error = noteWorker.lastError {
+                Text(error)
             }
         }
         .task {
-            if viewController == nil {
-                setupVIP()
-                viewController?.loadNotes()
-            }
+            // Fetch notes on first load (syncs from cloud)
+            await noteWorker.fetchNotes()
+        }
+        .refreshable {
+            await noteWorker.fetchNotes()
         }
     }
     
-    private func setupVIP() {
-        // Create VIP components
-        let interactor = NoteListInteractor(noteWorker: noteWorker)
-        let presenter = NoteListPresenter()
-        let vc = NoteListViewController()
-        
-        // Wire them together
-        vc.interactor = interactor
-        interactor.presenter = presenter
-        presenter.viewController = vc
-        
-        viewController = vc
+    private func deleteNote(_ note: Note) {
+        Task {
+            await noteWorker.deleteNote(id: note.id)
+        }
     }
 }

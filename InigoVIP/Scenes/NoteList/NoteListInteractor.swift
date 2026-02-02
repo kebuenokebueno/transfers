@@ -7,22 +7,22 @@
 
 import Foundation
 
-
-
 @MainActor
 class NoteListInteractor: NoteBusinessLogic {
     var presenter: NotePresentationLogic?
     private let noteWorker: NoteWorker
+    private let swiftDataService: SwiftDataService
     
-    init(noteWorker: NoteWorker) {
+    init(noteWorker: NoteWorker, swiftDataService: SwiftDataService) {
         self.noteWorker = noteWorker
+        self.swiftDataService = swiftDataService
     }
     
     // MARK: - Fetch Notes
     
     func fetchNotes(request: NoteScene.FetchNotes.Request) async {
-        // Fetch from local first
-        let localNotes = noteWorker.notes
+        // Fetch from SwiftData (local) first
+        let localNotes = (try? swiftDataService.fetchNotes()) ?? []
         let isFromCache = !localNotes.isEmpty
         
         // Present immediately with local data
@@ -34,11 +34,13 @@ class NoteListInteractor: NoteBusinessLogic {
             presenter?.presentNotes(response: response)
         }
         
-        // Fetch from cloud
+        // Sync from cloud in background
         await noteWorker.fetchNotes()
         
+        // Fetch updated notes from SwiftData
+        let updatedNotes = (try? swiftDataService.fetchNotes()) ?? []
         let response = NoteScene.FetchNotes.Response(
-            notes: noteWorker.notes,
+            notes: updatedNotes,
             isFromCache: false
         )
         presenter?.presentNotes(response: response)
@@ -68,19 +70,24 @@ class NoteListInteractor: NoteBusinessLogic {
     // MARK: - Update Note
     
     func updateNote(request: NoteScene.UpdateNote.Request) async {
-        guard let note = noteWorker.notes.first(where: { $0.id == request.noteId }) else {
+        // Fetch note from SwiftData
+        guard let note = try? swiftDataService.fetchNote(id: request.noteId) else {
+            let dummyNote = Note(
+                id: UUID().uuidString,
+                amount: request.amount,
+                description: request.description,
+                date: Date(),
+                category: request.category
+            )
             let response = NoteScene.UpdateNote.Response(
-                note: Note(id: UUID().uuidString,
-                           amount: request.amount,
-                           description: request.description,
-                           date: Date(),
-                           category: request.category),
-                success: false,
-                
+                note: dummyNote,
+                success: false
             )
             presenter?.presentUpdateResult(response: response)
             return
         }
+        
+        // Update note properties
         note.syncStatus = "pending"
         note.amount = request.amount
         note.noteDescription = request.description
@@ -110,7 +117,8 @@ class NoteListInteractor: NoteBusinessLogic {
     // MARK: - Fetch Single Note
     
     func fetchNote(request: NoteScene.FetchNote.Request) async {
-        let note = noteWorker.notes.first { $0.id == request.noteId }
+        // Fetch from SwiftData
+        let note = try? swiftDataService.fetchNote(id: request.noteId)
         
         let response = NoteScene.FetchNote.Response(note: note)
         presenter?.presentNote(response: response)

@@ -1,6 +1,6 @@
-// MARK: - InigoVIP App Entry Point
+// MARK: - InigoVIP App Entry Point (Final)
 // File: InigoVIPApp.swift
-// Final Production Version
+// Final Production Version with SwiftDataService
 
 import SwiftUI
 import SwiftData
@@ -12,8 +12,7 @@ struct InigoVIPApp: App {
     @State private var supabaseService = SupabaseService()
     @State private var noteWorker: NoteWorker?
     @State private var router = Router()
-    @Environment(\.scenePhase) private var scenePhase
-
+    
     var body: some Scene {
         WindowGroup {
             Group {
@@ -21,23 +20,28 @@ struct InigoVIPApp: App {
                     NavigationStack(path: $router.path) {
                         NoteListView()
                             .environment(noteWorker)
+                            .environment(swiftDataService)
                             .environment(router)
                             .navigationDestination(for: Route.self) { route in
                                 RouterView.destination(for: route)
                                     .environment(noteWorker)
+                                    .environment(swiftDataService)
                                     .environment(router)
                             }
                     }
                     .sheet(item: $router.presentedSheet) { route in
                         RouterView.destination(for: route)
                             .environment(noteWorker)
+                            .environment(swiftDataService)
                             .environment(router)
                     }
                     .fullScreenCover(item: $router.presentedFullScreen) { route in
                         RouterView.destination(for: route)
                             .environment(noteWorker)
+                            .environment(swiftDataService)
                             .environment(router)
                     }
+                    .modelContainer(for: Note.self)
                 } else {
                     // Initialization screen
                     VStack(spacing: 20) {
@@ -56,7 +60,6 @@ struct InigoVIPApp: App {
                     )
                     print("✅ App initialized successfully")
                 }
-                await noteWorker?.syncPendingNotes()
             }
         }
     }

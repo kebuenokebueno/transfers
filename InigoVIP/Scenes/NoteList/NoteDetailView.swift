@@ -6,35 +6,60 @@
 //
 
 import SwiftUI
-
-
+import SwiftData
 
 struct NoteDetailView: View {
     @Environment(Router.self) private var router
     @Environment(\.dismiss) private var dismiss
-    @State private var viewController: NoteListViewController?
+    @Environment(NoteWorker.self) private var noteWorker
+    @Environment(SwiftDataService.self) private var swiftDataService
     
     let noteId: String
-    @Environment(NoteWorker.self) private var noteWorker
+    @Query private var notes: [Note]
     
-    @State private var displayedNote: NoteScene.FetchNote.ViewModel.DisplayedNote?
     @State private var showDeleteConfirmation = false
+    @State private var viewController: NoteListViewController?
     
     init(noteId: String) {
         self.noteId = noteId
+        
+        // Query only this specific note from SwiftData
+        let predicate = #Predicate<Note> { note in
+            note.id == noteId
+        }
+        _notes = Query(filter: predicate, sort: \Note.date, order: .reverse)
+    }
+    
+    private var note: Note? {
+        notes.first
+    }
+    
+    // Formatted display data
+    private var displayedNote: NoteScene.FetchNote.ViewModel.DisplayedNote? {
+        guard let note = note else { return nil }
+        
+        return NoteScene.FetchNote.ViewModel.DisplayedNote(
+            id: note.id,
+            amount: note.formattedAmount,
+            description: note.noteDescription,
+            date: note.formattedDate,
+            category: note.category,
+            isPositive: note.isPositive,
+            syncStatus: note.syncStatusEnum.rawValue.capitalized
+        )
     }
     
     var body: some View {
         ScrollView {
-            if let note = displayedNote {
+            if let displayedNote = displayedNote {
                 VStack(spacing: 24) {
                     // Amount
-                    Text(note.amount)
+                    Text(displayedNote.amount)
                         .font(.system(size: 48, weight: .bold))
-                        .foregroundColor(note.isPositive ? .green : .primary)
+                        .foregroundColor(displayedNote.isPositive ? .green : .primary)
                     
                     // Category
-                    Text(note.category)
+                    Text(displayedNote.category)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .background(Color.blue.opacity(0.2))
@@ -45,9 +70,9 @@ struct NoteDetailView: View {
                     
                     // Details
                     VStack(alignment: .leading, spacing: 16) {
-                        DetailRow(label: "Description", value: note.description)
-                        DetailRow(label: "Date", value: note.date)
-                        DetailRow(label: "Sync Status", value: note.syncStatus)
+                        DetailRow(label: "Description", value: displayedNote.description)
+                        DetailRow(label: "Date", value: displayedNote.date)
+                        DetailRow(label: "Sync Status", value: displayedNote.syncStatus)
                     }
                     .padding()
                     .background(Color(.systemGray6))
@@ -57,7 +82,7 @@ struct NoteDetailView: View {
                     
                     // Edit Button
                     Button {
-                        router.navigate(to: .editNote(id: note.id))
+                        router.navigate(to: .editNote(id: displayedNote.id))
                     } label: {
                         Label("Edit Note", systemImage: "pencil")
                             .frame(maxWidth: .infinity)
@@ -77,7 +102,12 @@ struct NoteDetailView: View {
                 }
                 .padding()
             } else {
-                ProgressView("Loading...")
+                // Note not found
+                ContentUnavailableView(
+                    "Note Not Found",
+                    systemImage: "note.text",
+                    description: Text("This note may have been deleted")
+                )
             }
         }
         .navigationTitle("Note Details")
@@ -93,13 +123,16 @@ struct NoteDetailView: View {
         .task {
             if viewController == nil {
                 setupVIP()
-                loadNote()
             }
         }
     }
     
     private func setupVIP() {
-        let interactor = NoteListInteractor(noteWorker: noteWorker)
+        // ✅ Pass both noteWorker AND swiftDataService
+        let interactor = NoteListInteractor(
+            noteWorker: noteWorker,
+            swiftDataService: swiftDataService
+        )
         let presenter = NoteListPresenter()
         let vc = NoteListViewController()
         
@@ -110,30 +143,11 @@ struct NoteDetailView: View {
         viewController = vc
     }
     
-    private func loadNote() {
-        Task {
-            await viewController?.interactor?.fetchNote(
-                request: NoteScene.FetchNote.Request(noteId: noteId)
-            )
-            
-            // Get displayed note from note manager
-            if let note = noteManager.notes.first(where: { $0.id == noteId }) {
-                displayedNote = NoteScene.FetchNote.ViewModel.DisplayedNote(
-                    id: note.id,
-                    amount: note.formattedAmount,
-                    description: note.noteDescription,
-                    date: note.formattedDate,
-                    category: note.category,
-                    isPositive: note.isPositive,
-                    syncStatus: note.syncStatusEnum.rawValue.capitalized
-                )
-            }
-        }
-    }
-    
     private func deleteNote() {
-        viewController?.deleteNote(noteId: noteId)
-        dismiss()
+        Task {
+            await noteWorker.deleteNote(id: noteId)
+            dismiss()
+        }
     }
 }
 

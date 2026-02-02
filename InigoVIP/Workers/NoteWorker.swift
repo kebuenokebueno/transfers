@@ -9,7 +9,6 @@ class NoteWorker {
     private let swiftDataService: SwiftDataService
     private let supabaseService: SupabaseService
     
-    var notes: [Note] = []
     var isLoading = false
     var isSyncing = false
     var lastError: String?
@@ -24,18 +23,17 @@ class NoteWorker {
     
     // MARK: - 📥 Fetch Notes (Offline-First)
     
-    /// Fetch notes - tries local first, then syncs from cloud
+    /// Fetch notes - loads from local, then syncs from cloud
     func fetchNotes() async {
         isLoading = true
         lastError = nil
         
         do {
-            // 1. Load from local SwiftData first (instant)
-            notes = try swiftDataService.fetchNotes()
-            print("✅ Loaded \(notes.count) notes from local storage")
-            
-            // 2. Sync from Supabase in background
+            // Sync from cloud - SwiftData will update automatically
             await syncFromCloud()
+            
+            let count = try swiftDataService.fetchNotes().count
+            print("✅ \(count) notes available in SwiftData")
             
         } catch {
             lastError = "Failed to load notes: \(error.localizedDescription)"
@@ -50,12 +48,11 @@ class NoteWorker {
     /// Create note - saves locally immediately, syncs to cloud
     func createNote(_ note: Note) async {
         do {
-            // 1. Save to SwiftData immediately (offline-first)
+            // Save to SwiftData immediately (offline-first)
             try swiftDataService.saveNote(note)
-            notes.insert(note, at: 0)
             print("✅ Note saved locally: \(note.id)")
             
-            // 2. Sync to Supabase in background
+            // Sync to Supabase in background
             Task {
                 await syncNoteToCloud(note)
             }
@@ -68,23 +65,29 @@ class NoteWorker {
     
     // MARK: - ✏️ Update Note
     
-    /// Update note - saves locally immediately, syncs to cloud
-    func updateNote(_ note: Note) async {
+    /// Update note - fetches from DB, updates, saves, syncs
+    func updateNote(_ updatedNote: Note) async {
         do {
-            // 1. Update in SwiftData
-            note.markForSync()
-            try swiftDataService.updateNote(note)
-            
-            // Update local array
-            if let index = notes.firstIndex(where: { $0.id == note.id }) {
-                notes[index] = note
+            // Fetch existing note from SwiftData
+            guard let existingNote = try? swiftDataService.fetchNote(id: updatedNote.id) else {
+                print("⚠️ Note not found for update: \(updatedNote.id)")
+                lastError = "Note not found"
+                return
             }
             
-            print("✅ Note updated locally: \(note.id)")
+            // Update properties
+            existingNote.amount = updatedNote.amount
+            existingNote.noteDescription = updatedNote.noteDescription
+            existingNote.category = updatedNote.category
+            existingNote.markForSync()
             
-            // 2. Sync to Supabase in background
+            // Save to SwiftData
+            try swiftDataService.updateNote(existingNote)
+            print("✅ Note updated locally: \(existingNote.id)")
+            
+            // Sync to Supabase in background
             Task {
-                await syncNoteToCloud(note)
+                await syncNoteToCloud(existingNote)
             }
             
         } catch {
@@ -98,12 +101,11 @@ class NoteWorker {
     /// Delete note - removes locally immediately, syncs to cloud
     func deleteNote(id: String) async {
         do {
-            // 1. Delete from SwiftData
+            // Delete from SwiftData
             try swiftDataService.deleteNote(id: id)
-            notes.removeAll { $0.id == id }
             print("✅ Note deleted locally: \(id)")
             
-            // 2. Delete from Supabase in background
+            // Delete from Supabase in background
             Task {
                 do {
                     try await supabaseService.deleteNote(id: id)
@@ -145,9 +147,8 @@ class NoteWorker {
                 }
             }
             
-            // Reload from local storage
-            notes = try swiftDataService.fetchNotes()
-            print("✅ Sync complete: \(notes.count) notes")
+            let finalCount = try swiftDataService.fetchNotes().count
+            print("✅ Sync complete: \(finalCount) notes")
             
         } catch {
             print("⚠️ Sync from cloud failed: \(error)")
@@ -203,24 +204,12 @@ class NoteWorker {
     
     // MARK: - 🔍 Search & Filter
     
-    func searchNotes(query: String) async {
-        do {
-            notes = try swiftDataService.searchNotes(query: query)
-        } catch {
-            lastError = "Search failed: \(error.localizedDescription)"
-        }
+    func searchNotes(query: String) async throws -> [Note] {
+        return try swiftDataService.searchNotes(query: query)
     }
     
-    func filterByCategory(category: String) async {
-        do {
-            notes = try swiftDataService.fetchNotesByCategory(category: category)
-        } catch {
-            lastError = "Filter failed: \(error.localizedDescription)"
-        }
-    }
-    
-    func resetFilter() async {
-        await fetchNotes()
+    func filterByCategory(category: String) async throws -> [Note] {
+        return try swiftDataService.fetchNotesByCategory(category: category)
     }
     
     // MARK: - 📊 Statistics

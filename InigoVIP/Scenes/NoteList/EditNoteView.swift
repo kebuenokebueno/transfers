@@ -7,31 +7,46 @@
 
 import Foundation
 import SwiftUI
-import StoreKit
+import SwiftData
 
 struct EditNoteView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(NoteWorker.self) private var noteWorker
+    @Environment(SwiftDataService.self) private var swiftDataService
+    
     @State private var viewController: NoteListViewController?
-    @Environment(NoteWorker.self) private var noteWorker  // ← Get from environment
-
+    
     let noteId: String
+    
+    @Query private var notes: [Note]
     
     @State private var amount = ""
     @State private var description = ""
     @State private var category = ""
     @State private var isLoading = true
+    @State private var isSaving = false
     
     let categories = ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"]
     
     init(noteId: String) {
         self.noteId = noteId
+        
+        // Query only this specific note from SwiftData
+        let predicate = #Predicate<Note> { note in
+            note.id == noteId
+        }
+        _notes = Query(filter: predicate)
+    }
+    
+    private var note: Note? {
+        notes.first
     }
     
     var body: some View {
         Form {
             if isLoading {
                 ProgressView("Loading...")
-            } else {
+            } else if note != nil {
                 Section("Details") {
                     TextField("Amount", text: $amount)
                         .keyboardType(.decimalPad)
@@ -44,6 +59,12 @@ struct EditNoteView: View {
                         }
                     }
                 }
+            } else {
+                ContentUnavailableView(
+                    "Note Not Found",
+                    systemImage: "note.text",
+                    description: Text("This note may have been deleted")
+                )
             }
         }
         .navigationTitle("Edit Note")
@@ -53,7 +74,13 @@ struct EditNoteView: View {
                 Button("Save") {
                     saveChanges()
                 }
-                .disabled(amount.isEmpty || description.isEmpty)
+                .disabled(amount.isEmpty || description.isEmpty || isSaving)
+            }
+        }
+        .disabled(isSaving)
+        .overlay {
+            if isSaving {
+                ProgressView("Saving...")
             }
         }
         .alert("Success", isPresented: .constant(viewController?.successMessage != nil)) {
@@ -66,16 +93,36 @@ struct EditNoteView: View {
                 Text(message)
             }
         }
+        .alert("Error", isPresented: .constant(noteWorker.lastError != nil)) {
+            Button("OK") {
+                noteWorker.lastError = nil
+            }
+        } message: {
+            if let error = noteWorker.lastError {
+                Text(error)
+            }
+        }
         .task {
             if viewController == nil {
                 setupVIP()
-                loadNote()
+            }
+            loadNote()
+        }
+        .onChange(of: note) { oldValue, newValue in
+            if let newValue = newValue, !isSaving {
+                amount = String(abs(newValue.amount))
+                description = newValue.noteDescription
+                category = newValue.category
             }
         }
     }
     
     private func setupVIP() {
-        let interactor = NoteListInteractor(noteWorker: noteWorker)
+        // ✅ Pass both noteWorker AND swiftDataService
+        let interactor = NoteListInteractor(
+            noteWorker: noteWorker,
+            swiftDataService: swiftDataService
+        )
         let presenter = NoteListPresenter()
         let vc = NoteListViewController()
         
@@ -87,30 +134,40 @@ struct EditNoteView: View {
     }
     
     private func loadNote() {
-        Task {
-            await viewController?.interactor?.fetchNote(
-                request: NoteScene.FetchNote.Request(noteId: noteId)
-            )
-            
-            // Load data from note manager
-            if let note = noteWorker.notes.first(where: { $0.id == noteId }) {
-                amount = String(abs(note.amount))
-                description = note.noteDescription
-                category = note.category
-            }
-            
-            isLoading = false
+        // Load data from SwiftData note
+        if let note = note {
+            amount = String(abs(note.amount))
+            description = note.noteDescription
+            category = note.category
         }
+        isLoading = false
     }
     
     private func saveChanges() {
-        guard let amountValue = Double(amount) else { return }
+        guard let amountValue = Double(amount),
+              let note = note else { return }
         
-        viewController?.updateNote(
-            noteId: noteId,
-            amount: amountValue,
-            description: description,
-            category: category
-        )
+        isSaving = true
+        
+        Task {
+            // Create updated note with same ID
+            let updatedNote = Note(
+                id: note.id,
+                amount: note.isPositive ? amountValue : -amountValue,
+                description: description,
+                date: note.date,
+                category: category,
+                syncStatus: .pending
+            )
+            
+            // Update through worker
+            await noteWorker.updateNote(updatedNote)
+            
+            isSaving = false
+            
+            // Dismiss after short delay to show update
+            try? await Task.sleep(for: .milliseconds(500))
+            dismiss()
+        }
     }
 }
