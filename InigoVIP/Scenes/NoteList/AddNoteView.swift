@@ -19,7 +19,7 @@ struct AddNoteView: View {
     @State private var description = ""
     @State private var category = "Food"
     @State private var isIncome = false
-    @Environment(NoteManager.self) private var noteManager
+    @Environment(NoteWorker.self) private var noteWorker
 
     
     let categories = ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"]
@@ -86,7 +86,7 @@ struct AddNoteView: View {
     }
     
     private func setupVIP() {
-        let interactor = NoteListInteractor(noteManager: noteManager)
+        let interactor = NoteListInteractor(noteWorker: noteWorker)
         let presenter = NoteListPresenter()
         let vc = NoteListViewController()
         

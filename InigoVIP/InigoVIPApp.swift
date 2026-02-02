@@ -10,32 +10,32 @@ struct InigoVIPApp: App {
     // Services
     @State private var swiftDataService = SwiftDataService()
     @State private var supabaseService = SupabaseService()
-    @State private var noteManager: NoteManager?
+    @State private var noteWorker: NoteWorker?
     @State private var router = Router()
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
             Group {
-                if let noteManager = noteManager {
+                if let noteWorker = noteWorker {
                     NavigationStack(path: $router.path) {
                         NoteListView()
-                            .environment(noteManager)
+                            .environment(noteWorker)
                             .environment(router)
                             .navigationDestination(for: Route.self) { route in
                                 RouterView.destination(for: route)
-                                    .environment(noteManager)
+                                    .environment(noteWorker)
                                     .environment(router)
                             }
                     }
                     .sheet(item: $router.presentedSheet) { route in
                         RouterView.destination(for: route)
-                            .environment(noteManager)
+                            .environment(noteWorker)
                             .environment(router)
                     }
                     .fullScreenCover(item: $router.presentedFullScreen) { route in
                         RouterView.destination(for: route)
-                            .environment(noteManager)
+                            .environment(noteWorker)
                             .environment(router)
                     }
                 } else {
@@ -48,15 +48,15 @@ struct InigoVIPApp: App {
                 }
             }
             .task {
-                // Initialize NoteManager on first launch
-                if noteManager == nil {
-                    noteManager = NoteManager(
+                // Initialize NoteWorker on first launch
+                if noteWorker == nil {
+                    noteWorker = NoteWorker(
                         swiftDataService: swiftDataService,
                         supabaseService: supabaseService
                     )
                     print("✅ App initialized successfully")
                 }
-                await noteManager?.syncPendingNotes()
+                await noteWorker?.syncPendingNotes()
             }
         }
     }

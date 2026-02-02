@@ -60,8 +60,7 @@
 				Services/SupabaseService.swift,
 				Services/SwiftDataService.swift,
 				Workers/AnalyticsWorker.swift,
-				Workers/NoteManager.swift,
-				Workers/TransactionWorker.swift,
+				Workers/NoteWorker.swift,
 			);
 			target = 6AABCC372F2938C8009E5D12 /* InigoVIPTests */;
 		};
@@ -88,8 +87,7 @@
 				Services/SupabaseService.swift,
 				Services/SwiftDataService.swift,
 				Workers/AnalyticsWorker.swift,
-				Workers/NoteManager.swift,
-				Workers/TransactionWorker.swift,
+				Workers/NoteWorker.swift,
 			);
 			target = 6AABCC412F2938C8009E5D12 /* InigoVIPUITests */;
 		};

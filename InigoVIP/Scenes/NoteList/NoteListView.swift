@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NoteListView: View {
     @Environment(Router.self) private var router
-    @Environment(NoteManager.self) private var noteManager
+    @Environment(NoteWorker.self) private var noteWorker
     @State private var viewController: NoteListViewController?
 
     
@@ -31,7 +31,7 @@ struct NoteListView: View {
     
     private func setupVIP() {
         // Create VIP components
-        let interactor = NoteListInteractor(noteManager: noteManager)
+        let interactor = NoteListInteractor(noteWorker: noteWorker)
         let presenter = NoteListPresenter()
         let vc = NoteListViewController()
         

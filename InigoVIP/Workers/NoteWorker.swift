@@ -5,7 +5,7 @@ import SwiftData
 /// Saves to SwiftData immediately, syncs to Supabase in background
 @MainActor
 @Observable
-class NoteManager {
+class NoteWorker {
     private let swiftDataService: SwiftDataService
     private let supabaseService: SupabaseService
     

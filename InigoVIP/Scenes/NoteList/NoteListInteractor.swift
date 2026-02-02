@@ -12,17 +12,17 @@ import Foundation
 @MainActor
 class NoteListInteractor: NoteBusinessLogic {
     var presenter: NotePresentationLogic?
-    private let noteManager: NoteManager
+    private let noteWorker: NoteWorker
     
-    init(noteManager: NoteManager) {
-        self.noteManager = noteManager
+    init(noteWorker: NoteWorker) {
+        self.noteWorker = noteWorker
     }
     
     // MARK: - Fetch Notes
     
     func fetchNotes(request: NoteScene.FetchNotes.Request) async {
         // Fetch from local first
-        let localNotes = noteManager.notes
+        let localNotes = noteWorker.notes
         let isFromCache = !localNotes.isEmpty
         
         // Present immediately with local data
@@ -35,10 +35,10 @@ class NoteListInteractor: NoteBusinessLogic {
         }
         
         // Fetch from cloud
-        await noteManager.fetchNotes()
+        await noteWorker.fetchNotes()
         
         let response = NoteScene.FetchNotes.Response(
-            notes: noteManager.notes,
+            notes: noteWorker.notes,
             isFromCache: false
         )
         presenter?.presentNotes(response: response)
@@ -56,7 +56,7 @@ class NoteListInteractor: NoteBusinessLogic {
             syncStatus: .pending
         )
         
-        await noteManager.createNote(note)
+        await noteWorker.createNote(note)
         
         let response = NoteScene.CreateNote.Response(
             note: note,
@@ -68,7 +68,7 @@ class NoteListInteractor: NoteBusinessLogic {
     // MARK: - Update Note
     
     func updateNote(request: NoteScene.UpdateNote.Request) async {
-        guard let note = noteManager.notes.first(where: { $0.id == request.noteId }) else {
+        guard let note = noteWorker.notes.first(where: { $0.id == request.noteId }) else {
             let response = NoteScene.UpdateNote.Response(
                 note: Note(id: UUID().uuidString,
                            amount: request.amount,
@@ -86,7 +86,7 @@ class NoteListInteractor: NoteBusinessLogic {
         note.noteDescription = request.description
         note.category = request.category
         
-        await noteManager.updateNote(note)
+        await noteWorker.updateNote(note)
         
         let response = NoteScene.UpdateNote.Response(
             note: note,
@@ -98,7 +98,7 @@ class NoteListInteractor: NoteBusinessLogic {
     // MARK: - Delete Note
     
     func deleteNote(request: NoteScene.DeleteNote.Request) async {
-        await noteManager.deleteNote(id: request.noteId)
+        await noteWorker.deleteNote(id: request.noteId)
         
         let response = NoteScene.DeleteNote.Response(
             success: true,
@@ -110,7 +110,7 @@ class NoteListInteractor: NoteBusinessLogic {
     // MARK: - Fetch Single Note
     
     func fetchNote(request: NoteScene.FetchNote.Request) async {
-        let note = noteManager.notes.first { $0.id == request.noteId }
+        let note = noteWorker.notes.first { $0.id == request.noteId }
         
         let response = NoteScene.FetchNote.Response(note: note)
         presenter?.presentNote(response: response)

@@ -12,7 +12,7 @@ import StoreKit
 struct EditNoteView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewController: NoteListViewController?
-    @Environment(NoteManager.self) private var noteManager  // ← Get from environment
+    @Environment(NoteWorker.self) private var noteWorker  // ← Get from environment
 
     let noteId: String
     
@@ -75,7 +75,7 @@ struct EditNoteView: View {
     }
     
     private func setupVIP() {
-        let interactor = NoteListInteractor(noteManager: noteManager)
+        let interactor = NoteListInteractor(noteWorker: noteWorker)
         let presenter = NoteListPresenter()
         let vc = NoteListViewController()
         
@@ -93,7 +93,7 @@ struct EditNoteView: View {
             )
             
             // Load data from note manager
-            if let note = noteManager.notes.first(where: { $0.id == noteId }) {
+            if let note = noteWorker.notes.first(where: { $0.id == noteId }) {
                 amount = String(abs(note.amount))
                 description = note.noteDescription
                 category = note.category
