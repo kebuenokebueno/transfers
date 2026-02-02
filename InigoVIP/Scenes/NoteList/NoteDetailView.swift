@@ -13,8 +13,10 @@ struct NoteDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(NoteWorker.self) private var noteWorker
     @Environment(SwiftDataService.self) private var swiftDataService
+    @Environment(\.modelContext) private var modelContext
     
     let noteId: String
+    
     @Query private var notes: [Note]
     
     @State private var showDeleteConfirmation = false
@@ -51,7 +53,7 @@ struct NoteDetailView: View {
     
     var body: some View {
         ScrollView {
-            if let displayedNote = displayedNote {
+            if let displayedNote = displayedNote, let note = note {
                 VStack(spacing: 24) {
                     // Amount
                     Text(displayedNote.amount)
@@ -102,7 +104,7 @@ struct NoteDetailView: View {
                 }
                 .padding()
             } else {
-                // Note not found
+                // Note not found or was deleted
                 ContentUnavailableView(
                     "Note Not Found",
                     systemImage: "note.text",
@@ -128,7 +130,6 @@ struct NoteDetailView: View {
     }
     
     private func setupVIP() {
-        // ✅ Pass both noteWorker AND swiftDataService
         let interactor = NoteListInteractor(
             noteWorker: noteWorker,
             swiftDataService: swiftDataService
@@ -144,9 +145,20 @@ struct NoteDetailView: View {
     }
     
     private func deleteNote() {
+        guard let note = note else { return }
+        
         Task {
-            await noteWorker.deleteNote(id: noteId)
+            // Delete from SwiftData via modelContext (triggers @Query update)
+            modelContext.delete(note)
+            
+            // Save immediately
+            try? modelContext.save()
+            
+            // Dismiss immediately (note is gone from DB)
             dismiss()
+            
+            // Then delete from Supabase in background
+            await noteWorker.deleteNote(id: note.id)
         }
     }
 }
