@@ -44,7 +44,7 @@ class SupabaseService {
     func fetchNotes() async throws -> [Note] {
         print("📥 Fetching notes from Supabase...")
         
-        let response: [SupabaseNote] = try await client
+        let response: [Note] = try await client
             .from("notes")
             .select()
             .order("created_at", ascending: false)
@@ -54,21 +54,12 @@ class SupabaseService {
         print("✅ Fetched \(response.count) notes")
         
         // Convert to Note model
-        return response.map { $0.toNote() }
+        return response
     }
     
     /// Create a new note
     func createNote(_ note: Note) async throws {
         print("💾 Creating note: \(note.id)")
-        
-        let note = SupabaseNote(
-            id: note.id,
-            amount: note.amount,
-            description: note.transactionDescription,
-            date: note.date,
-            category: note.category,
-            thumbnail_url: note.thumbnailUrl
-        )
         
         try await client
             .from("notes")
@@ -81,15 +72,6 @@ class SupabaseService {
     /// Update an existing note
     func updateNote(_ note: Note) async throws {
         print("✏️ Updating note: \(note.id)")
-        
-        let note = SupabaseNote(
-            id: note.id,
-            amount: note.amount,
-            description: note.transactionDescription,
-            date: note.date,
-            category: note.category,
-            thumbnail_url: note.thumbnailUrl
-        )
         
         try await client
             .from("notes")
@@ -117,14 +99,14 @@ class SupabaseService {
     func fetchNote(id: String) async throws -> Note? {
         print("📥 Fetching note: \(id)")
         
-        let response: [SupabaseNote] = try await client
+        let response: [Note] = try await client
             .from("notes")
             .select()
             .eq("id", value: id)
             .execute()
             .value
         
-        return response.first?.toNote()
+        return response.first
     }
     
     // MARK: - 🔍 Search & Filter
@@ -133,7 +115,7 @@ class SupabaseService {
     func searchNotes(query: String) async throws -> [Note] {
         print("🔍 Searching notes: \(query)")
         
-        let response: [SupabaseNote] = try await client
+        let response: [Note] = try await client
             .from("notes")
             .select()
             .ilike("description", pattern: "%\(query)%")
@@ -141,14 +123,14 @@ class SupabaseService {
             .execute()
             .value
         
-        return response.map { $0.toNote() }
+        return response
     }
     
     /// Filter notes by category
     func fetchNotesByCategory(category: String) async throws -> [Note] {
         print("📂 Fetching notes for category: \(category)")
         
-        let response: [SupabaseNote] = try await client
+        let response: [Note] = try await client
             .from("notes")
             .select()
             .eq("category", value: category)
@@ -156,14 +138,14 @@ class SupabaseService {
             .execute()
             .value
         
-        return response.map { $0.toNote() }
+        return response
     }
     
     /// Filter notes by date range
     func fetchNotesByDateRange(from: Date, to: Date) async throws -> [Note] {
         print("📅 Fetching notes from \(from) to \(to)")
         
-        let response: [SupabaseNote] = try await client
+        let response: [Note] = try await client
             .from("notes")
             .select()
             .gte("date", value: from.ISO8601Format())
@@ -172,7 +154,7 @@ class SupabaseService {
             .execute()
             .value
         
-        return response.map { $0.toNote() }
+        return response
     }
     
     // MARK: - 📊 Statistics
@@ -217,50 +199,6 @@ class SupabaseService {
             print("❌ Supabase connection failed: \(error)")
             return false
         }
-    }
-}
-
-// MARK: - 🗄️ Supabase Note Model
-
-struct SupabaseNote: Codable {
-    let id: String
-    let amount: Double
-    let description: String
-    let date: Date
-    let category: String
-    let thumbnail_url: String?
-    let created_at: Date?
-    let updated_at: Date?
-    
-    init(
-        id: String,
-        amount: Double,
-        description: String,
-        date: Date,
-        category: String,
-        thumbnail_url: String?
-    ) {
-        self.id = id
-        self.amount = amount
-        self.description = description
-        self.date = date
-        self.category = category
-        self.thumbnail_url = thumbnail_url
-        self.created_at = Date()
-        self.updated_at = Date()
-    }
-    
-    // Convert to Note model
-    func toNote() -> Note {
-        Note(
-            id: id,
-            amount: amount,
-            description: description,
-            date: date,
-            category: category,
-            thumbnailUrl: thumbnail_url,
-            syncStatus: .synced
-        )
     }
 }
 

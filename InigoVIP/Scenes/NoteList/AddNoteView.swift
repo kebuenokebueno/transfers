@@ -60,7 +60,9 @@ struct AddNoteView: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        saveNote()
+                        Task {
+                            await saveNote()
+                        }
                     }
                     .disabled(amount.isEmpty || description.isEmpty)
                 }
@@ -95,14 +97,16 @@ struct AddNoteView: View {
         viewController = vc
     }
     
-    private func saveNote() {
+    private func saveNote() async {
         guard let amountValue = Double(amount) else { return }
-        
-        viewController?.createNote(
+        let x = NoteScene.CreateNote.Request(
             amount: amountValue,
             description: description,
             category: category,
             isIncome: isIncome
+        )
+        await viewController?.interactor?.createNote(
+            request: x
         )
     }
 }

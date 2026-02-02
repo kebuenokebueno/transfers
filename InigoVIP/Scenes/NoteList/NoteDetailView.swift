@@ -15,14 +15,13 @@ struct NoteDetailView: View {
     @State private var viewController: NoteListViewController?
     
     let noteId: String
-    private let noteManager: NoteManager
+    @Environment(NoteManager.self) private var noteManager
     
     @State private var displayedNote: NoteScene.FetchNote.ViewModel.DisplayedNote?
     @State private var showDeleteConfirmation = false
     
     init(noteId: String) {
         self.noteId = noteId
-        self.noteManager = noteManager
     }
     
     var body: some View {

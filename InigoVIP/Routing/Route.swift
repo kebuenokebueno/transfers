@@ -9,27 +9,27 @@ import Foundation
 import SwiftUI
 
 enum Route: Hashable, Equatable {
-    case transactionDetail(id: String)
+    case noteDetail(id: String)
     case settings
-//    case profile
-    case addTransaction
-    case editTransaction(id: String)
+    case profile
+    case addNote
+    case editNote(id: String)
 }
 
 
 extension Route: Identifiable {
     var id: String {
         switch self {
-        case .transactionDetail(let id):
-            return "transactionDetail_\(id)"
+        case .noteDetail(let id):
+            return "noteDetail_\(id)"
         case .settings:
             return "settings"
-//        case .profile:
-//            return "profile"
-        case .addTransaction:
-            return "addTransaction"
-        case .editTransaction(let id):
-            return "editTransaction_\(id)"
+        case .profile:
+            return "profile"
+        case .addNote:
+            return "addNote"
+        case .editNote(let id):
+            return "editNote_\(id)"
         }
     }
 }

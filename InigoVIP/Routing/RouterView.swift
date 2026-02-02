@@ -12,19 +12,19 @@ struct RouterView {
     @ViewBuilder
     static func destination(for route: Route) -> some View {
         switch route {
-        case .transactionDetail(let id):
+        case .noteDetail(let id):
             NoteDetailView(noteId: id)
             
         case .settings:
             SettingsView()
             
-//        case .profile:
-//            ProfileView()
+        case .profile:
+            ProfileView()
             
-        case .addTransaction:
+        case .addNote:
             AddNoteView()
             
-        case .editTransaction(let id):
+        case .editNote(let id):
             EditNoteView(noteId: id)
         }
     }
