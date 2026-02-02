@@ -8,73 +8,46 @@
 import SwiftUI
 
 
-struct TransactionRow: View {
-    let transaction: TransactionList.FetchTransactions.ViewModel.DisplayedTransaction
-    
-    // ✅ Assistive Access: Dynamic Type awareness
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+struct NoteRow: View {
+    let note: Note
     
     var body: some View {
-        HStack(alignment: .top, spacing: dynamicTypeSize.isAccessibilitySize ? 16 : 12) {
-            // Mostrar imagen de la API o icono por defecto
-            if let thumbnailUrl = transaction.thumbnailUrl,
-               let url = URL(string: thumbnailUrl) {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .empty:
-                        ProgressView()
-                            .frame(width: dynamicTypeSize.isAccessibilitySize ? 52 : 44,
-                                   height: dynamicTypeSize.isAccessibilitySize ? 52 : 44)
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: dynamicTypeSize.isAccessibilitySize ? 52 : 44,
-                                   height: dynamicTypeSize.isAccessibilitySize ? 52 : 44)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                    case .failure:
-                        CategoryIcon(category: transaction.category)
-                    @unknown default:
-                        CategoryIcon(category: transaction.category)
-                    }
-                }
-                // ✅ VoiceOver: Decorative images should be hidden
-                .accessibilityHidden(true)
-            } else {
-                CategoryIcon(category: transaction.category)
-                    // ✅ VoiceOver: Decorative images should be hidden
-                    .accessibilityHidden(true)
-            }
+        HStack(spacing: 12) {
+            // Category Icon
+            CategoryIcon(category: note.category)
+                .frame(width: 44, height: 44)
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(transaction.description)
+                Text(note.noteDescription)
                     .font(.headline)
-                    // ✅ Dynamic Type: Scale with user preferences
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                 
-                Text(transaction.date)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                
-                Text(transaction.category)
-                    .font(.caption2)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(Color.blue.opacity(0.1))
-                    .foregroundStyle(.blue)
-                    .clipShape(Capsule())
+                HStack {
+                    Text(note.category)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Text("•")
+                        .foregroundColor(.secondary)
+                    
+                    Text(note.shortDate)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    // Sync indicator
+                    if note.syncStatusEnum == .pending {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                            .font(.caption2)
+                            .foregroundColor(.orange)
+                    }
+                }
             }
             
-            Spacer(minLength: 8)
+            Spacer()
             
-            Text(transaction.amount)
+            Text(note.formattedAmount)
                 .font(.headline)
-                .foregroundStyle(transaction.isPositive ? .green : .primary)
-                // ✅ Dynamic Type: Ensure readability
-                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                .foregroundColor(note.isPositive ? .green : .primary)
         }
-        .padding(.vertical, dynamicTypeSize.isAccessibilitySize ? 8 : 4)
-        // ✅ Assistive Access: Minimum touch target 44x44
-        .frame(minHeight: 44)
+        .padding(.vertical, 4)
     }
 }

@@ -30,7 +30,7 @@ class AuthService {
     func logout() {
         Task { @MainActor in
             // Clear all user data FIRST
-            try? await swiftDataService?.clearAllUserData()
+            try? swiftDataService?.deleteAllNotes()
             
             // Then clear auth
             isLoggedIn = false
