@@ -27,39 +27,81 @@ class NoteListViewController: NoteDisplayLogic {
     var displayedNotes: [NoteScene.FetchNotes.ViewModel.DisplayedNote] = []
     var isLoading = false
     var errorMessage: String?
+    var successMessage: String?
     
-    // Display Method
+    // MARK: - Display Methods
+    
     func displayNotes(viewModel: NoteScene.FetchNotes.ViewModel) {
         displayedNotes = viewModel.displayedNotes
         isLoading = false
     }
     
     func displayCreateResult(viewModel: NoteScene.CreateNote.ViewModel) {
-        // Not used in list
+        if viewModel.success {
+            successMessage = viewModel.message
+            // Refresh list
+            Task {
+                await interactor?.fetchNotes(request: NoteScene.FetchNotes.Request())
+            }
+        } else {
+            errorMessage = viewModel.message
+        }
     }
     
     func displayUpdateResult(viewModel: NoteScene.UpdateNote.ViewModel) {
-        // Not used in list
+        if viewModel.success {
+            successMessage = viewModel.message
+            // Refresh list
+            Task {
+                await interactor?.fetchNotes(request: NoteScene.FetchNotes.Request())
+            }
+        } else {
+            errorMessage = viewModel.message
+        }
     }
     
     func displayDeleteResult(viewModel: NoteScene.DeleteNote.ViewModel) {
         if viewModel.success {
-            // Refresh list after delete
-            loadNotes()
+            successMessage = viewModel.message
         } else {
             errorMessage = viewModel.message
         }
     }
     
     func displayNote(viewModel: NoteScene.FetchNote.ViewModel) {
-        // Not used in list
+        // Handle single note display
     }
     
-    // User Actions
+    // MARK: - User Actions
+    
     func loadNotes() {
         isLoading = true
         Task {
             await interactor?.fetchNotes(request: NoteScene.FetchNotes.Request())
+        }
+    }
+    
+    func createNote(amount: Double, description: String, category: String, isIncome: Bool) {
+        Task {
+            let request = NoteScene.CreateNote.Request(
+                amount: amount,
+                description: description,
+                category: category,
+                isIncome: isIncome
+            )
+            await interactor?.createNote(request: request)
+        }
+    }
+    
+    func updateNote(noteId: String, amount: Double, description: String, category: String) {
+        Task {
+            let request = NoteScene.UpdateNote.Request(
+                noteId: noteId,
+                amount: amount,
+                description: description,
+                category: category
+            )
+            await interactor?.updateNote(request: request)
         }
     }
     
