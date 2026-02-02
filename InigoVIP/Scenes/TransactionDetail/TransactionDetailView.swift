@@ -74,7 +74,6 @@ struct TransactionDetailView: View {
                 date: Date(),
                 category: "Food",
                 thumbnailUrl: nil,
-                userId: "a"
             )
         }
         .navigationTitle("Transaction Details")

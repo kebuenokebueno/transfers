@@ -17,7 +17,6 @@ final public class Transfer {
     var date: Date
     var category: String
     var thumbnailUrl: String?
-    var userId: String // For multi-user support
     var syncStatus: SyncStatus
     var createdAt: Date
     var updatedAt: Date
@@ -25,11 +24,7 @@ final public class Transfer {
     public var isPositive: Bool {
         amount >= 0
     }
-    
-    // Relationships
-    @Relationship(deleteRule: .cascade) var tags: [TagEntity]?
-    @Relationship(deleteRule: .nullify, inverse: \CategoryEntity.transactions) var categoryEntity: CategoryEntity?
-    
+
     enum SyncStatus: String, Codable {
         case synced
         case pending
@@ -43,7 +38,6 @@ final public class Transfer {
         date: Date,
         category: String,
         thumbnailUrl: String? = nil,
-        userId: String,
         syncStatus: SyncStatus = .pending
     ) {
         self.id = id
@@ -52,7 +46,6 @@ final public class Transfer {
         self.date = date
         self.category = category
         self.thumbnailUrl = thumbnailUrl
-        self.userId = userId
         self.syncStatus = syncStatus
         self.createdAt = Date()
         self.updatedAt = Date()

@@ -15,9 +15,6 @@ class SwiftDataService {
     private var modelContainer: ModelContainer?
     private var modelContext: ModelContext?
     
-    // Current user ID for filtering
-    private(set) var currentUserId: String?
-    
     // Statistics
     private(set) var totalTransactions: Int = 0
     private(set) var pendingSyncCount: Int = 0
@@ -31,9 +28,6 @@ class SwiftDataService {
     private func setupContainer() {
         let schema = Schema([
             Transfer.self,
-            CategoryEntity.self,
-            TagEntity.self,
-            UserSessionEntity.self
         ])
         
         let modelConfiguration = ModelConfiguration(
@@ -59,64 +53,24 @@ class SwiftDataService {
         }
     }
     
-    func setCurrentUser(userId: String, email: String, name: String) {
-        self.currentUserId = userId
-        
-        // Create or update user session
-        Task {
-            await createUserSession(userId: userId, email: email, name: name)
-        }
-    }
-    
     // MARK: - 🗑️ Clear Data on Logout (CRITICAL)
     
     func clearAllUserData() async throws {
         guard let context = modelContext else { return }
-        guard let userId = currentUserId else { return }
         
-        print("🗑️ Clearing all data for user: \(userId)")
+        print("🗑️ Clearing all data")
         
         // Delete transactions
-        let transactionDescriptor = FetchDescriptor<Transfer>(
-            predicate: #Predicate { $0.userId == userId }
-        )
+        let transactionDescriptor = FetchDescriptor<Transfer>()
         let transactions = try context.fetch(transactionDescriptor)
         for transaction in transactions {
             context.delete(transaction)
-        }
-        
-        // Delete categories
-        let categoryDescriptor = FetchDescriptor<CategoryEntity>(
-            predicate: #Predicate { $0.userId == userId }
-        )
-        let categories = try context.fetch(categoryDescriptor)
-        for category in categories {
-            context.delete(category)
-        }
-        
-        // Delete tags
-        let tagDescriptor = FetchDescriptor<TagEntity>(
-            predicate: #Predicate { $0.userId == userId }
-        )
-        let tags = try context.fetch(tagDescriptor)
-        for tag in tags {
-            context.delete(tag)
-        }
-        
-        // Delete user session
-        let sessionDescriptor = FetchDescriptor<UserSessionEntity>(
-            predicate: #Predicate { $0.userId == userId }
-        )
-        let sessions = try context.fetch(sessionDescriptor)
-        for session in sessions {
-            context.delete(session)
         }
         
         // Save changes
         try context.save()
         
         // Clear current user
-        currentUserId = nil
         totalTransactions = 0
         pendingSyncCount = 0
         
@@ -127,7 +81,6 @@ class SwiftDataService {
     
     func saveTransaction(_ transaction: Transfer) async throws {
         guard let context = modelContext else { throw SwiftDataError.contextNotAvailable }
-//        guard let userId = currentUserId else { throw SwiftDataError.userNotLoggedIn }
         
         let entity = Transfer(
             id: transaction.id,
@@ -136,7 +89,6 @@ class SwiftDataService {
             date: transaction.date,
             category: transaction.category,
             thumbnailUrl: transaction.thumbnailUrl,
-            userId: "userId"
         )
         
         context.insert(entity)
@@ -149,10 +101,8 @@ class SwiftDataService {
     
     func fetchTransactions() async throws -> [Transfer] {
         guard let context = modelContext else { throw SwiftDataError.contextNotAvailable }
-//        guard let userId = currentUserId else { throw SwiftDataError.userNotLoggedIn }
         
         let descriptor = FetchDescriptor<Transfer>(
-//            predicate: #Predicate { $0.userId == userId },
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
         
@@ -162,12 +112,10 @@ class SwiftDataService {
     
     func fetchTransaction(id: String) async throws -> Transfer? {
         guard let context = modelContext else { throw SwiftDataError.contextNotAvailable }
-//        guard let userId = currentUserId else { throw SwiftDataError.userNotLoggedIn }
         
         let descriptor = FetchDescriptor<Transfer>(
             predicate: #Predicate {
                 $0.id == id
-//                && $0.userId == userId
             }
         )
         
@@ -177,12 +125,10 @@ class SwiftDataService {
     
     func updateTransaction(_ transaction: Transfer) async throws {
         guard let context = modelContext else { throw SwiftDataError.contextNotAvailable }
-//        guard let userId = currentUserId else { throw SwiftDataError.userNotLoggedIn }
         
         let descriptor = FetchDescriptor<Transfer>(
             predicate: #Predicate {
                 $0.id == "transaction.id"
-//                && $0.userId == userId
             }
         )
         
@@ -202,12 +148,10 @@ class SwiftDataService {
     
     func deleteTransaction(id: String) async throws {
         guard let context = modelContext else { throw SwiftDataError.contextNotAvailable }
-//        guard let userId = currentUserId else { throw SwiftDataError.userNotLoggedIn }
         
         let descriptor = FetchDescriptor<Transfer>(
             predicate: #Predicate {
                 $0.id == id
-//                && $0.userId == userId
             }
         )
         
@@ -226,10 +170,8 @@ class SwiftDataService {
     
     func fetchStatistics() async throws -> TransactionStatistics {
         guard let context = modelContext else { throw SwiftDataError.contextNotAvailable }
-//        guard let userId = currentUserId else { throw SwiftDataError.userNotLoggedIn }
         
         let descriptor = FetchDescriptor<Transfer>(
-//            predicate: #Predicate { $0.userId == userId }
         )
         
         let transactions = try context.fetch(descriptor)
@@ -258,11 +200,8 @@ class SwiftDataService {
     
     private func updateStatistics() async {
         guard let context = modelContext else { return }
-        guard let userId = currentUserId else { return }
         
-        let descriptor = FetchDescriptor<Transfer>(
-            predicate: #Predicate { $0.userId == userId }
-        )
+        let descriptor = FetchDescriptor<Transfer>()
         
         if let transactions = try? context.fetch(descriptor) {
             totalTransactions = transactions.count
@@ -274,13 +213,11 @@ class SwiftDataService {
     
     func fetchPendingSyncTransactions() async throws -> [Transfer] {
         guard let context = modelContext else { throw SwiftDataError.contextNotAvailable }
-        guard let userId = currentUserId else { throw SwiftDataError.userNotLoggedIn }
         
         let descriptor = FetchDescriptor<Transfer>(
-            predicate: #Predicate {
-                $0.userId == userId
-//                && $0.syncStatus == .pending
-            }
+//            predicate: #Predicate {
+//                $0.syncStatus == .pending
+//            }
         )
         
         let entities = try context.fetch(descriptor)
@@ -289,11 +226,10 @@ class SwiftDataService {
     
     func markTransactionAsSynced(id: String) async throws {
         guard let context = modelContext else { throw SwiftDataError.contextNotAvailable }
-        guard let userId = currentUserId else { throw SwiftDataError.userNotLoggedIn }
         
         let descriptor = FetchDescriptor<Transfer>(
             predicate: #Predicate {
-                $0.id == id && $0.userId == userId
+                $0.id == id
             }
         )
         
@@ -304,65 +240,6 @@ class SwiftDataService {
         try context.save()
         
         await updateStatistics()
-    }
-    
-    // MARK: - 📂 Category Management
-    
-    func saveCategory(id: String, name: String, icon: String, color: String) async throws {
-        guard let context = modelContext else { throw SwiftDataError.contextNotAvailable }
-        guard let userId = currentUserId else { throw SwiftDataError.userNotLoggedIn }
-        
-        let category = CategoryEntity(
-            id: id,
-            name: name,
-            icon: icon,
-            color: color,
-            userId: userId
-        )
-        
-        context.insert(category)
-        try context.save()
-    }
-    
-    func fetchCategories() async throws -> [CategoryEntity] {
-        guard let context = modelContext else { throw SwiftDataError.contextNotAvailable }
-        guard let userId = currentUserId else { throw SwiftDataError.userNotLoggedIn }
-        
-        let descriptor = FetchDescriptor<CategoryEntity>(
-            predicate: #Predicate { $0.userId == userId }
-        )
-        
-        return try context.fetch(descriptor)
-    }
-    
-    // MARK: - 👤 User Session
-    
-    private func createUserSession(userId: String, email: String, name: String) async {
-        guard let context = modelContext else { return }
-        
-        let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? "unknown"
-        
-        // Check if session exists
-        let descriptor = FetchDescriptor<UserSessionEntity>(
-            predicate: #Predicate { $0.userId == userId }
-        )
-        
-        if let existingSessions = try? context.fetch(descriptor), let session = existingSessions.first {
-            // Update existing session
-            session.lastLoginDate = Date()
-            session.deviceId = deviceId
-        } else {
-            // Create new session
-            let session = UserSessionEntity(
-                userId: userId,
-                email: email,
-                name: name,
-                deviceId: deviceId
-            )
-            context.insert(session)
-        }
-        
-        try? context.save()
     }
     
     // MARK: - 🔍 Search & Filter

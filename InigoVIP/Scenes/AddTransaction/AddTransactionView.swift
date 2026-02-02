@@ -82,7 +82,6 @@ struct AddTransactionView: View {
                 date: Date(),
                 category: category,
                 thumbnailUrl: nil,
-                userId: "a"
             )
             
             // Save to SwiftData

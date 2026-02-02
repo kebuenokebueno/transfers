@@ -56,7 +56,6 @@ struct EditTransactionView: View {
                 date: Date(),
                 category: "Food",
                 thumbnailUrl: nil,
-                userId: "a"
             )
             
             if let transaction = transaction {
