@@ -99,7 +99,7 @@ struct NoteDetailView: View {
     }
     
     private func setupVIP() {
-        let interactor = NoteListInteractor(noteManager: noteManager)
+        let interactor = NoteListInteractor(noteWorker: noteWorker)
         let presenter = NoteListPresenter()
         let vc = NoteListViewController()
         
