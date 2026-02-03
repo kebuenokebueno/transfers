@@ -16,13 +16,11 @@ enum NoteScene {
         
         struct Response {
             let notes: [Note]
-            let isFromCache: Bool
         }
         
         struct ViewModel {
             let displayedNotes: [DisplayedNote]
             let totalCount: Int
-            let isFromCache: Bool
             
             struct DisplayedNote: Identifiable {
                 let id: String

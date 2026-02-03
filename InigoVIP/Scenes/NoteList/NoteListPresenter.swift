@@ -37,7 +37,6 @@ class NoteListPresenter: NotePresentationLogic {
         let viewModel = NoteScene.FetchNotes.ViewModel(
             displayedNotes: displayedNotes,
             totalCount: displayedNotes.count,
-            isFromCache: response.isFromCache
         )
         
         viewController?.displayNotes(viewModel: viewModel)
