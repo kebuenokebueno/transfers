@@ -113,14 +113,5 @@ class NoteListInteractor: NoteBusinessLogic {
         )
         presenter?.presentDeleteResult(response: response)
     }
-    
-    // MARK: - Fetch Single Note
-    
-    func fetchNote(request: NoteScene.FetchNote.Request) async {
-        // Fetch from SwiftData
-        let note = try? swiftDataService.fetchNote(id: request.noteId)
-        
-        let response = NoteScene.FetchNote.Response(note: note)
-        presenter?.presentNote(response: response)
-    }
+
 }
