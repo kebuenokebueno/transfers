@@ -234,14 +234,6 @@ extension Note: Codable {
     }
 }
 
-// MARK: - Hashable for Navigation
-
-//extension Note: Hashable {
-//    public func hash(into hasher: inout Hasher) {
-//        hasher.combine(id)
-//    }
-//}
-
 // MARK: - Equatable
 
 extension Note: Equatable {
