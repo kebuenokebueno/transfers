@@ -14,6 +14,7 @@ protocol NoteDisplayLogic: AnyObject {
     func displayCreateResult(viewModel: NoteScene.CreateNote.ViewModel)
     func displayUpdateResult(viewModel: NoteScene.UpdateNote.ViewModel)
     func displayDeleteResult(viewModel: NoteScene.DeleteNote.ViewModel)
+    func displayNote(viewModel: NoteScene.FetchNote.ViewModel)
 }
 
 
@@ -65,6 +66,10 @@ class NoteListViewController: NoteDisplayLogic {
         } else {
             errorMessage = viewModel.message
         }
+    }
+    
+    func displayNote(viewModel: NoteScene.FetchNote.ViewModel) {
+        // Handle single note display
     }
     
     // MARK: - User Actions

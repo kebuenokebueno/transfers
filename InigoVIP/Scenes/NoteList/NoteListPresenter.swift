@@ -12,6 +12,7 @@ protocol NotePresentationLogic {
     func presentCreateResult(response: NoteScene.CreateNote.Response)
     func presentUpdateResult(response: NoteScene.UpdateNote.Response)
     func presentDeleteResult(response: NoteScene.DeleteNote.Response)
+    func presentNote(response: NoteScene.FetchNote.Response)
 }
 
 @MainActor
@@ -70,6 +71,25 @@ class NoteListPresenter: NotePresentationLogic {
             message: response.success ? "Note deleted successfully" : "Failed to delete note"
         )
         viewController?.displayDeleteResult(viewModel: viewModel)
+    }
+    
+    // MARK: - Present Single Note
+    
+    func presentNote(response: NoteScene.FetchNote.Response) {
+        let displayedNote = response.note.map { note in
+            NoteScene.FetchNote.ViewModel.DisplayedNote(
+                id: note.id,
+                amount: formatAmount(note.amount),
+                description: note.noteDescription,
+                date: formatDate(note.date),
+                category: note.category,
+                isPositive: note.isPositive,
+                syncStatus: note.syncStatusEnum.rawValue.capitalized
+            )
+        }
+        
+        let viewModel = NoteScene.FetchNote.ViewModel(displayedNote: displayedNote)
+        viewController?.displayNote(viewModel: viewModel)
     }
     
     // MARK: - Formatting Helpers

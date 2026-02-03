@@ -7,6 +7,7 @@ protocol NoteBusinessLogic {
     func createNote(request: NoteScene.CreateNote.Request) async
     func updateNote(request: NoteScene.UpdateNote.Request) async
     func deleteNote(request: NoteScene.DeleteNote.Request) async
+    func fetchNote(request: NoteScene.FetchNote.Request) async
 }
 
 

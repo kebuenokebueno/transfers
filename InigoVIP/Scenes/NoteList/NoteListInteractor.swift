@@ -10,10 +10,10 @@ import Foundation
 @MainActor
 class NoteListInteractor: NoteBusinessLogic {
     var presenter: NotePresentationLogic?
-    private let noteWorker: NoteWorker
-    private let swiftDataService: SwiftDataService
+    private let noteWorker: NoteWorkerProtocol
+    private let swiftDataService: SwiftDataServiceProtocol
     
-    init(noteWorker: NoteWorker, swiftDataService: SwiftDataService) {
+    init(noteWorker: NoteWorkerProtocol, swiftDataService: SwiftDataServiceProtocol) {
         self.noteWorker = noteWorker
         self.swiftDataService = swiftDataService
     }
@@ -114,4 +114,13 @@ class NoteListInteractor: NoteBusinessLogic {
         presenter?.presentDeleteResult(response: response)
     }
 
+    // MARK: - Fetch Single Note
+    
+    func fetchNote(request: NoteScene.FetchNote.Request) async {
+        // Fetch from SwiftData
+        let note = try? swiftDataService.fetchNote(id: request.noteId)
+        
+        let response = NoteScene.FetchNote.Response(note: note)
+        presenter?.presentNote(response: response)
+    }
 }
