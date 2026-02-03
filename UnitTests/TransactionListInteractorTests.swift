@@ -1,309 +1,301 @@
-
-// File: TransactionListTests.swift
-// Coverage Target: 85%+
-// Framework: Swift Testing (iOS 17+)
+//
+//  NoteListInteractorTests.swift
+//  InigoVIPTests
+//
+//  Created by Inigo on 29/1/26.
+//
 
 import Testing
 import Foundation
-import SwiftUI
 @testable import InigoVIP
 
-
 // MARK: - Interactor Tests
+@MainActor
+@Suite("NoteList Interactor Tests", .tags(.unit, .interactor))
+struct NoteListInteractorTests {
 
-@Suite("TransactionList Interactor Tests", .tags(.unit, .interactor))
-struct TransactionListInteractorTests {
-    
-    // MARK: - Success Cases
-    
-    @Test("Worker uses network service")
-    func testWorkerUsesNetwork() async throws {
-        // Arrange
-        let mockNetwork = MockNetworkService()
-        await mockNetwork.setSuccessResponse()
-        
-        let worker = TransactionWorker(networkService: mockNetwork)
-        
-        // Act
-        let transactions = try await worker.fetchTransactions()
-        
-        // Assert
-        #expect(transactions.count == 5)
-        #expect(transactions[0].description == "Grocery Store")
-        
-        // Verify network was called
-        let callCount = await mockNetwork.callCount
-        #expect(callCount == 1, "Network should be called once")
+    // ---------------------------------------------------------------------------
+    // MARK: - Helper: builds a wired-up Interactor with mocks
+    // ---------------------------------------------------------------------------
+    @MainActor
+    private func makeSUT() -> (
+        interactor: NoteListInteractor,
+        presenter: MockNoteListPresenter,
+        worker: MockNoteWorker,
+        swiftData: MockSwiftDataService
+    ) {
+        let swiftData = MockSwiftDataService()
+        let supabase  = MockSupabaseService()
+        let worker    = MockNoteWorker(swiftDataService: swiftData, supabaseService: supabase)
+        let interactor = NoteListInteractor(noteWorker: worker, swiftDataService: swiftData)
+        let presenter  = MockNoteListPresenter()
+        interactor.presenter = presenter
+        return (interactor, presenter, worker, swiftData)
     }
 
-    @Test("Worker uses cache to avoid network calls")
-    func testWorkerUsesCache() async throws {
-        // Arrange
-        let mockNetwork = MockNetworkService()
-        await mockNetwork.setSuccessResponse()
-        let cacheService = CacheService()
-        
-        let worker = TransactionWorker(
-            networkService: mockNetwork,
-            cacheService: cacheService
-        )
-        
-        // Act - First call hits network
-        _ = try await worker.fetchTransactions()
-        
-        // Second call should use cache
-        _ = try await worker.fetchTransactions()
-        
-        // Assert
-        let callCount = await mockNetwork.callCount
-        #expect(callCount == 1, "Network should only be called once (cache used for 2nd call)")
-    }
-    
-    
+    // =========================================================================
+    // MARK: - Fetch Notes
+    // =========================================================================
     @MainActor
-    @Test("Fetch transactions successfully with valid data")
-    func fetchTransactionsSuccess() async throws {
-        // Arrange
-        let mockWorker = MockTransactionWorker()
-        let mockAnalyticsWorker = MockAnalyticsWorker()
-        let sut = TransactionListInteractor(
-            transactionWorker: mockWorker,
-            analyticsWorker: mockAnalyticsWorker
-        )
-        let mockPresenter = MockTransactionListPresenter()
-        sut.presenter = mockPresenter
-        
-        let expectedTransactions = TestDataBuilder.createMixedTransfers()
-        await mockWorker.setMockTransactions(expectedTransactions)
-        
-        // Act
-        await sut.fetchTransactions()
-        
-        // Assert
-        #expect(mockPresenter.presentTransactionsCalled == true,
-                "Presenter should be called after successful fetch")
-        #expect(mockPresenter.receivedResponse?.transactions.count == 5,
-                "Should receive all 5 transactions")
-        #expect(mockPresenter.presentTransactionsCallCount == 1,
-                "Presenter should be called exactly once")
-        
-        // Verify transaction data integrity
-        let firstTransaction = mockPresenter.receivedResponse?.transactions.first
-        #expect(firstTransaction?.id == "1")
-        #expect(firstTransaction?.amount == -45.50)
-        #expect(firstTransaction?.description == "Grocery Store")
+    @Test("Fetch notes – returns all notes from SwiftData")
+    func fetchNotesSuccess() async {
+        let (interactor, presenter, _, swiftData) = makeSUT()
+        let notes = TestDataBuilder.createMixedNotes()
+        swiftData.seed(notes)
+
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+
+        #expect(presenter.presentNotesCalled == true)
+        #expect(presenter.lastFetchResponse?.notes.count == 5)
     }
-    
     @MainActor
-    @Test("Fetch transactions with empty result")
-    func fetchTransactionsEmpty() async throws {
-        // Arrange
-        let mockWorker = MockTransactionWorker()
-        let mockAnalyticsWorker = MockAnalyticsWorker()
-        let sut = TransactionListInteractor(
-            transactionWorker: mockWorker,
-            analyticsWorker: mockAnalyticsWorker
-        )
-        let mockPresenter = MockTransactionListPresenter()
-        sut.presenter = mockPresenter
-        
-        await mockWorker.setMockTransactions([])
-        
-        // Act
-        await sut.fetchTransactions()
-        
-        // Assert
-        #expect(mockPresenter.presentTransactionsCalled == true,
-                "Presenter should be called even with empty results")
-        #expect(mockPresenter.receivedResponse?.transactions.isEmpty == true,
-                "Should handle empty transaction list")
+    @Test("Fetch notes – empty SwiftData returns empty response")
+    func fetchNotesEmpty() async {
+        let (interactor, presenter, _, _) = makeSUT()
+
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+
+        #expect(presenter.presentNotesCalled == true)
+        #expect(presenter.lastFetchResponse?.notes.isEmpty == true)
     }
-    
     @MainActor
-    @Test("Fetch transactions with large dataset (1000 items)")
-    func fetchTransactionsLargeDataset() async throws {
-        // Arrange
-        let mockWorker = MockTransactionWorker()
-        let mockAnalyticsWorker = MockAnalyticsWorker()
-        let sut = TransactionListInteractor(
-            transactionWorker: mockWorker,
-            analyticsWorker: mockAnalyticsWorker
-        )
-        let mockPresenter = MockTransactionListPresenter()
-        sut.presenter = mockPresenter
-        
-        let largeDataset = TestDataBuilder.createTransfers(count: 1000)
-        await mockWorker.setMockTransactions(largeDataset)
-        
-        // Act
-        await sut.fetchTransactions()
-        
-        // Assert
-        #expect(mockPresenter.receivedResponse?.transactions.count == 1000,
-                "Should handle large datasets")
+    @Test("Fetch notes – large dataset (1 000 notes)")
+    func fetchNotesLargeDataset() async {
+        let (interactor, presenter, _, swiftData) = makeSUT()
+        swiftData.seed(TestDataBuilder.createNotes(count: 1000))
+
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+
+        #expect(presenter.lastFetchResponse?.notes.count == 1000)
     }
-    
-    // MARK: - Error Handling
-    
     @MainActor
-    @Test("Fetch transactions handles network error gracefully")
-    func fetchTransactionsHandlesError() async throws {
-        // Arrange
-        let mockWorker = MockTransactionWorker()
-        await mockWorker.setShouldFail(true)
-        
-        let mockAnalyticsWorker = MockAnalyticsWorker()
-        let sut = TransactionListInteractor(
-            transactionWorker: mockWorker,
-            analyticsWorker: mockAnalyticsWorker
-        )
-        let mockPresenter = MockTransactionListPresenter()
-        sut.presenter = mockPresenter
-        
-        // Act
-        await sut.fetchTransactions()
-        
-        // Assert
-        #expect(mockPresenter.presentTransactionsCalled == false,
-                "Presenter should not be called when error occurs")
-        #expect(mockPresenter.presentTransactionsCallCount == 0,
-                "Presenter call count should be zero on error")
+    @Test("Fetch notes – nil presenter does not crash")
+    func fetchNotesNilPresenter() async {
+        let (interactor, _, _, swiftData) = makeSUT()
+        interactor.presenter = nil                          // deliberately nil
+        swiftData.seed(TestDataBuilder.createMixedNotes())
+
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        // success = no crash
+        #expect(true)
     }
-    
+
+    // =========================================================================
+    // MARK: - Create Note
+    // =========================================================================
     @MainActor
-    @Test("Fetch transactions handles nil presenter gracefully")
-    func fetchTransactionsWithNilPresenter() async throws {
-        // Arrange
-        let mockWorker = MockTransactionWorker()
-        let mockAnalyticsWorker = MockAnalyticsWorker()
-        let sut = TransactionListInteractor(
-            transactionWorker: mockWorker,
-            analyticsWorker: mockAnalyticsWorker
+    @Test("Create note – persists to SwiftData and calls presenter")
+    func createNoteSuccess() async {
+        let (interactor, presenter, worker, swiftData) = makeSUT()
+
+        let request = NoteScene.CreateNote.Request(
+            amount: 75.00,
+            description: "Coffee Shop",
+            category: "Food",
+            isIncome: false
         )
-        // Note: presenter is nil
-        
-        let transactions = TestDataBuilder.createMixedTransfers()
-        await mockWorker.setMockTransactions(transactions)
-        
-        // Act - should not crash
-        await sut.fetchTransactions()
-        
-        // Assert - no crash is the success criteria
-        #expect(true, "Should handle nil presenter without crashing")
+
+        await interactor.createNote(request: request)
+
+        // Presenter told about the new note
+        #expect(presenter.presentCreateResultCalled == true)
+        #expect(presenter.lastCreateResponse?.success == true)
+
+        // Actually landed in SwiftData
+        #expect(swiftData.notes.count == 1)
+        #expect(swiftData.notes.first?.noteDescription == "Coffee Shop")
+        #expect(swiftData.notes.first?.amount == -75.00, "Expense should be negative")
+
+        // Worker.createNote was called
+        #expect(worker.createNoteCallCount == 1)
     }
-    
-    // MARK: - Analytics Tracking
-    
     @MainActor
-    @Test("Fetch transactions tracks analytics events")
-    func fetchTransactionsTracksAnalytics() async throws {
-        // Arrange
-        let mockWorker = MockTransactionWorker()
-        let mockAnalyticsWorker = MockAnalyticsWorker()
-        let sut = TransactionListInteractor(
-            transactionWorker: mockWorker,
-            analyticsWorker: mockAnalyticsWorker
+    @Test("Create note – income flag keeps amount positive")
+    func createNoteIncome() async {
+        let (interactor, presenter, _, swiftData) = makeSUT()
+
+        let request = NoteScene.CreateNote.Request(
+            amount: 2500.00,
+            description: "Salary",
+            category: "Income",
+            isIncome: true
         )
-        let mockPresenter = MockTransactionListPresenter()
-        sut.presenter = mockPresenter
-        
-        let transactions = TestDataBuilder.createTransfers(count: 3)
-        await mockWorker.setMockTransactions(transactions)
-        
-        // Act
-        await sut.fetchTransactions()
-        
-        // Assert
-        let events = await mockAnalyticsWorker.trackedEvents
-        #expect(events.contains(where: { $0.contains("fetch_transactions_started") }),
-                "Should track fetch start event")
-        #expect(events.contains(where: { $0.contains("fetch_transactions_success") }),
-                "Should track fetch success event")
-        #expect(events.contains(where: { $0.contains("3 items") }),
-                "Should include item count in analytics")
+
+        await interactor.createNote(request: request)
+
+        #expect(presenter.lastCreateResponse?.success == true)
+        #expect(swiftData.notes.first?.amount == 2500.00)
     }
-    
+
     @MainActor
-    @Test("Fetch transactions does not track success on error")
-    func fetchTransactionsDoesNotTrackSuccessOnError() async throws {
-        // Arrange
-        let mockWorker = MockTransactionWorker()
-        await mockWorker.setShouldFail(true)
-        let mockAnalyticsWorker = MockAnalyticsWorker()
-        let sut = TransactionListInteractor(
-            transactionWorker: mockWorker,
-            analyticsWorker: mockAnalyticsWorker
-        )
-        
-        // Act
-        await sut.fetchTransactions()
-        
-        // Assert
-        let events = await mockAnalyticsWorker.trackedEvents
-        #expect(events.contains(where: { $0.contains("fetch_transactions_started") }),
-                "Should track start event even on error")
-        #expect(!events.contains(where: { $0.contains("fetch_transactions_success") }),
-                "Should not track success event on error")
+    @Test("Create note – multiple notes accumulate")
+    func createNoteMultiple() async {
+        let (interactor, _, _, swiftData) = makeSUT()
+
+        for i in 1...3 {
+            await interactor.createNote(request: NoteScene.CreateNote.Request(
+                amount: Double(i * 10),
+                description: "Note \(i)",
+                category: "Food",
+                isIncome: false
+            ))
+        }
+
+        #expect(swiftData.notes.count == 3)
     }
-    
-    // MARK: - Worker Integration
-    
+
+    // =========================================================================
+    // MARK: - Update Note
+    // =========================================================================
+
     @MainActor
-    @Test("Fetch transactions calls worker exactly once")
-    func fetchTransactionsCallsWorkerOnce() async throws {
-        // Arrange
-        let mockWorker = MockTransactionWorker()
-        let mockAnalyticsWorker = MockAnalyticsWorker()
-        let sut = TransactionListInteractor(
-            transactionWorker: mockWorker,
-            analyticsWorker: mockAnalyticsWorker
+    @Test("Update note – changes persist to SwiftData")
+    func updateNoteSuccess() async {
+        let (interactor, presenter, worker, swiftData) = makeSUT()
+
+        // Seed an existing note
+        let original = TestDataBuilder.createNote(id: "upd_1", amount: -50.00, description: "Old Name", category: "Food")
+        swiftData.seed([original])
+
+        let request = NoteScene.UpdateNote.Request(
+            noteId: "upd_1",
+            amount: 99.99,
+            description: "New Name",
+            category: "Entertainment"
         )
-        let mockPresenter = MockTransactionListPresenter()
-        sut.presenter = mockPresenter
-        
-        await mockWorker.setMockTransactions(TestDataBuilder.createTransfers(count: 2))
-        
-        // Act
-        await sut.fetchTransactions()
-        
-        // Assert
-        let callCount = await mockWorker.fetchCallCount
-        #expect(callCount == 1, "Worker should be called exactly once")
+
+        await interactor.updateNote(request: request)
+
+        // Presenter told success
+        #expect(presenter.presentUpdateResultCalled == true)
+        #expect(presenter.lastUpdateResponse?.success == true)
+
+        // SwiftData reflects the update
+        let updated = swiftData.notes.first(where: { $0.id == "upd_1" })
+        #expect(updated?.noteDescription == "New Name")
+        #expect(updated?.category == "Entertainment")
+        #expect(updated?.amount == 99.99)
+
+        // Worker was invoked
+        #expect(worker.updateNoteCallCount == 1)
     }
-    
+
     @MainActor
-    @Test("Multiple fetch calls work correctly")
-    func multipleFetchCalls() async throws {
-        // Arrange
-        let mockWorker = MockTransactionWorker()
-        let mockAnalyticsWorker = MockAnalyticsWorker()
-        let sut = TransactionListInteractor(
-            transactionWorker: mockWorker,
-            analyticsWorker: mockAnalyticsWorker
+    @Test("Update note – non-existent id reports failure")
+    func updateNoteNotFound() async {
+        let (interactor, presenter, _, _) = makeSUT()
+        // SwiftData is empty – note doesn't exist
+
+        let request = NoteScene.UpdateNote.Request(
+            noteId: "ghost",
+            amount: 10.00,
+            description: "Ghost",
+            category: "Other"
         )
-        let mockPresenter = MockTransactionListPresenter()
-        sut.presenter = mockPresenter
-        
-        let firstBatch = TestDataBuilder.createTransfers(count: 3)
-        await mockWorker.setMockTransactions(firstBatch)
-        
-        // Act - First fetch
-        await sut.fetchTransactions()
-        
-        // Update data
-        let secondBatch = TestDataBuilder.createTransfers(count: 5)
-        await mockWorker.setMockTransactions(secondBatch)
-        
-        // Act - Second fetch
-        await sut.fetchTransactions()
-        
-        // Assert
-        #expect(mockPresenter.presentTransactionsCallCount == 2,
-                "Should handle multiple fetch calls")
-        #expect(mockPresenter.receivedResponse?.transactions.count == 5,
-                "Should have latest data")
-        
-        let workerCalls = await mockWorker.fetchCallCount
-        #expect(workerCalls == 2, "Worker should be called twice")
+
+        await interactor.updateNote(request: request)
+
+        #expect(presenter.presentUpdateResultCalled == true)
+        #expect(presenter.lastUpdateResponse?.success == false)
+    }
+
+    @MainActor
+    @Test("Update note – sync status set to pending")
+    func updateNoteSetsPending() async {
+        let (interactor, _, _, swiftData) = makeSUT()
+
+        let original = TestDataBuilder.createNote(id: "sync_1", syncStatus: "synced")
+        swiftData.seed([original])
+
+        await interactor.updateNote(request: NoteScene.UpdateNote.Request(
+            noteId: "sync_1",
+            amount: 1.00,
+            description: "Trigger sync",
+            category: "Other"
+        ))
+
+        let updated = swiftData.notes.first(where: { $0.id == "sync_1" })
+        #expect(updated?.syncStatus == "pending")
+    }
+
+    // =========================================================================
+    // MARK: - Delete Note
+    // =========================================================================
+
+    @MainActor
+    @Test("Delete note – removes from SwiftData and calls presenter")
+    func deleteNoteSuccess() async {
+        let (interactor, presenter, worker, swiftData) = makeSUT()
+
+        swiftData.seed(TestDataBuilder.createMixedNotes())   // 5 notes
+        #expect(swiftData.notes.count == 5)
+
+        await interactor.deleteNote(request: NoteScene.DeleteNote.Request(noteId: "3"))
+
+        // Presenter told success
+        #expect(presenter.presentDeleteResultCalled == true)
+        #expect(presenter.lastDeleteResponse?.success == true)
+        #expect(presenter.lastDeleteResponse?.noteId == "3")
+
+        // Gone from SwiftData
+        #expect(swiftData.notes.count == 4)
+        #expect(swiftData.notes.contains(where: { $0.id == "3" }) == false)
+
+        // Worker was invoked
+        #expect(worker.deleteNoteCallCount == 1)
+    }
+
+    @MainActor
+    @Test("Delete note – non-existent id still reports success (idempotent)")
+    func deleteNoteNotFound() async {
+        let (interactor, presenter, _, _) = makeSUT()
+        // SwiftData is empty
+
+        await interactor.deleteNote(request: NoteScene.DeleteNote.Request(noteId: "ghost"))
+
+        // Interactor still tells presenter it's done (cloud delete is fire-and-forget)
+        #expect(presenter.presentDeleteResultCalled == true)
+    }
+
+    @MainActor
+    @Test("Delete note – delete all notes one by one")
+    func deleteNoteAll() async {
+        let (interactor, _, _, swiftData) = makeSUT()
+        let notes = TestDataBuilder.createMixedNotes()
+        swiftData.seed(notes)
+
+        for note in notes {
+            await interactor.deleteNote(request: NoteScene.DeleteNote.Request(noteId: note.id))
+        }
+
+        #expect(swiftData.notes.isEmpty)
+    }
+
+    // =========================================================================
+    // MARK: - Fetch Single Note
+    // =========================================================================
+
+    @MainActor
+    @Test("Fetch single note – returns correct note")
+    func fetchNoteSuccess() async {
+        let (interactor, presenter, _, swiftData) = makeSUT()
+        swiftData.seed(TestDataBuilder.createMixedNotes())
+
+        await interactor.fetchNote(request: NoteScene.FetchNote.Request(noteId: "3"))
+
+        #expect(presenter.presentNoteCalled == true)
+        #expect(presenter.lastNoteResponse?.note?.id == "3")
+        #expect(presenter.lastNoteResponse?.note?.noteDescription == "Salary")
+    }
+
+    @MainActor
+    @Test("Fetch single note – missing id returns nil note")
+    func fetchNoteMissing() async {
+        let (interactor, presenter, _, _) = makeSUT()
+
+        await interactor.fetchNote(request: NoteScene.FetchNote.Request(noteId: "missing"))
+
+        #expect(presenter.presentNoteCalled == true)
+        #expect(presenter.lastNoteResponse?.note == nil)
     }
 }
