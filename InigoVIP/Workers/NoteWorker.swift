@@ -3,9 +3,25 @@ import SwiftData
 
 /// Manages notes with offline-first architecture
 /// Saves to SwiftData immediately, syncs to Supabase in background
+
+//
+//  NoteWorkerProtocol.swift
+//  InigoVIP
+//
+
+import Foundation
+
+@MainActor
+protocol NoteWorkerProtocol: AnyObject {
+    func fetchNotes() async
+    func createNote(_ note: Note) async
+    func updateNote(_ updatedNote: Note) async
+    func deleteNote(id: String) async
+}
+
 @MainActor
 @Observable
-class NoteWorker {
+class NoteWorker: NoteWorkerProtocol {
     private let swiftDataService: SwiftDataService
     private let supabaseService: SupabaseService
     

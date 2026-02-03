@@ -1,9 +1,14 @@
 import Foundation
 import SwiftData
 
+protocol SwiftDataServiceProtocol: AnyObject {
+    func fetchNotes() throws -> [Note]
+    func fetchNote(id: String) throws -> Note?
+}
+
 @MainActor
 @Observable
-class SwiftDataService {
+class SwiftDataService: SwiftDataServiceProtocol {
     private var modelContainer: ModelContainer?
     private var modelContext: ModelContext?
     
