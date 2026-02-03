@@ -23,13 +23,12 @@ class NoteListInteractor: NoteBusinessLogic {
     func fetchNotes(request: NoteScene.FetchNotes.Request) async {
         // Fetch from SwiftData (local) first
         let localNotes = (try? swiftDataService.fetchNotes()) ?? []
-        let isFromCache = !localNotes.isEmpty
+        let isFromSwiftData = !localNotes.isEmpty
         
         // Present immediately with local data
-        if isFromCache {
+        if isFromSwiftData {
             let response = NoteScene.FetchNotes.Response(
                 notes: localNotes,
-                isFromCache: true
             )
             presenter?.presentNotes(response: response)
         }
@@ -41,7 +40,6 @@ class NoteListInteractor: NoteBusinessLogic {
         let updatedNotes = (try? swiftDataService.fetchNotes()) ?? []
         let response = NoteScene.FetchNotes.Response(
             notes: updatedNotes,
-            isFromCache: false
         )
         presenter?.presentNotes(response: response)
     }
