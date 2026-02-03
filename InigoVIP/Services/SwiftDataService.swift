@@ -163,30 +163,26 @@ class SwiftDataService {
         
         return try context.fetch(descriptor)
     }
-    
-    // MARK: - 📊 Statistics
-    
-    func fetchStatistics() throws -> NoteStatistics {
-        let notes = try fetchNotes()
-        
-        let totalIncome = notes.filter { $0.amount > 0 }.reduce(0) { $0 + $1.amount }
-        let totalExpenses = notes.filter { $0.amount < 0 }.reduce(0) { $0 + abs($1.amount) }
-        let balance = totalIncome - totalExpenses
-        
-        return NoteStatistics(
-            totalNotes: notes.count,
-            totalIncome: totalIncome,
-            totalExpenses: totalExpenses,
-            balance: balance
-        )
-    }
 }
 
-// MARK: - Statistics Model
+// MARK: - ⚠️ Errors
 
-struct NoteStatistics {
-    let totalNotes: Int
-    let totalIncome: Double
-    let totalExpenses: Double
-    let balance: Double
+enum SwiftDataError: Error, LocalizedError {
+    case contextNotAvailable
+    case userNotLoggedIn
+    case entityNotFound
+    case saveFailed
+    
+    var errorDescription: String? {
+        switch self {
+        case .contextNotAvailable:
+            return "Database context is not available"
+        case .userNotLoggedIn:
+            return "User must be logged in to access data"
+        case .entityNotFound:
+            return "Entity not found in database"
+        case .saveFailed:
+            return "Failed to save to database"
+        }
+    }
 }

@@ -211,15 +211,4 @@ class NoteWorker {
     func filterByCategory(category: String) async throws -> [Note] {
         return try swiftDataService.fetchNotesByCategory(category: category)
     }
-    
-    // MARK: - 📊 Statistics
-    
-    func getStatistics() async -> NoteStatistics? {
-        do {
-            return try swiftDataService.fetchStatistics()
-        } catch {
-            lastError = "Failed to get statistics: \(error.localizedDescription)"
-            return nil
-        }
-    }
 }

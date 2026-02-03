@@ -157,33 +157,6 @@ class SupabaseService {
         return response
     }
     
-    // MARK: - 📊 Statistics
-    
-    /// Calculate statistics from notes
-    func fetchStatistics() async throws -> TransactionStatistics {
-        let notes = try await fetchNotes()
-        
-        let totalIncome = notes.filter { $0.amount > 0 }.reduce(0) { $0 + $1.amount }
-        let totalExpenses = notes.filter { $0.amount < 0 }.reduce(0) { $0 + abs($1.amount) }
-        let balance = totalIncome - totalExpenses
-        
-        // This month
-        let calendar = Calendar.current
-        let now = Date()
-        let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now))!
-        let thisMonthNotes = notes.filter { $0.date >= startOfMonth }
-        let monthlyTotal = thisMonthNotes.reduce(0) { $0 + $1.amount }
-        
-        return TransactionStatistics(
-            totalTransactions: notes.count,
-            totalIncome: totalIncome,
-            totalExpenses: totalExpenses,
-            balance: balance,
-            monthlyTotal: monthlyTotal,
-            averageTransaction: notes.isEmpty ? 0 : (totalIncome + totalExpenses) / Double(notes.count)
-        )
-    }
-    
     // MARK: - 🔄 Test Connection
     
     func testConnection() async -> Bool {

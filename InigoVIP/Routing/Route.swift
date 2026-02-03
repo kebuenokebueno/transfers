@@ -14,7 +14,6 @@ enum Route: Hashable, Equatable {
     case editNote(id: String)
 }
 
-
 extension Route: Identifiable {
     var id: String {
         switch self {
