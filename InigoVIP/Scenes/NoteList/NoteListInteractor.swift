@@ -27,10 +27,10 @@ class NoteListInteractor: NoteBusinessLogic {
         
         // Present immediately with local data
         if isFromSwiftData {
-            let response = NoteScene.FetchNotes.Response(
-                notes: localNotes,
-            )
-            presenter?.presentNotes(response: response)
+            let response = NoteScene.FetchNotes.Response(notes: localNotes)
+            await MainActor.run {
+                presenter?.presentNotes(response: response)
+            }
         }
         
         // Sync from cloud in background
@@ -38,10 +38,10 @@ class NoteListInteractor: NoteBusinessLogic {
         
         // Fetch updated notes from SwiftData
         let updatedNotes = (try? swiftDataService.fetchNotes()) ?? []
-        let response = NoteScene.FetchNotes.Response(
-            notes: updatedNotes,
-        )
-        presenter?.presentNotes(response: response)
+        let response = NoteScene.FetchNotes.Response(notes: updatedNotes)
+        await MainActor.run {
+            presenter?.presentNotes(response: response)
+        }
     }
     
     // MARK: - Create Note
@@ -62,7 +62,9 @@ class NoteListInteractor: NoteBusinessLogic {
             note: note,
             success: true
         )
-        presenter?.presentCreateResult(response: response)
+        await MainActor.run {
+            presenter?.presentCreateResult(response: response)
+        }
     }
     
     // MARK: - Update Note
@@ -81,7 +83,9 @@ class NoteListInteractor: NoteBusinessLogic {
                 note: dummyNote,
                 success: false
             )
-            presenter?.presentUpdateResult(response: response)
+            await MainActor.run {
+                presenter?.presentUpdateResult(response: response)
+            }
             return
         }
         
@@ -97,7 +101,9 @@ class NoteListInteractor: NoteBusinessLogic {
             note: note,
             success: true
         )
-        presenter?.presentUpdateResult(response: response)
+        await MainActor.run {
+            presenter?.presentUpdateResult(response: response)
+        }
     }
     
     // MARK: - Delete Note
@@ -109,7 +115,9 @@ class NoteListInteractor: NoteBusinessLogic {
             success: true,
             noteId: request.noteId
         )
-        presenter?.presentDeleteResult(response: response)
+        await MainActor.run {
+            presenter?.presentDeleteResult(response: response)
+        }
     }
 
     // MARK: - Fetch Single Note
@@ -119,6 +127,8 @@ class NoteListInteractor: NoteBusinessLogic {
         let note = try? swiftDataService.fetchNote(id: request.noteId)
         
         let response = NoteScene.FetchNote.Response(note: note)
-        presenter?.presentNote(response: response)
+        await MainActor.run {
+            presenter?.presentNote(response: response)
+        }
     }
 }

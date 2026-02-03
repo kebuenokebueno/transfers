@@ -1,293 +1,306 @@
+//
+//  NoteListPresenterTests.swift
+//  InigoVIPTests
+//
+//  Created by Inigo on 29/1/26.
+//
 
-import Foundation
-import SwiftUI
 import Testing
+import Foundation
 @testable import InigoVIP
 
 // MARK: - Presenter Tests
 
-@Suite("TransactionList Presenter Tests", .tags(.unit, .presenter))
-struct TransactionListPresenterTests {
+@Suite("NoteList Presenter Tests", .tags(.unit, .presenter))
+struct NoteListPresenterTests {
+
+    // ---------------------------------------------------------------------------
+    // MARK: - Helper
+    // ---------------------------------------------------------------------------
+
+    @MainActor private func makeSUT() -> (
+        presenter: NoteListPresenter,
+        vc: MockNoteListViewController
+    ) {
+        let presenter = NoteListPresenter()
+        let vc        = MockNoteListViewController()
+        presenter.viewController = vc
+        return (presenter, vc)
+    }
+
+    // =========================================================================
+    // MARK: - Fetch Notes – formatting
+    // =========================================================================
+
+
+    @MainActor @Test("Present notes – formats negative amount with € and minus sign")
+    func presentNotesFormatsExpense() {
+        let (presenter, vc) = makeSUT()
+
+        let note = TestDataBuilder.createNote(id: "1", amount: -45.50, description: "Grocery Store", category: "Food")
+        let response = NoteScene.FetchNotes.Response(notes: [note])
+
+        presenter.presentNotes(response: response)
+
+        #expect(vc.displayNotesCalled == true)
+        let displayed = vc.lastFetchViewModel?.displayedNotes.first
+        #expect(displayed?.amount.contains("€") == true)
+        #expect(displayed?.amount.contains("-") == true)
+        #expect(displayed?.amount.contains("45") == true)
+        #expect(displayed?.isPositive == false)
+    }
+
+
+    @MainActor @Test("Present notes – formats positive amount correctly")
+    func presentNotesFormatsIncome() {
+        let (presenter, vc) = makeSUT()
+
+        let note = TestDataBuilder.createNote(id: "2", amount: 2500.00, description: "Salary", category: "Income")
+        let response = NoteScene.FetchNotes.Response(notes: [note])
+
+        presenter.presentNotes(response: response)
+
+        let displayed = vc.lastFetchViewModel?.displayedNotes.first
+        #expect(displayed?.isPositive == true)
+        #expect(displayed?.amount.contains("+") == true)
+        #expect(displayed?.amount.contains("2") == true)
+        #expect(displayed?.amount.contains("500") == true)
+        #expect(displayed?.category == "Income")
+    }
+
     
-    // MARK: - Data Formatting
-    
-    @MainActor
-    @Test("Present transactions formats negative amounts correctly")
-    func presentTransactionsFormatsNegativeAmount() {
-        // Arrange
-        let sut = TransactionListPresenter()
-        let mockViewController = MockTransactionListViewController()
-        sut.viewController = mockViewController
-        
-        let transaction = TestDataBuilder.createTransfer(
-            id: "1",
-            amount: -50.50,
-            description: "Test Transaction",
-            category: "Food"
+    @MainActor @Test("Present notes – formats date correctly")
+    func presentNotesFormatsDate() {
+        let (presenter, vc) = makeSUT()
+
+        let testDate = Calendar.current.date(from: DateComponents(year: 2026, month: 1, day: 25))!
+        let note = TestDataBuilder.createNote(id: "1", amount: -10.0, date: testDate)
+        let response = NoteScene.FetchNotes.Response(notes: [note])
+
+        presenter.presentNotes(response: response)
+
+        let displayed = vc.lastFetchViewModel?.displayedNotes.first
+        #expect(
+            displayed?.date.contains("Jan") == true ||
+            displayed?.date.contains("2026") == true,
+            "Date should contain month or year"
         )
-        let response = TransactionList.FetchTransactions.Response(transactions: [transaction])
-        
-        // Act
-        sut.presentTransactions(response: response)
-        
-        // Assert
-        #expect(mockViewController.displayTransactionsCalled == true,
-                "ViewController should be called")
-        #expect(mockViewController.receivedViewModel?.transactions.count == 1,
-                "Should format one transaction")
-        
-        let displayedTransaction = mockViewController.receivedViewModel?.transactions.first
-        #expect(displayedTransaction?.id == "1")
-        #expect(displayedTransaction?.description == "Test Transaction")
-        #expect(displayedTransaction?.isPositive == false,
-                "Negative amount should be marked as expense")
-        #expect(displayedTransaction?.amount.contains("50") == true,
-                "Amount should contain the value")
-        #expect(displayedTransaction?.amount.contains("€") == true,
-                "Amount should contain currency symbol")
     }
-    
-    @MainActor
-    @Test("Present transactions formats positive amounts correctly")
-    func presentTransactionsFormatsPositiveAmount() {
-        // Arrange
-        let sut = TransactionListPresenter()
-        let mockViewController = MockTransactionListViewController()
-        sut.viewController = mockViewController
-        
-        let transaction = TestDataBuilder.createTransfer(
-            id: "2",
-            amount: 2500.00,
-            description: "Salary",
-            category: "Income"
-        )
-        let response = TransactionList.FetchTransactions.Response(transactions: [transaction])
-        
-        // Act
-        sut.presentTransactions(response: response)
-        
-        // Assert
-        let displayedTransaction = mockViewController.receivedViewModel?.transactions.first
-        #expect(displayedTransaction?.isPositive == true,
-                "Positive amount should be marked as income")
-        #expect(displayedTransaction?.category == "Income")
-        #expect(displayedTransaction?.amount.contains("2") == true)
-        #expect(displayedTransaction?.amount.contains("500") == true)
+
+
+    @MainActor @Test("Present notes – empty list still calls ViewController")
+    func presentNotesEmpty() {
+        let (presenter, vc) = makeSUT()
+
+        let response = NoteScene.FetchNotes.Response(notes: [])
+        presenter.presentNotes(response: response)
+
+        #expect(vc.displayNotesCalled == true)
+        #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
+        #expect(vc.lastFetchViewModel?.totalCount == 0)
     }
-    
-    @MainActor
-    @Test("Present transactions formats dates correctly")
-    func presentTransactionsFormatsDate() {
-        // Arrange
-        let sut = TransactionListPresenter()
-        let mockViewController = MockTransactionListViewController()
-        sut.viewController = mockViewController
-        
-        let calendar = Calendar.current
-        let testDate = calendar.date(from: DateComponents(year: 2026, month: 1, day: 25))!
-        
-        let transaction = TestDataBuilder.createTransfer(
-            id: "1",
-            amount: -100.0,
-            date: testDate
-        )
-        let response = TransactionList.FetchTransactions.Response(transactions: [transaction])
-        
-        // Act
-        sut.presentTransactions(response: response)
-        
-        // Assert
-        let displayedTransaction = mockViewController.receivedViewModel?.transactions.first
-        #expect(displayedTransaction?.date.contains("Jan") == true ||
-                displayedTransaction?.date.contains("2026") == true,
-                "Date should be formatted properly")
-    }
-    
-    @MainActor
-    @Test("Present transactions handles empty list")
-    func presentEmptyTransactions() {
-        // Arrange
-        let sut = TransactionListPresenter()
-        let mockViewController = MockTransactionListViewController()
-        sut.viewController = mockViewController
-        
-        let response = TransactionList.FetchTransactions.Response(transactions: [])
-        
-        // Act
-        sut.presentTransactions(response: response)
-        
-        // Assert
-        #expect(mockViewController.displayTransactionsCalled == true,
-                "ViewController should be called even with empty list")
-        #expect(mockViewController.receivedViewModel?.transactions.isEmpty == true,
-                "Should present empty list correctly")
-    }
-    
-    @MainActor
-    @Test("Present transactions preserves transaction order")
-    func presentTransactionsPreservesOrder() {
-        // Arrange
-        let sut = TransactionListPresenter()
-        let mockViewController = MockTransactionListViewController()
-        sut.viewController = mockViewController
-        
-        let transactions = [
-            TestDataBuilder.createTransfer(id: "1", description: "First"),
-            TestDataBuilder.createTransfer(id: "2", description: "Second"),
-            TestDataBuilder.createTransfer(id: "3", description: "Third")
+
+
+    @MainActor @Test("Present notes – preserves order")
+    func presentNotesOrder() {
+        let (presenter, vc) = makeSUT()
+
+        let notes = [
+            TestDataBuilder.createNote(id: "A", description: "First"),
+            TestDataBuilder.createNote(id: "B", description: "Second"),
+            TestDataBuilder.createNote(id: "C", description: "Third")
         ]
-        let response = TransactionList.FetchTransactions.Response(transactions: transactions)
-        
-        // Act
-        sut.presentTransactions(response: response)
-        
-        // Assert
-        let displayed = mockViewController.receivedViewModel?.transactions ?? []
+        let response = NoteScene.FetchNotes.Response(notes: notes)
+        presenter.presentNotes(response: response)
+
+        let displayed = vc.lastFetchViewModel?.displayedNotes ?? []
         #expect(displayed.count == 3)
-        #expect(displayed[0].id == "1")
-        #expect(displayed[0].description == "First")
-        #expect(displayed[1].id == "2")
-        #expect(displayed[1].description == "Second")
-        #expect(displayed[2].id == "3")
-        #expect(displayed[2].description == "Third")
+        #expect(vc.lastFetchViewModel?.totalCount == 3)
+        #expect(displayed[0].id == "A")
+        #expect(displayed[1].id == "B")
+        #expect(displayed[2].id == "C")
     }
-    
-    // MARK: - Currency Formatting
-    
-    @MainActor
-    @Test("Present transactions uses absolute values for display")
-    func presentTransactionsUsesAbsoluteValues() {
-        // Arrange
-        let sut = TransactionListPresenter()
-        let mockViewController = MockTransactionListViewController()
-        sut.viewController = mockViewController
-        
-        let transaction = TestDataBuilder.createTransfer(
-            id: "1",
-            amount: -123.45
-        )
-        let response = TransactionList.FetchTransactions.Response(transactions: [transaction])
-        
-        // Act
-        sut.presentTransactions(response: response)
-        
-        // Assert
-        let displayedAmount = mockViewController.receivedViewModel?.transactions.first?.amount
-        #expect(displayedAmount?.contains("-") == false,
-                "Displayed amount should not contain minus sign (handled by color)")
-        #expect(displayedAmount?.contains("123") == true)
+
+
+    @MainActor @Test("Present notes – zero amount treated as positive")
+    func presentNotesZeroAmount() {
+        let (presenter, vc) = makeSUT()
+
+        let note = TestDataBuilder.createNote(id: "z", amount: 0.0)
+        presenter.presentNotes(response: NoteScene.FetchNotes.Response(notes: [note]))
+
+        #expect(vc.lastFetchViewModel?.displayedNotes.first?.isPositive == true)
     }
-    
-    @MainActor
-    @Test("Present transactions includes thumbnailUrl when present")
-    func presentTransactionsIncludesThumbnailUrl() {
-        // Arrange
-        let sut = TransactionListPresenter()
-        let mockViewController = MockTransactionListViewController()
-        sut.viewController = mockViewController
-        
-        let transaction = TestDataBuilder.createTransfer(
-            id: "1",
-            amount: -50.0,
-            thumbnailUrl: "https://example.com/image.jpg"
-        )
-        let response = TransactionList.FetchTransactions.Response(transactions: [transaction])
-        
-        // Act
-        sut.presentTransactions(response: response)
-        
-        // Assert
-        let displayed = mockViewController.receivedViewModel?.transactions.first
-        #expect(displayed?.thumbnailUrl == "https://example.com/image.jpg",
-                "Should preserve thumbnail URL")
+
+
+    @MainActor @Test("Present notes – very large amount still has €")
+    func presentNotesLargeAmount() {
+        let (presenter, vc) = makeSUT()
+
+        let note = TestDataBuilder.createNote(id: "big", amount: 1_000_000.99)
+        presenter.presentNotes(response: NoteScene.FetchNotes.Response(notes: [note]))
+
+        #expect(vc.lastFetchViewModel?.displayedNotes.first?.amount.contains("€") == true)
     }
-    
-    // MARK: - Edge Cases
-    
-    @MainActor
-    @Test("Present transactions handles zero amount")
-    func presentTransactionsHandlesZeroAmount() {
-        // Arrange
-        let sut = TransactionListPresenter()
-        let mockViewController = MockTransactionListViewController()
-        sut.viewController = mockViewController
-        
-        let transaction = TestDataBuilder.createTransfer(id: "1", amount: 0.0)
-        let response = TransactionList.FetchTransactions.Response(transactions: [transaction])
-        
-        // Act
-        sut.presentTransactions(response: response)
-        
-        // Assert
-        let displayed = mockViewController.receivedViewModel?.transactions.first
-        #expect(displayed?.isPositive == true,
-                "Zero amount should be treated as positive")
+
+
+    @MainActor @Test("Present notes – nil viewController does not crash")
+    func presentNotesNilVC() {
+        let presenter = NoteListPresenter()
+        presenter.viewController = nil          // deliberately nil
+
+        let note = TestDataBuilder.createNote(id: "x", amount: 5.0)
+        presenter.presentNotes(response: NoteScene.FetchNotes.Response(notes: [note]))
+        #expect(true, "No crash")
     }
-    
-    @MainActor
-    @Test("Present transactions handles very large amounts")
-    func presentTransactionsHandlesLargeAmounts() {
-        // Arrange
-        let sut = TransactionListPresenter()
-        let mockViewController = MockTransactionListViewController()
-        sut.viewController = mockViewController
-        
-        let transaction = TestDataBuilder.createTransfer(
-            id: "1",
-            amount: 1_000_000.99
-        )
-        let response = TransactionList.FetchTransactions.Response(transactions: [transaction])
-        
-        // Act
-        sut.presentTransactions(response: response)
-        
-        // Assert
-        let displayed = mockViewController.receivedViewModel?.transactions.first
-        #expect(displayed?.amount.contains("€") == true,
-                "Should format large amounts with currency")
+
+
+    @MainActor @Test("Present notes – called twice, VC sees both")
+    func presentNotesMultipleCalls() {
+        let (presenter, vc) = makeSUT()
+
+        presenter.presentNotes(response: NoteScene.FetchNotes.Response(
+            notes: [TestDataBuilder.createNote(id: "1")]))
+        presenter.presentNotes(response: NoteScene.FetchNotes.Response(
+            notes: TestDataBuilder.createMixedNotes()))
+
+        #expect(vc.displayNotesCallCount == 2)
+        #expect(vc.lastFetchViewModel?.displayedNotes.count == 5, "Latest batch wins")
+        #expect(vc.lastFetchViewModel?.totalCount == 5)
     }
-    
-    @MainActor
-    @Test("Present transactions handles nil viewController gracefully")
-    func presentTransactionsWithNilViewController() {
-        // Arrange
-        let sut = TransactionListPresenter()
-        // viewController is nil
-        
-        let transaction = TestDataBuilder.createTransfer(id: "1", amount: 100.0)
-        let response = TransactionList.FetchTransactions.Response(transactions: [transaction])
-        
-        // Act - should not crash
-        sut.presentTransactions(response: response)
-        
-        // Assert - no crash is success
-        #expect(true, "Should handle nil viewController without crashing")
+
+    // =========================================================================
+    // MARK: - Create Note – formatting
+    // =========================================================================
+
+
+    @MainActor @Test("Present create result – success carries message")
+    func presentCreateSuccess() {
+        let (presenter, vc) = makeSUT()
+
+        let note = TestDataBuilder.createNote(id: "new_1", amount: -22.50, description: "Lunch")
+        let response = NoteScene.CreateNote.Response(note: note, success: true)
+
+        presenter.presentCreateResult(response: response)
+
+        #expect(vc.displayCreateResultCalled == true)
+        #expect(vc.lastCreateViewModel?.success == true)
+        #expect(vc.lastCreateViewModel?.message != nil)
     }
+
+
+    @MainActor @Test("Present create result – failure forwards error")
+    func presentCreateFailure() {
+        let (presenter, vc) = makeSUT()
+
+        let note = TestDataBuilder.createNote(id: "fail_1")
+        let response = NoteScene.CreateNote.Response(note: note, success: false)
+
+        presenter.presentCreateResult(response: response)
+
+        #expect(vc.displayCreateResultCalled == true)
+        #expect(vc.lastCreateViewModel?.success == false)
+        #expect(vc.lastCreateViewModel?.message != nil)
+    }
+
+    // =========================================================================
+    // MARK: - Update Note – formatting
+    // =========================================================================
+
+
+    @MainActor @Test("Present update result – success carries message")
+    func presentUpdateSuccess() {
+        let (presenter, vc) = makeSUT()
+
+        let note = TestDataBuilder.createNote(id: "upd_1", amount: 99.99, description: "Updated")
+        let response = NoteScene.UpdateNote.Response(note: note, success: true)
+
+        presenter.presentUpdateResult(response: response)
+
+        #expect(vc.displayUpdateResultCalled == true)
+        #expect(vc.lastUpdateViewModel?.success == true)
+        #expect(vc.lastUpdateViewModel?.message != nil)
+    }
+
+  
+    @MainActor @Test("Present update result – failure forwards error")
+    func presentUpdateFailure() {
+        let (presenter, vc) = makeSUT()
+
+        let note = TestDataBuilder.createNote(id: "upd_fail")
+        let response = NoteScene.UpdateNote.Response(note: note, success: false)
+
+        presenter.presentUpdateResult(response: response)
+
+        #expect(vc.displayUpdateResultCalled == true)
+        #expect(vc.lastUpdateViewModel?.success == false)
+        #expect(vc.lastUpdateViewModel?.message != nil)
+    }
+
+    // =========================================================================
+    // MARK: - Delete Note – formatting
+    // =========================================================================
+
+
+    @MainActor @Test("Present delete result – success carries message")
+    func presentDeleteSuccess() {
+        let (presenter, vc) = makeSUT()
+
+        let response = NoteScene.DeleteNote.Response(success: true, noteId: "del_1")
+
+        presenter.presentDeleteResult(response: response)
+
+        #expect(vc.displayDeleteResultCalled == true)
+        #expect(vc.lastDeleteViewModel?.success == true)
+        #expect(vc.lastDeleteViewModel?.message != nil)
+    }
+
     
-    // MARK: - Multiple Calls
-    
-    @MainActor
-    @Test("Present transactions can be called multiple times")
-    func presentTransactionsMultipleCalls() {
-        // Arrange
-        let sut = TransactionListPresenter()
-        let mockViewController = MockTransactionListViewController()
-        sut.viewController = mockViewController
-        
-        let firstBatch = [TestDataBuilder.createTransfer(id: "1", amount: 100.0)]
-        let secondBatch = [
-            TestDataBuilder.createTransfer(id: "2", amount: 200.0),
-            TestDataBuilder.createTransfer(id: "3", amount: 300.0)
-        ]
-        
-        // Act
-        sut.presentTransactions(response: TransactionList.FetchTransactions.Response(transactions: firstBatch))
-        sut.presentTransactions(response: TransactionList.FetchTransactions.Response(transactions: secondBatch))
-        
-        // Assert
-        #expect(mockViewController.displayTransactionsCallCount == 2,
-                "ViewController should be called twice")
-        #expect(mockViewController.receivedViewModel?.transactions.count == 2,
-                "Should have latest data")
+    @MainActor @Test("Present delete result – failure carries message")
+    func presentDeleteFailure() {
+        let (presenter, vc) = makeSUT()
+
+        let response = NoteScene.DeleteNote.Response(success: false, noteId: "del_fail")
+
+        presenter.presentDeleteResult(response: response)
+
+        #expect(vc.displayDeleteResultCalled == true)
+        #expect(vc.lastDeleteViewModel?.success == false)
+        #expect(vc.lastDeleteViewModel?.message != nil)
+    }
+
+    // =========================================================================
+    // MARK: - Fetch Single Note – formatting
+    // =========================================================================
+
+
+    @MainActor @Test("Present single note – formats all fields")
+    func presentNoteSingle() {
+        let (presenter, vc) = makeSUT()
+
+        let note = TestDataBuilder.createNote(id: "det_1", amount: -88.00, description: "Detail Test", category: "Entertainment")
+        let response = NoteScene.FetchNote.Response(note: note)
+
+        presenter.presentNote(response: response)
+
+        #expect(vc.displayNoteCalled == true)
+        let vm = vc.lastNoteViewModel?.displayedNote
+        #expect(vm?.id == "det_1")
+        #expect(vm?.description == "Detail Test")
+        #expect(vm?.category == "Entertainment")
+        #expect(vm?.amount.contains("88") == true)
+        #expect(vm?.isPositive == false)
+    }
+
+
+    @MainActor @Test("Present single note – nil note still calls ViewController")
+    func presentNoteNil() {
+        let (presenter, vc) = makeSUT()
+
+        let response = NoteScene.FetchNote.Response(note: nil)
+        presenter.presentNote(response: response)
+
+        #expect(vc.displayNoteCalled == true)
+        #expect(vc.lastNoteViewModel?.displayedNote == nil)
     }
 }
