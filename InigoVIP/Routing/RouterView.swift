@@ -14,13 +14,7 @@ struct RouterView {
         switch route {
         case .noteDetail(let id):
             NoteDetailView(noteId: id)
-            
-        case .settings:
-            SettingsView()
-            
-        case .profile:
-            ProfileView()
-            
+
         case .addNote:
             AddNoteView()
             
