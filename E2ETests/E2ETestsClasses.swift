@@ -10,12 +10,6 @@ import Supabase
 @testable import InigoVIP
 
 
-enum TestSupabaseConfig {
-    static let supabaseURL = "https://yjetrepgnhxzlphvawwy.supabase.co"
-    static let supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqZXRyZXBnbmh4emxwaHZhd3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMDcwNzksImV4cCI6MjA3Njc4MzA3OX0.aaSuBJt4dZu2hW1wHVgRdCKCL0BvohmfyGgVGNFHvw4"
-    static let testTableName = "notes_test"
-}
-
 @MainActor
 class TestSupabaseService {
     private let client: SupabaseClient
@@ -24,8 +18,8 @@ class TestSupabaseService {
     init(tableName: String = "notes_test") {
         self.tableName = tableName
         self.client = SupabaseClient(
-            supabaseURL: URL(string: TestSupabaseConfig.supabaseURL)!,
-            supabaseKey: TestSupabaseConfig.supabaseAnonKey
+            supabaseURL: URL(string: SupabaseConfig.supabaseTestURL)!,
+            supabaseKey: SupabaseConfig.supabaseAnonTestKey
         )
     }
     
