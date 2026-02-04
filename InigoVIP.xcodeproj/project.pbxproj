@@ -42,56 +42,9 @@
 		6AABCC422F2938C8009E5D12 /* InigoVIPUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InigoVIPUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		6AABCCA62F2A25CC009E5D12 /* Exceptions for "InigoVIP" folder in "InigoVIPTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Components/CategoryIcon.swift,
-				Components/CategoryPicker.swift,
-				Components/NoteRow.swift,
-				Models/Note.swift,
-				Models/NoteScene.swift,
-				Models/PhotoAPI.swift,
-				Scenes/NoteList/NoteListInteractor.swift,
-				Scenes/NoteList/NoteListPresenter.swift,
-				Scenes/NoteList/NoteListViewController.swift,
-				Services/AnalyticsService.swift,
-				Services/SupabaseService.swift,
-				Services/SwiftDataService.swift,
-				Workers/AnalyticsWorker.swift,
-				Workers/NoteWorker.swift,
-			);
-			target = 6AABCC372F2938C8009E5D12 /* InigoVIPTests */;
-		};
-		6AABCCA72F2A25CC009E5D12 /* Exceptions for "InigoVIP" folder in "InigoVIPUITests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Components/CategoryIcon.swift,
-				Components/CategoryPicker.swift,
-				Components/NoteRow.swift,
-				Models/Note.swift,
-				Models/NoteScene.swift,
-				Models/PhotoAPI.swift,
-				Scenes/NoteList/NoteListInteractor.swift,
-				Scenes/NoteList/NoteListPresenter.swift,
-				Scenes/NoteList/NoteListViewController.swift,
-				Services/AnalyticsService.swift,
-				Services/SupabaseService.swift,
-				Services/SwiftDataService.swift,
-				Workers/AnalyticsWorker.swift,
-				Workers/NoteWorker.swift,
-			);
-			target = 6AABCC412F2938C8009E5D12 /* InigoVIPUITests */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6AABCC2D2F2938C6009E5D12 /* InigoVIP */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				6AABCCA62F2A25CC009E5D12 /* Exceptions for "InigoVIP" folder in "InigoVIPTests" target */,
-				6AABCCA72F2A25CC009E5D12 /* Exceptions for "InigoVIP" folder in "InigoVIPUITests" target */,
-			);
 			path = InigoVIP;
 			sourceTree = "<group>";
 		};

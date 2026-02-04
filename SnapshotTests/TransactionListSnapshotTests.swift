@@ -150,23 +150,14 @@ final class NoteListSnapshotTests: XCTestCase {
     
     @MainActor
     func testNoteList_Empty() {
-        let view = NoteListContent(notes: []).frame(width: 375, height: 667)
-        
-        assertSnapshot(
-            of: view,
-            as: .image(layout: .device(config: .iPhone13))
-        )
+        let view = NoteListContent(notes: [])
+            .frame(width: 375, height: 667)
+        assertSnapshot(of: view, as: .image(layout: .device(config: .iPhone13)))
     }
     
     func testNoteList_WithData() {
-//        let viewModel = NoteScene.FetchNotes.ViewModel(
-//            notes: SnapshotTestData.sampleNotes
-//        )
-        let x: [Note] = SnapshotTestData.sampleNotes
-        
-        let view = NoteListContent(notes: x)
+        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
             .frame(width: 375, height: 667)
-        
         assertSnapshot(of: view, as: .image, record: recording)
     }
 //    
