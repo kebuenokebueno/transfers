@@ -160,184 +160,153 @@ final class NoteListSnapshotTests: XCTestCase {
             .frame(width: 375, height: 667)
         assertSnapshot(of: view, as: .image, record: recording)
     }
-//    
-//    func testNoteList_DarkMode() {
-//        let viewModel = NoteScene.FetchNotes.ViewModel(
-//            notes: SnapshotTestData.sampleNotes
-//        )
-//        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
-//            .frame(width: 375, height: 667)
-//            .preferredColorScheme(.dark)
-//        
-//        assertSnapshot(of: view, as: .image, record: recording)
-//    }
-//    
-//    func testNoteList_LargeText() {
-//        let viewModel = NoteScene.FetchNotes.ViewModel(
-//            notes: SnapshotTestData.sampleNotes
-//        )
-//        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
-//            .frame(width: 375, height: 667)
-//            .environment(\.dynamicTypeSize, .accessibility3)
-//        
-//        assertSnapshot(of: view, as: .image, record: recording)
-//    }
-//}
-//
-//// MARK: - Device-Specific Snapshots
-//
-//final class DeviceSpecificSnapshotTests: XCTestCase {
-//    var analyticsService: AnalyticsService!
-//    
-//    override func setUp() {
-//        super.setUp()
-//        analyticsService = AnalyticsService()
-//    }
-//    
-//    func testNoteList_iPhoneSE() {
-//        let viewModel = NoteScene.FetchNotes.ViewModel(
-//            notes: SnapshotTestData.sampleNotes
-//        )
-//        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
-//            .frame(width: 320, height: 568)
-//        
-//        assertSnapshot(of: view, as: .image, record: recording)
-//    }
-//    
-//    func testNoteList_iPhone15() {
-//        let viewModel = NoteScene.FetchNotes.ViewModel(
-//            notes: SnapshotTestData.sampleNotes
-//        )
-//        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
-//            .frame(width: 375, height: 812)
-//        
-//        assertSnapshot(of: view, as: .image, record: recording)
-//    }
-//    
-//    func testNoteList_iPhone15ProMax() {
-//        let viewModel = NoteScene.FetchNotes.ViewModel(
-//            notes: SnapshotTestData.sampleNotes
-//        )
-//        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
-//            .frame(width: 430, height: 932)
-//        
-//        assertSnapshot(of: view, as: .image, record: recording)
-//    }
-//    
-//    func testNoteList_iPadPro() {
-//        let viewModel = NoteScene.FetchNotes.ViewModel(
-//            notes: SnapshotTestData.sampleNotes
-//        )
-//        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
-//            .frame(width: 1024, height: 1366)
-//        
-//        assertSnapshot(of: view, as: .image, record: recording)
-//    }
-//}
-//
-//
-//// MARK: - Category Icon Snapshots
-//
-//final class CategoryIconSnapshotTests: XCTestCase {
-//    
-//    func testCategoryIcons_AllCategories() {
-//        let categories = ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"]
-//        
-//        for category in categories {
-//            let view = CategoryIcon(category: category)
-//                .frame(width: 100, height: 100)
-//                .padding()
-//            
-//            assertSnapshot(of: view, as: .image, named: "icon_\(category)", record: recording)
-//        }
-//    }
-//    
-//    func testCategoryIcons_DarkMode() {
-//        let categories = ["Food", "Utilities", "Income"]
-//        
-//        for category in categories {
-//            let view = CategoryIcon(category: category)
-//                .frame(width: 100, height: 100)
-//                .padding()
-//                .preferredColorScheme(.dark)
-//            
-//            assertSnapshot(of: view, as: .image, named: "icon_\(category)_dark", record: recording)
-//        }
-//    }
-//    
-//    func testCategoryIcon_AccessibilitySize() {
-//        let view = CategoryIcon(category: "Food")
-//            .frame(width: 100, height: 100)
-//            .padding()
-//            .environment(\.dynamicTypeSize, .accessibility5)
-//        
-//        assertSnapshot(of: view, as: .image, record: recording)
-//    }
-//}
-//
-//// MARK: - Regression Tests
-//
-//final class RegressionSnapshotTests: XCTestCase {
-//    var analyticsService: AnalyticsService!
-//    
-//    override func setUp() {
-//        super.setUp()
-//        analyticsService = AnalyticsService()
-//    }
-//    
-//    // This test captures the entire note list screen
-//    // If anything changes visually, this will catch it
-//    func testFullScreen_NoteList() {
-//        let viewModel = NoteScene.FetchNotes.ViewModel(
-//            displayedNotes: SnapshotTestData.sampleNotes
-//        )
-//        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
-//            .frame(width: 375, height: 812)  // iPhone 15 size
-//        
-//        assertSnapshot(of: view, as: .image, named: "full_screen", record: recording)
-//    }
-//    
-//    // Test with many notes (scrolling)
-//    func testFullScreen_ManyNotes() {
-//        var manyNotes: [Note] = []
-//        for i in 1...20 {
-//            let amount = (i % 3 == 0) ? Double(i * 100) : -Double(i * 10)
-//            manyNotes.append(
-//                SnapshotTestData.sampleNote(
-//                    id: "\(i)",
-//                    amount: amount,
-//                    description: "Note \(i)"
-//                )
-//            )
-//        }
-//        
-//        let viewModel = NoteScene.FetchNotes.ViewModel(displayedNotes: manyNotes)
-//        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
-//            .frame(width: 375, height: 812)
-//        
-//        assertSnapshot(of: view, as: .image, named: "many_notes", record: recording)
-//    }
-//}
-//
-//// MARK: - Precision Snapshot Tests (Different Precisions)
-//
-//final class PrecisionSnapshotTests: XCTestCase {
-//    
-//    // Test with pixel-perfect precision (default)
-//    func testPrecision_PixelPerfect() {
-//        let note = SnapshotTestData.sampleNote()
-//        let view = NoteRow(note: note)
-//            .frame(width: 375, height: 80)
-//        
-//        assertSnapshot(of: view, as: .image(precision: 1.0), record: recording)
-//    }
-//    
-//    // Test with 99% precision (allows tiny variations)
-//    func testPrecision_99Percent() {
-//        let note = SnapshotTestData.sampleNote()
-//        let view = NoteRow(note: note)
-//            .frame(width: 375, height: 80)
-//        
-//        assertSnapshot(of: view, as: .image(precision: 0.99), record: recording)
-//    }
+    
+    func testNoteList_DarkMode() {
+        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+            .frame(width: 375, height: 667)
+            .preferredColorScheme(.dark)
+        
+        assertSnapshot(of: view, as: .image, record: recording)
+    }
+    
+    func testNoteList_LargeText() {
+        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+            .frame(width: 375, height: 667)
+            .environment(\.dynamicTypeSize, .accessibility3)
+        
+        assertSnapshot(of: view, as: .image, record: recording)
+    }
+}
+
+// MARK: - Device-Specific Snapshots
+
+final class DeviceSpecificSnapshotTests: XCTestCase {
+    var analyticsService: AnalyticsService!
+    
+    override func setUp() {
+        super.setUp()
+        analyticsService = AnalyticsService()
+    }
+    
+    func testNoteList_iPhoneSE() {
+        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+            .frame(width: 320, height: 568)
+        assertSnapshot(of: view, as: .image, record: recording)
+    }
+    
+    func testNoteList_iPhone15() {
+        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+            .frame(width: 375, height: 812)
+        assertSnapshot(of: view, as: .image, record: recording)
+    }
+    
+    func testNoteList_iPhone15ProMax() {
+        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+            .frame(width: 430, height: 932)
+        assertSnapshot(of: view, as: .image, record: recording)
+    }
+    
+    func testNoteList_iPadPro() {
+        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+            .frame(width: 1024, height: 1366)
+        assertSnapshot(of: view, as: .image, record: recording)
+    }
+}
+
+
+// MARK: - Category Icon Snapshots
+
+final class CategoryIconSnapshotTests: XCTestCase {
+    
+    func testCategoryIcons_AllCategories() {
+        let categories = ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"]
+        
+        for category in categories {
+            let view = CategoryIcon(category: category)
+                .frame(width: 100, height: 100)
+                .padding()
+            assertSnapshot(of: view, as: .image, named: "icon_\(category)", record: recording)
+        }
+    }
+    
+    func testCategoryIcons_DarkMode() {
+        let categories = ["Food", "Utilities", "Income"]
+        
+        for category in categories {
+            let view = CategoryIcon(category: category)
+                .frame(width: 100, height: 100)
+                .padding()
+                .preferredColorScheme(.dark)
+            assertSnapshot(of: view, as: .image, named: "icon_\(category)_dark", record: recording)
+        }
+    }
+    
+    func testCategoryIcon_AccessibilitySize() {
+        let view = CategoryIcon(category: "Food")
+            .frame(width: 100, height: 100)
+            .padding()
+            .environment(\.dynamicTypeSize, .accessibility5)
+        assertSnapshot(of: view, as: .image, record: recording)
+    }
+}
+
+// MARK: - Regression Tests
+
+final class RegressionSnapshotTests: XCTestCase {
+    var analyticsService: AnalyticsService!
+    
+    override func setUp() {
+        super.setUp()
+        analyticsService = AnalyticsService()
+    }
+    
+    // This test captures the entire note list screen
+    // If anything changes visually, this will catch it
+    func testFullScreen_NoteList() {
+        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+            .frame(width: 375, height: 812)  // iPhone 15 size
+        assertSnapshot(of: view, as: .image, named: "full_screen", record: recording)
+    }
+    
+    // Test with many notes (scrolling)
+    func testFullScreen_ManyNotes() {
+        var manyNotes: [Note] = []
+        for i in 1...20 {
+            let amount = (i % 3 == 0) ? Double(i * 100) : -Double(i * 10)
+            manyNotes.append(
+                SnapshotTestData.sampleNote(
+                    id: "\(i)",
+                    amount: amount,
+                    description: "Note \(i)"
+                )
+            )
+        }
+        
+        let view = NoteListContent(notes: manyNotes)
+            .frame(width: 375, height: 812)
+        assertSnapshot(of: view, as: .image, named: "many_notes", record: recording)
+    }
+}
+
+// MARK: - Precision Snapshot Tests (Different Precisions)
+
+final class PrecisionSnapshotTests: XCTestCase {
+    
+    // Test with pixel-perfect precision (default)
+    func testPrecision_PixelPerfect() {
+        let note = SnapshotTestData.sampleNote()
+        let view = NoteRow(note: note)
+            .frame(width: 375, height: 80)
+        
+        assertSnapshot(of: view, as: .image(precision: 1.0), record: recording)
+    }
+    
+    // Test with 99% precision (allows tiny variations)
+    func testPrecision_99Percent() {
+        let note = SnapshotTestData.sampleNote()
+        let view = NoteRow(note: note)
+            .frame(width: 375, height: 80)
+        
+        assertSnapshot(of: view, as: .image(precision: 0.99), record: recording)
+    }
 }
