@@ -5,38 +5,37 @@ import SwiftUI
 @testable import InigoVIP
 
 struct SnapshotTestData {
-    static func sampleTransaction(
+    static func sampleNote(
         id: String = "1",
         amount: Double = -45.50,
         description: String = "Grocery Store",
         category: String = "Food"
-    ) -> TransactionList.FetchTransactions.ViewModel.DisplayedTransaction {
-        TransactionList.FetchTransactions.ViewModel.DisplayedTransaction(
+    ) -> Note {
+        Note(
             id: id,
-            amount: "€\(abs(amount))",
+            amount: Double(amount),
             description: description,
-            date: "Jan 25, 2026",
+            date: Date(),
             category: category,
-            isPositive: amount >= 0,
-            thumbnailUrl: "https://via.placeholder.com/150"
+            syncStatus: Note.SyncStatus.pending
         )
     }
     
-    static var sampleTransactions: [TransactionList.FetchTransactions.ViewModel.DisplayedTransaction] {
+    static var sampleNotes: [Note] {
         [
-            sampleTransaction(id: "1", amount: -45.50, description: "Grocery Store", category: "Food"),
-            sampleTransaction(id: "2", amount: -120.00, description: "Electric Bill", category: "Utilities"),
-            sampleTransaction(id: "3", amount: 2500.00, description: "Salary", category: "Income"),
-            sampleTransaction(id: "4", amount: -30.00, description: "Gas Station", category: "Transport"),
-            sampleTransaction(id: "5", amount: 150.00, description: "Freelance Work", category: "Income")
+            sampleNote(id: "1", amount: -45.50, description: "Grocery Store", category: "Food"),
+            sampleNote(id: "2", amount: -120.00, description: "Electric Bill", category: "Utilities"),
+            sampleNote(id: "3", amount: 2500.00, description: "Salary", category: "Income"),
+            sampleNote(id: "4", amount: -30.00, description: "Gas Station", category: "Transport"),
+            sampleNote(id: "5", amount: 150.00, description: "Freelance Work", category: "Income")
         ]
     }
 }
 
-// MARK: - Transaction Row Snapshot Tests
+// MARK: - Note Row Snapshot Tests
 var recording = false
 
-final class TransactionRowSnapshotTests: XCTestCase {
+final class NoteRowSnapshotTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
@@ -45,30 +44,30 @@ final class TransactionRowSnapshotTests: XCTestCase {
     
     // MARK: - Basic States
     
-    func testTransactionRow_Expense() {
+    func testNoteRow_Expense() {
         
-        let transaction = SnapshotTestData.sampleTransaction(amount: -45.50)
-        let view = TransactionRow(transaction: transaction)
+        let note = SnapshotTestData.sampleNote(amount: -45.50)
+        let view = NoteRow(note: note)
             .frame(width: 375, height: 80)
             .padding()
         
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testTransactionRow_Income() {
-        let transaction = SnapshotTestData.sampleTransaction(amount: 2500.00, description: "Salary", category: "Income")
-        let view = TransactionRow(transaction: transaction)
+    func testNoteRow_Income() {
+        let note = SnapshotTestData.sampleNote(amount: 2500.00, description: "Salary", category: "Income")
+        let view = NoteRow(note: note)
             .frame(width: 375, height: 80)
             .padding()
         
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testTransactionRow_LongDescription() {
-        let transaction = SnapshotTestData.sampleTransaction(
-            description: "Very Long Transaction Description That Should Wrap To Multiple Lines"
+    func testNoteRow_LongDescription() {
+        let note = SnapshotTestData.sampleNote(
+            description: "Very Long Note Description That Should Wrap To Multiple Lines"
         )
-        let view = TransactionRow(transaction: transaction)
+        let view = NoteRow(note: note)
             .frame(width: 375, height: 100)
             .padding()
         
@@ -77,9 +76,9 @@ final class TransactionRowSnapshotTests: XCTestCase {
     
     // MARK: - Dark Mode
     
-    func testTransactionRow_DarkMode() {
-        let transaction = SnapshotTestData.sampleTransaction()
-        let view = TransactionRow(transaction: transaction)
+    func testNoteRow_DarkMode() {
+        let note = SnapshotTestData.sampleNote()
+        let view = NoteRow(note: note)
             .frame(width: 375, height: 80)
             .padding()
             .preferredColorScheme(.dark)
@@ -87,9 +86,9 @@ final class TransactionRowSnapshotTests: XCTestCase {
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testTransactionRow_Income_DarkMode() {
-        let transaction = SnapshotTestData.sampleTransaction(amount: 2500.00)
-        let view = TransactionRow(transaction: transaction)
+    func testNoteRow_Income_DarkMode() {
+        let note = SnapshotTestData.sampleNote(amount: 2500.00)
+        let view = NoteRow(note: note)
             .frame(width: 375, height: 80)
             .padding()
             .preferredColorScheme(.dark)
@@ -99,9 +98,9 @@ final class TransactionRowSnapshotTests: XCTestCase {
     
     // MARK: - Dynamic Type
     
-    func testTransactionRow_LargeText() {
-        let transaction = SnapshotTestData.sampleTransaction()
-        let view = TransactionRow(transaction: transaction)
+    func testNoteRow_LargeText() {
+        let note = SnapshotTestData.sampleNote()
+        let view = NoteRow(note: note)
             .frame(width: 375, height: 120)
             .padding()
             .environment(\.dynamicTypeSize, .accessibility3)
@@ -109,9 +108,9 @@ final class TransactionRowSnapshotTests: XCTestCase {
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testTransactionRow_ExtraLargeText() {
-        let transaction = SnapshotTestData.sampleTransaction()
-        let view = TransactionRow(transaction: transaction)
+    func testNoteRow_ExtraLargeText() {
+        let note = SnapshotTestData.sampleNote()
+        let view = NoteRow(note: note)
             .frame(width: 375, height: 150)
             .padding()
             .environment(\.dynamicTypeSize, .accessibility5)
@@ -121,16 +120,16 @@ final class TransactionRowSnapshotTests: XCTestCase {
     
     // MARK: - All Categories
     
-    func testTransactionRow_AllCategories() {
+    func testNoteRow_AllCategories() {
         let categories = ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"]
         
         for category in categories {
-            let transaction = SnapshotTestData.sampleTransaction(
+            let note = SnapshotTestData.sampleNote(
                 id: category,
-                description: "\(category) Transaction",
+                description: "\(category) Note",
                 category: category
             )
-            let view = TransactionRow(transaction: transaction)
+            let view = NoteRow(note: note)
                 .frame(width: 375, height: 80)
                 .padding()
             
@@ -139,9 +138,9 @@ final class TransactionRowSnapshotTests: XCTestCase {
     }
 }
 
-// MARK: - Transaction List Snapshot Tests
+// MARK: - Note List Snapshot Tests
 
-final class TransactionListSnapshotTests: XCTestCase {
+final class NoteListSnapshotTests: XCTestCase {
     var analyticsService: AnalyticsService!
     
     override func setUp() {
@@ -149,40 +148,41 @@ final class TransactionListSnapshotTests: XCTestCase {
         analyticsService = AnalyticsService()
     }
     
-    func testTransactionList_Empty() {
-        let viewModel = TransactionList.FetchTransactions.ViewModel(transactions: [])
-        let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
+    func testNoteList_Empty() {
+        let viewModel = NoteScene.FetchNotes.ViewModel(displayedNotes: [], totalCount: 0)
+        NoteListConteht
+        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
             .frame(width: 375, height: 667)
         
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testTransactionList_WithData() {
-        let viewModel = TransactionList.FetchTransactions.ViewModel(
-            transactions: SnapshotTestData.sampleTransactions
+    func testNoteList_WithData() {
+        let viewModel = NoteScene.FetchNotes.ViewModel(
+            notes: SnapshotTestData.sampleNotes
         )
-        let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
+        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
             .frame(width: 375, height: 667)
         
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testTransactionList_DarkMode() {
-        let viewModel = TransactionList.FetchTransactions.ViewModel(
-            transactions: SnapshotTestData.sampleTransactions
+    func testNoteList_DarkMode() {
+        let viewModel = NoteScene.FetchNotes.ViewModel(
+            notes: SnapshotTestData.sampleNotes
         )
-        let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
+        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
             .frame(width: 375, height: 667)
             .preferredColorScheme(.dark)
         
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testTransactionList_LargeText() {
-        let viewModel = TransactionList.FetchTransactions.ViewModel(
-            transactions: SnapshotTestData.sampleTransactions
+    func testNoteList_LargeText() {
+        let viewModel = NoteScene.FetchNotes.ViewModel(
+            notes: SnapshotTestData.sampleNotes
         )
-        let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
+        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
             .frame(width: 375, height: 667)
             .environment(\.dynamicTypeSize, .accessibility3)
         
@@ -200,101 +200,47 @@ final class DeviceSpecificSnapshotTests: XCTestCase {
         analyticsService = AnalyticsService()
     }
     
-    func testTransactionList_iPhoneSE() {
-        let viewModel = TransactionList.FetchTransactions.ViewModel(
-            transactions: SnapshotTestData.sampleTransactions
+    func testNoteList_iPhoneSE() {
+        let viewModel = NoteScene.FetchNotes.ViewModel(
+            notes: SnapshotTestData.sampleNotes
         )
-        let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
+        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
             .frame(width: 320, height: 568)
         
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testTransactionList_iPhone15() {
-        let viewModel = TransactionList.FetchTransactions.ViewModel(
-            transactions: SnapshotTestData.sampleTransactions
+    func testNoteList_iPhone15() {
+        let viewModel = NoteScene.FetchNotes.ViewModel(
+            notes: SnapshotTestData.sampleNotes
         )
-        let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
+        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
             .frame(width: 375, height: 812)
         
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testTransactionList_iPhone15ProMax() {
-        let viewModel = TransactionList.FetchTransactions.ViewModel(
-            transactions: SnapshotTestData.sampleTransactions
+    func testNoteList_iPhone15ProMax() {
+        let viewModel = NoteScene.FetchNotes.ViewModel(
+            notes: SnapshotTestData.sampleNotes
         )
-        let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
+        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
             .frame(width: 430, height: 932)
         
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testTransactionList_iPadPro() {
-        let viewModel = TransactionList.FetchTransactions.ViewModel(
-            transactions: SnapshotTestData.sampleTransactions
+    func testNoteList_iPadPro() {
+        let viewModel = NoteScene.FetchNotes.ViewModel(
+            notes: SnapshotTestData.sampleNotes
         )
-        let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
+        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
             .frame(width: 1024, height: 1366)
         
         assertSnapshot(of: view, as: .image, record: recording)
     }
 }
 
-// MARK: - User Header Snapshots
-
-final class UserHeaderSnapshotTests: XCTestCase {
-    
-    func testUserHeader_Default() {
-        let authService = AuthService()
-        authService.isLoggedIn = true
-        authService.currentUser = User(name: "John Doe", email: "john@example.com")
-        
-        let view = UserHeaderView()
-            .environment(authService)
-            .frame(width: 375, height: 100)
-        
-        assertSnapshot(of: view, as: .image, record: recording)
-    }
-    
-    func testUserHeader_LongName() {
-        let authService = AuthService()
-        authService.isLoggedIn = true
-        authService.currentUser = User(name: "Christopher Alexander Wellington", email: "christopher@example.com")
-        
-        let view = UserHeaderView()
-            .environment(authService)
-            .frame(width: 375, height: 100)
-        
-        assertSnapshot(of: view, as: .image, record: recording)
-    }
-    
-    func testUserHeader_DarkMode() {
-        let authService = AuthService()
-        authService.isLoggedIn = true
-        authService.currentUser = User(name: "John Doe", email: "john@example.com")
-        
-        let view = UserHeaderView()
-            .environment(authService)
-            .frame(width: 375, height: 100)
-            .preferredColorScheme(.dark)
-        
-        assertSnapshot(of: view, as: .image, record: recording)
-    }
-    
-    func testUserHeader_LargeText() {
-        let authService = AuthService()
-        authService.isLoggedIn = true
-        authService.currentUser = User(name: "John Doe", email: "john@example.com")
-        
-        let view = UserHeaderView()
-            .environment(authService)
-            .frame(width: 375, height: 150)
-            .environment(\.dynamicTypeSize, .accessibility3)
-        
-        assertSnapshot(of: view, as: .image, record: recording)
-    }
-}
 
 // MARK: - Category Icon Snapshots
 
@@ -345,37 +291,37 @@ final class RegressionSnapshotTests: XCTestCase {
         analyticsService = AnalyticsService()
     }
     
-    // This test captures the entire transaction list screen
+    // This test captures the entire note list screen
     // If anything changes visually, this will catch it
-    func testFullScreen_TransactionList() {
-        let viewModel = TransactionList.FetchTransactions.ViewModel(
-            transactions: SnapshotTestData.sampleTransactions
+    func testFullScreen_NoteList() {
+        let viewModel = NoteScene.FetchNotes.ViewModel(
+            displayedNotes: SnapshotTestData.sampleNotes
         )
-        let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
+        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
             .frame(width: 375, height: 812)  // iPhone 15 size
         
         assertSnapshot(of: view, as: .image, named: "full_screen", record: recording)
     }
     
-    // Test with many transactions (scrolling)
-    func testFullScreen_ManyTransactions() {
-        var manyTransactions: [TransactionList.FetchTransactions.ViewModel.DisplayedTransaction] = []
+    // Test with many notes (scrolling)
+    func testFullScreen_ManyNotes() {
+        var manyNotes: [Note] = []
         for i in 1...20 {
             let amount = (i % 3 == 0) ? Double(i * 100) : -Double(i * 10)
-            manyTransactions.append(
-                SnapshotTestData.sampleTransaction(
+            manyNotes.append(
+                SnapshotTestData.sampleNote(
                     id: "\(i)",
                     amount: amount,
-                    description: "Transaction \(i)"
+                    description: "Note \(i)"
                 )
             )
         }
         
-        let viewModel = TransactionList.FetchTransactions.ViewModel(transactions: manyTransactions)
-        let view = TransactionListContent(transactions: viewModel.transactions, analyticsService: analyticsService)
+        let viewModel = NoteScene.FetchNotes.ViewModel(displayedNotes: manyNotes)
+        let view = NoteListContent(notes: viewModel.notes, analyticsService: analyticsService)
             .frame(width: 375, height: 812)
         
-        assertSnapshot(of: view, as: .image, named: "many_transactions", record: recording)
+        assertSnapshot(of: view, as: .image, named: "many_notes", record: recording)
     }
 }
 
@@ -385,8 +331,8 @@ final class PrecisionSnapshotTests: XCTestCase {
     
     // Test with pixel-perfect precision (default)
     func testPrecision_PixelPerfect() {
-        let transaction = SnapshotTestData.sampleTransaction()
-        let view = TransactionRow(transaction: transaction)
+        let note = SnapshotTestData.sampleNote()
+        let view = NoteRow(note: note)
             .frame(width: 375, height: 80)
         
         assertSnapshot(of: view, as: .image(precision: 1.0), record: recording)
@@ -394,8 +340,8 @@ final class PrecisionSnapshotTests: XCTestCase {
     
     // Test with 99% precision (allows tiny variations)
     func testPrecision_99Percent() {
-        let transaction = SnapshotTestData.sampleTransaction()
-        let view = TransactionRow(transaction: transaction)
+        let note = SnapshotTestData.sampleNote()
+        let view = NoteRow(note: note)
             .frame(width: 375, height: 80)
         
         assertSnapshot(of: view, as: .image(precision: 0.99), record: recording)

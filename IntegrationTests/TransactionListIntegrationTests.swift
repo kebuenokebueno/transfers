@@ -1,241 +1,371 @@
-// MARK: - External API Integration Tests
-// File: ExternalAPIIntegrationTests.swift
-// Purpose: Test integration with REAL external APIs
-// WARNING: These tests require internet connection and hit real APIs
-// Run these: Manually before releases, or nightly in CI/CD
+//
+//  NoteListIntegrationTests.swift
+//  InigoVIPTests
+//
+//  Created by Inigo on 29/1/26.
+//
 
 import Testing
 import Foundation
 @testable import InigoVIP
 
-// MARK: - Real API Integration Tests
+// MARK: - Full VIP Stack Integration Tests
+// Wire: Interactor → (real) Presenter → MockViewController
+//        ↑ uses MockNoteWorker + MockSwiftDataService
 
-@Suite("Real API Integration Tests - REQUIRES INTERNET", .tags(.externalAPI, .slow))
-struct RealAPIIntegrationTests {
-    
-    // MARK: - JSONPlaceholder API Tests
-    
-    @Test("Real API: Fetch photos from JSONPlaceholder")
-    func testRealAPIFetchPhotos() async throws {
-        // Arrange
-        let networkService = NetworkService()  // ✅ Real service, not mock
-        
-        // Act
-        let transactions = try await networkService.fetchTransactions()
-        
-        // Assert
-        #expect(transactions.count > 0, "Should fetch real data from API")
-        #expect(transactions.count <= 20, "API is configured to return 20 items")
-        
-        // Verify data structure from real API
-        let firstTransaction = transactions.first
-        #expect(firstTransaction?.id.isEmpty == false, "Should have valid ID")
-        #expect(firstTransaction?.description.isEmpty == false, "Should have description from API")
-        #expect(firstTransaction?.thumbnailUrl?.isEmpty == false, "Should have thumbnail URL")
-        
-        // Verify URL is valid
-        if let urlString = firstTransaction?.thumbnailUrl,
-           let url = URL(string: urlString) {
-            #expect(url.scheme == "https", "Should use HTTPS")
-            #expect(url.host?.contains("placeholder") == true, "Should be from placeholder domain")
-        }
-    }
-    
-    @Test("Real API: Returns expected number of items")
-    func testRealAPIItemCount() async throws {
-        // Arrange
-        let networkService = NetworkService()
-        
-        // Act
-        let transactions = try await networkService.fetchTransactions()
-        
-        // Assert
-        #expect(transactions.count == 20, "Should return exactly 20 items as configured")
-    }
-    
-    @Test("Real API: Data consistency across multiple calls")
-    func testRealAPIConsistency() async throws {
-        // Arrange
-        let networkService = NetworkService()
-        
-        // Act - Make multiple calls
-        let call1 = try await networkService.fetchTransactions()
-        let call2 = try await networkService.fetchTransactions()
-        
-        // Assert - JSONPlaceholder returns consistent data
-        #expect(call1.count == call2.count, "API should return consistent count")
-        
-        // IDs should be same (JSONPlaceholder is deterministic)
-        let ids1 = Set(call1.map { $0.id })
-        let ids2 = Set(call2.map { $0.id })
-        #expect(ids1 == ids2, "Should return same IDs across calls")
-    }
-    
-    @Test("Real API: Response time is acceptable")
-    func testRealAPIPerformance() async throws {
-        // Arrange
-        let networkService = NetworkService()
-        
-        // Act
-        let startTime = Date()
-        _ = try await networkService.fetchTransactions()
-        let duration = Date().timeIntervalSince(startTime)
-        
-        // Assert
-        #expect(duration < 10.0, "API should respond in <10 seconds, took \(duration)s")
-        
-        print("📊 Real API response time: \(String(format: "%.2f", duration))s")
-    }
-    
-    @Test("Real API: Returns valid JSON structure")
-    func testRealAPIJSONStructure() async throws {
-        // Arrange
-        let url = URL(string: "https://jsonplaceholder.typicode.com/photos?_limit=5")!
-        
-        // Act
-        let (data, response) = try await URLSession.shared.data(from: url)
-        
-        // Assert HTTP response
-        let httpResponse = response as? HTTPURLResponse
-        #expect(httpResponse?.statusCode == 200, "Should return 200 OK")
-        
-        // Assert JSON structure
-        let json = try JSONSerialization.jsonObject(with: data) as? [[String: Any]]
-        #expect(json != nil, "Should be valid JSON array")
-        #expect(json?.count == 5, "Should return requested limit")
-        
-        // Verify expected fields exist
-        let firstItem = json?.first
-        #expect(firstItem?["id"] != nil, "Should have id field")
-        #expect(firstItem?["title"] != nil, "Should have title field")
-        #expect(firstItem?["thumbnailUrl"] != nil, "Should have thumbnailUrl field")
-    }
-    
-    @Test("Real API: All transactions have valid data")
-    func testRealAPIDataValidation() async throws {
-        // Arrange
-        let networkService = NetworkService()
-        
-        // Act
-        let transactions = try await networkService.fetchTransactions()
-        
-        // Assert - All items have required fields
-        for transaction in transactions {
-            #expect(transaction.id.isEmpty == false, "ID should not be empty")
-            #expect(transaction.description.isEmpty == false, "Description should not be empty")
-            #expect(transaction.amount != 0, "Amount should not be zero")
-            #expect(transaction.category.isEmpty == false, "Category should not be empty")
-        }
-    }
-    
-    @Test("Real API: Categories are assigned correctly")
-    func testRealAPICategoryAssignment() async throws {
-        // Arrange
-        let networkService = NetworkService()
-        let validCategories = ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"]
-        
-        // Act
-        let transactions = try await networkService.fetchTransactions()
-        
-        // Assert - All categories are valid
-        for transaction in transactions {
-            #expect(validCategories.contains(transaction.category),
-                   "Category '\(transaction.category)' should be valid")
-        }
-    }
-    
-    @Test("Real API: Income/Expense distribution is logical")
-    func testRealAPIIncomeExpenseDistribution() async throws {
-        // Arrange
-        let networkService = NetworkService()
-        
-        // Act
-        let transactions = try await networkService.fetchTransactions()
-        
-        // Assert - Should have both income and expenses
-        let incomes = transactions.filter { $0.amount > 0 }
-        let expenses = transactions.filter { $0.amount < 0 }
-        
-        #expect(incomes.count > 0, "Should have at least some income transactions")
-        #expect(expenses.count > 0, "Should have at least some expense transactions")
-        
-        print("📊 Income: \(incomes.count), Expenses: \(expenses.count)")
-    }
-    
-    @Test("Real API: Thumbnail URLs have correct format")
-    func testRealAPIThumbnailURLFormat() async throws {
-        // Arrange
-        let networkService = NetworkService()
-        
-        // Act
-        let transactions = try await networkService.fetchTransactions()
-        
-        // Assert - Verify URL format (but don't try to load the image)
-        guard let firstThumbnailUrl = transactions.first?.thumbnailUrl,
-              let url = URL(string: firstThumbnailUrl) else {
-            Issue.record("First transaction should have valid thumbnail URL")
-            return
-        }
-        
-        // Just verify it's a valid URL format
-        #expect(url.scheme == "https", "Should use HTTPS")
-        #expect(url.host != nil, "Should have a host")
-        
-        // Note: via.placeholder.com URLs may not actually load images
-        // This is OK - we're just testing that the API returns valid URL strings
-        print("📸 Thumbnail URL format: \(firstThumbnailUrl)")
-    }
-    
-    // MARK: - Worker Integration with Real API
-    
-    @Test("TransactionWorker with real NetworkService")
-    func testWorkerWithRealAPI() async throws {
-        // Arrange
-        let realNetwork = NetworkService()
-        let cache = CacheService()
-        let worker = TransactionWorker(
-            networkService: realNetwork,  // ✅ Real API
-            cacheService: cache
-        )
-        
-        // Act
-        let transactions = try await worker.fetchTransactions()
-        
-        // Assert
-        #expect(transactions.count > 0, "Should fetch real transactions through worker")
-    }
-    
+@Suite("NoteList – Full VIP Integration", .tags(.integration))
+struct NoteListIntegrationTests {
+
+    // ---------------------------------------------------------------------------
+    // MARK: - Helper – returns every layer wired together
+    // ---------------------------------------------------------------------------
     @MainActor
-    @Test("Full VIP stack with real API")
-    func testFullVIPStackWithRealAPI() async throws {
-        // Arrange - Full stack with real network
-        let realNetwork = NetworkService()
-        let worker = TransactionWorker(
-            networkService: realNetwork,  // ✅ Real API
-            cacheService: CacheService()
-        )
-        let interactor = TransactionListInteractor(
-            transactionWorker: worker,
-            analyticsWorker: MockAnalyticsWorker()  // Still mock analytics
-        )
-        let presenter = TransactionListPresenter()
-        let viewController = MockTransactionListViewController()
-        
-        interactor.presenter = presenter
-        presenter.viewController = viewController
-        
-        // Act
-        await interactor.fetchTransactions()
-        
-        // Assert
-        #expect(viewController.displayTransactionsCalled == true,
-               "Should complete full VIP flow with real API")
-        #expect(viewController.receivedViewModel?.transactions.count ?? 0 > 0,
-               "Should receive real data through VIP stack")
-        
-        // Verify formatting was applied
-        let displayed = viewController.receivedViewModel?.transactions.first
-        #expect(displayed?.amount.contains("€") == true,
-               "Presenter should format real data")
+    private func makeStack() -> (
+        interactor: NoteListInteractor,
+        presenter: NoteListPresenter,
+        vc: MockNoteListViewController,
+        worker: MockNoteWorker,
+        local: MockSwiftDataService,
+        cloud: MockSupabaseService
+    ) {
+        let local      = MockSwiftDataService()
+        let cloud      = MockSupabaseService()
+        let worker     = MockNoteWorker(swiftDataService: local, supabaseService: cloud)
+        let interactor = NoteListInteractor(noteWorker: worker, swiftDataService: local)
+        let presenter  = NoteListPresenter()
+        let vc         = MockNoteListViewController()
+
+        interactor.presenter     = presenter
+        presenter.viewController = vc
+
+        return (interactor, presenter, vc, worker, local, cloud)
+    }
+
+    // =========================================================================
+    // MARK: - Fetch → display
+    // =========================================================================
+
+    @MainActor
+    @Test("Integration: Fetch – notes reach ViewController formatted")
+    func integrationFetch() async {
+        let (interactor, _, vc, _, local, _) = makeStack()
+        local.seed(TestDataBuilder.createMixedNotes())   // 5 notes
+
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+
+        #expect(vc.displayNotesCalled == true)
+        #expect(vc.lastFetchViewModel?.displayedNotes.count == 5)
+        #expect(vc.lastFetchViewModel?.totalCount == 5)
+
+        // Spot-check formatting on a known note
+        let grocery = vc.lastFetchViewModel?.displayedNotes.first(where: { $0.description == "Grocery Store" })
+        #expect(grocery != nil)
+        #expect(grocery?.amount.contains("€") == true)
+        #expect(grocery?.isPositive == false)
+
+        let salary = vc.lastFetchViewModel?.displayedNotes.first(where: { $0.description == "Salary" })
+        #expect(salary != nil)
+        #expect(salary?.isPositive == true)
+    }
+
+    @MainActor
+    @Test("Integration: Fetch – empty store shows empty list")
+    func integrationFetchEmpty() async {
+        let (interactor, _, vc, _, _, _) = makeStack()
+
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+
+        #expect(vc.displayNotesCalled == true)
+        #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
+        #expect(vc.lastFetchViewModel?.totalCount == 0)
+    }
+
+    // =========================================================================
+    // MARK: - Create → stored → fetch shows it
+    // =========================================================================
+
+    @MainActor
+    @Test("Integration: Create – note persists and appears on next fetch")
+    func integrationCreateThenFetch() async {
+        let (interactor, _, vc, _, local, cloud) = makeStack()
+
+        // 1. Create
+        await interactor.createNote(request: NoteScene.CreateNote.Request(
+            amount: 42.00,
+            description: "Integration Lunch",
+            category: "Food",
+            isIncome: false
+        ))
+
+        // VC told success
+        #expect(vc.displayCreateResultCalled == true)
+        #expect(vc.lastCreateViewModel?.success == true)
+
+        // Landed in both stores
+        #expect(local.notes.count == 1)
+        #expect(cloud.notes.count == 1)
+
+        // 2. Fetch – should appear in formatted list
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+
+        #expect(vc.lastFetchViewModel?.displayedNotes.count == 1)
+        #expect(vc.lastFetchViewModel?.displayedNotes.first?.description == "Integration Lunch")
+        #expect(vc.lastFetchViewModel?.displayedNotes.first?.amount.contains("42") == true)
+    }
+
+    @MainActor
+    @Test("Integration: Create income – amount stays positive through stack")
+    func integrationCreateIncome() async {
+        let (interactor, _, vc, _, _, _) = makeStack()
+
+        await interactor.createNote(request: NoteScene.CreateNote.Request(
+            amount: 3000.00,
+            description: "Bonus",
+            category: "Income",
+            isIncome: true
+        ))
+
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+
+        let displayed = vc.lastFetchViewModel?.displayedNotes.first
+        #expect(displayed != nil)
+        #expect(displayed?.isPositive == true)
+        #expect(displayed?.amount.contains("3") == true)
+        #expect(displayed?.amount.contains("000") == true)
+    }
+
+    // =========================================================================
+    // MARK: - Update → fetch shows updated data
+    // =========================================================================
+
+    @MainActor
+    @Test("Integration: Update – changes visible on next fetch")
+    func integrationUpdateThenFetch() async {
+        let (interactor, _, vc, _, local, cloud) = makeStack()
+
+        // Seed
+        let original = TestDataBuilder.createNote(id: "int_u1", amount: -10.0, description: "Before", category: "Food")
+        local.seed([original])
+        cloud.notes  = [original]
+
+        // Update
+        await interactor.updateNote(request: NoteScene.UpdateNote.Request(
+            noteId: "int_u1",
+            amount: 55.55,
+            description: "After",
+            category: "Entertainment"
+        ))
+
+        #expect(vc.displayUpdateResultCalled == true)
+        #expect(vc.lastUpdateViewModel?.success == true)
+
+        // Fetch – formatted list reflects the change
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+
+        let displayed = vc.lastFetchViewModel?.displayedNotes.first
+        #expect(displayed != nil)
+        #expect(displayed?.description == "After")
+        #expect(displayed?.category == "Entertainment")
+        #expect(displayed?.amount.contains("55") == true)
+    }
+
+    @MainActor
+    @Test("Integration: Update non-existent – failure propagates cleanly")
+    func integrationUpdateMissing() async {
+        let (interactor, _, vc, _, _, _) = makeStack()
+
+        await interactor.updateNote(request: NoteScene.UpdateNote.Request(
+            noteId: "no_such_id",
+            amount: 1.0,
+            description: "Ghost",
+            category: "Other"
+        ))
+
+        #expect(vc.displayUpdateResultCalled == true)
+        #expect(vc.lastUpdateViewModel?.success == false)
+    }
+
+    // =========================================================================
+    // MARK: - Delete → fetch confirms removal
+    // =========================================================================
+
+    @MainActor
+    @Test("Integration: Delete – note gone from stores and next fetch")
+    func integrationDeleteThenFetch() async {
+        let (interactor, _, vc, _, local, cloud) = makeStack()
+
+        let notes = TestDataBuilder.createMixedNotes()
+        local.seed(notes)
+        cloud.notes = notes
+
+        // Delete note with id "2" (Electric Bill)
+        await interactor.deleteNote(request: NoteScene.DeleteNote.Request(noteId: "2"))
+
+        #expect(vc.displayDeleteResultCalled == true)
+        #expect(vc.lastDeleteViewModel?.success == true)
+
+        // Gone from both stores
+        #expect(local.notes.contains(where: { $0.id == "2" }) == false)
+        #expect(cloud.notes.contains(where: { $0.id == "2" }) == false)
+
+        // Fetch – formatted list no longer contains it
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+
+        #expect(vc.lastFetchViewModel?.displayedNotes.count == 4)
+        #expect(vc.lastFetchViewModel?.displayedNotes.contains(where: { $0.id == "2" }) == false)
+    }
+
+    @MainActor
+    @Test("Integration: Delete all – list becomes empty")
+    func integrationDeleteAll() async {
+        let (interactor, _, vc, _, local, _) = makeStack()
+
+        let notes = TestDataBuilder.createMixedNotes()
+        local.seed(notes)
+
+        for note in notes {
+            await interactor.deleteNote(request: NoteScene.DeleteNote.Request(noteId: note.id))
+        }
+
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+
+        #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
+        #expect(vc.lastFetchViewModel?.totalCount == 0)
+    }
+
+    // =========================================================================
+    // MARK: - Full lifecycle: create → fetch → update → fetch → delete → fetch
+    // =========================================================================
+
+    @MainActor
+    @Test("Integration: Full CRUD lifecycle end-to-end")
+    func integrationFullLifecycle() async {
+        let (interactor, _, vc, _, local, _) = makeStack()
+
+        // ── CREATE ──
+        await interactor.createNote(request: NoteScene.CreateNote.Request(
+            amount: 25.00,
+            description: "Lifecycle Note",
+            category: "Food",
+            isIncome: false
+        ))
+        #expect(local.notes.count == 1)
+        let createdId = local.notes.first!.id
+
+        // ── FETCH ──
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        #expect(vc.lastFetchViewModel?.displayedNotes.count == 1)
+        #expect(vc.lastFetchViewModel?.displayedNotes.first?.description == "Lifecycle Note")
+
+        // ── UPDATE ──
+        await interactor.updateNote(request: NoteScene.UpdateNote.Request(
+            noteId: createdId,
+            amount: 50.00,
+            description: "Lifecycle Note – Updated",
+            category: "Entertainment"
+        ))
+        #expect(vc.lastUpdateViewModel?.success == true)
+
+        // ── FETCH after update ──
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        #expect(vc.lastFetchViewModel?.displayedNotes.first?.description == "Lifecycle Note – Updated")
+        #expect(vc.lastFetchViewModel?.displayedNotes.first?.category == "Entertainment")
+
+        // ── DELETE ──
+        await interactor.deleteNote(request: NoteScene.DeleteNote.Request(noteId: createdId))
+        #expect(vc.lastDeleteViewModel?.success == true)
+        #expect(local.notes.isEmpty)
+
+        // ── FETCH after delete ──
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
+    }
+
+    // =========================================================================
+    // MARK: - Cloud failure paths – local still works
+    // =========================================================================
+
+    @MainActor
+    @Test("Integration: Cloud down – create still persists locally")
+    func integrationCloudDownCreate() async {
+        let (interactor, _, vc, _, local, cloud) = makeStack()
+        cloud.shouldFail = true
+
+        await interactor.createNote(request: NoteScene.CreateNote.Request(
+            amount: 10.0,
+            description: "Offline Note",
+            category: "Other",
+            isIncome: false
+        ))
+
+        // Persisted locally despite cloud failure
+        #expect(local.notes.count == 1)
+        #expect(vc.displayCreateResultCalled == true)
+
+        // Fetch still surfaces it
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        #expect(vc.lastFetchViewModel?.displayedNotes.count == 1)
+        #expect(vc.lastFetchViewModel?.displayedNotes.first?.description == "Offline Note")
+    }
+
+    @MainActor
+    @Test("Integration: Cloud down – update still persists locally")
+    func integrationCloudDownUpdate() async {
+        let (interactor, _, vc, _, local, cloud) = makeStack()
+
+        let original = TestDataBuilder.createNote(id: "offline_u", description: "Original")
+        local.seed([original])
+        cloud.shouldFail = true   // cloud goes down after seed
+
+        await interactor.updateNote(request: NoteScene.UpdateNote.Request(
+            noteId: "offline_u",
+            amount: 77.0,
+            description: "Offline Update",
+            category: "Food"
+        ))
+
+        // Local reflects the change
+        #expect(local.notes.first?.noteDescription == "Offline Update")
+
+        // Fetch confirms it comes through formatted
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        #expect(vc.lastFetchViewModel?.displayedNotes.first?.description == "Offline Update")
+    }
+
+    @MainActor
+    @Test("Integration: Cloud down – delete still removes locally")
+    func integrationCloudDownDelete() async {
+        let (interactor, _, vc, _, local, cloud) = makeStack()
+
+        local.seed([TestDataBuilder.createNote(id: "offline_d")])
+        cloud.shouldFail = true
+
+        await interactor.deleteNote(request: NoteScene.DeleteNote.Request(noteId: "offline_d"))
+
+        #expect(local.notes.isEmpty)
+
+        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
+    }
+
+    // =========================================================================
+    // MARK: - Fetch single note through full stack
+    // =========================================================================
+
+    @MainActor
+    @Test("Integration: Fetch single note – formatted detail reaches VC")
+    func integrationFetchSingleNote() async {
+        let (interactor, _, vc, _, local, _) = makeStack()
+
+        local.seed(TestDataBuilder.createMixedNotes())
+
+        await interactor.fetchNote(request: NoteScene.FetchNote.Request(noteId: "4"))
+
+        #expect(vc.displayNoteCalled == true)
+        #expect(vc.lastNoteViewModel?.displayedNote?.id == "4")
+        #expect(vc.lastNoteViewModel?.displayedNote?.description == "Gas Station")
+        #expect(vc.lastNoteViewModel?.displayedNote?.category == "Transport")
+        #expect(vc.lastNoteViewModel?.displayedNote?.amount.contains("30") == true)
+        #expect(vc.lastNoteViewModel?.displayedNote?.isPositive == false)
     }
 }

@@ -1,5 +1,5 @@
 //
-//  TransactionRow.swift
+//  NoteRow.swift
 //  InigoVIP
 //
 //  Created by Inigo on 28/1/26.
