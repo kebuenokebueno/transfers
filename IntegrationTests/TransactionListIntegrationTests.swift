@@ -10,15 +10,12 @@ import Foundation
 @testable import InigoVIP
 
 // MARK: - Full VIP Stack Integration Tests
-// Wire: Interactor → (real) Presenter → MockViewController
-//        ↑ uses MockNoteWorker + MockSwiftDataService
 
 @Suite("NoteList – Full VIP Integration", .tags(.integration))
 struct NoteListIntegrationTests {
 
-    // ---------------------------------------------------------------------------
     // MARK: - Helper – returns every layer wired together
-    // ---------------------------------------------------------------------------
+
     @MainActor
     private func makeStack() -> (
         interactor: NoteListInteractor,
@@ -41,9 +38,7 @@ struct NoteListIntegrationTests {
         return (interactor, presenter, vc, worker, local, cloud)
     }
 
-    // =========================================================================
     // MARK: - Fetch → display
-    // =========================================================================
 
     @MainActor
     @Test("Integration: Fetch – notes reach ViewController formatted")
@@ -80,9 +75,7 @@ struct NoteListIntegrationTests {
         #expect(vc.lastFetchViewModel?.totalCount == 0)
     }
 
-    // =========================================================================
     // MARK: - Create → stored → fetch shows it
-    // =========================================================================
 
     @MainActor
     @Test("Integration: Create – note persists and appears on next fetch")
@@ -134,9 +127,7 @@ struct NoteListIntegrationTests {
         #expect(displayed?.amount.contains("000") == true)
     }
 
-    // =========================================================================
     // MARK: - Update → fetch shows updated data
-    // =========================================================================
 
     @MainActor
     @Test("Integration: Update – changes visible on next fetch")
@@ -185,9 +176,7 @@ struct NoteListIntegrationTests {
         #expect(vc.lastUpdateViewModel?.success == false)
     }
 
-    // =========================================================================
     // MARK: - Delete → fetch confirms removal
-    // =========================================================================
 
     @MainActor
     @Test("Integration: Delete – note gone from stores and next fetch")
@@ -233,9 +222,7 @@ struct NoteListIntegrationTests {
         #expect(vc.lastFetchViewModel?.totalCount == 0)
     }
 
-    // =========================================================================
     // MARK: - Full lifecycle: create → fetch → update → fetch → delete → fetch
-    // =========================================================================
 
     @MainActor
     @Test("Integration: Full CRUD lifecycle end-to-end")
@@ -281,9 +268,7 @@ struct NoteListIntegrationTests {
         #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
     }
 
-    // =========================================================================
     // MARK: - Cloud failure paths – local still works
-    // =========================================================================
 
     @MainActor
     @Test("Integration: Cloud down – create still persists locally")
@@ -348,9 +333,7 @@ struct NoteListIntegrationTests {
         #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
     }
 
-    // =========================================================================
     // MARK: - Fetch single note through full stack
-    // =========================================================================
 
     @MainActor
     @Test("Integration: Fetch single note – formatted detail reaches VC")

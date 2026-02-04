@@ -14,9 +14,7 @@ import Foundation
 @Suite("NoteWorker – CRUD & SwiftData", .tags(.unit, .swiftdata))
 struct NoteWorkerCRUDTests {
 
-    // ---------------------------------------------------------------------------
     // MARK: - Helper
-    // ---------------------------------------------------------------------------
     @MainActor
     private func makeWorker() -> (
         worker: MockNoteWorker,
@@ -29,9 +27,7 @@ struct NoteWorkerCRUDTests {
         return (worker, local, cloud)
     }
 
-    // =========================================================================
     // MARK: - Fetch
-    // =========================================================================
 
     @MainActor
     @Test("Fetch – loads existing notes from SwiftData")
@@ -56,9 +52,7 @@ struct NoteWorkerCRUDTests {
         #expect(worker.lastError == nil)
     }
 
-    // =========================================================================
     // MARK: - Create
-    // =========================================================================
 
     @MainActor
     @Test("Create – note saved to SwiftData immediately")
@@ -116,9 +110,7 @@ struct NoteWorkerCRUDTests {
         #expect(worker.lastError != nil)
     }
 
-    // =========================================================================
     // MARK: - Update
-    // =========================================================================
 
     @MainActor
     @Test("Update – changes reflected in SwiftData")
@@ -193,9 +185,7 @@ struct NoteWorkerCRUDTests {
         #expect(worker.lastError != nil)
     }
 
-    // =========================================================================
     // MARK: - Delete
-    // =========================================================================
 
     @MainActor
     @Test("Delete – removes note from SwiftData")
@@ -254,9 +244,7 @@ struct NoteWorkerCRUDTests {
         #expect(worker.lastError != nil)
     }
 
-    // =========================================================================
     // MARK: - Call-count tracking
-    // =========================================================================
 
     @MainActor
     @Test("Worker tracks call counts across all operations")
@@ -284,9 +272,7 @@ struct NoteWorkerCRUDTests {
         #expect(worker.deleteNoteCallCount  == 1)
     }
 
-    // =========================================================================
     // MARK: - Reset helper
-    // =========================================================================
 
     @MainActor
     @Test("Reset clears everything")

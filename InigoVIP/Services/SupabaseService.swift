@@ -12,7 +12,6 @@ import Supabase
 // MARK: - Configuration
 
 struct SupabaseConfig {
-    // 🔧 REPLACE WITH YOUR SUPABASE PROJECT DETAILS
     static let supabaseURL = "https://yjetrepgnhxzlphvawwy.supabase.co"
     static let supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqZXRyZXBnbmh4emxwaHZhd3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMDcwNzksImV4cCI6MjA3Njc4MzA3OX0.aaSuBJt4dZu2hW1wHVgRdCKCL0BvohmfyGgVGNFHvw4"
 }

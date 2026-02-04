@@ -14,9 +14,8 @@ import Foundation
 @Suite("NoteList Interactor Tests", .tags(.unit, .interactor))
 struct NoteListInteractorTests {
 
-    // ---------------------------------------------------------------------------
     // MARK: - Helper: builds a wired-up Interactor with mocks
-    // ---------------------------------------------------------------------------
+
     @MainActor
     private func makeSUT() -> (
         interactor: NoteListInteractor,
@@ -33,9 +32,8 @@ struct NoteListInteractorTests {
         return (interactor, presenter, worker, swiftData)
     }
 
-    // =========================================================================
     // MARK: - Fetch Notes
-    // =========================================================================
+
     @MainActor
     @Test("Fetch notes – returns all notes from SwiftData")
     func fetchNotesSuccess() async {
@@ -80,9 +78,8 @@ struct NoteListInteractorTests {
         #expect(true)
     }
 
-    // =========================================================================
     // MARK: - Create Note
-    // =========================================================================
+
     @MainActor
     @Test("Create note – persists to SwiftData and calls presenter")
     func createNoteSuccess() async {
@@ -144,9 +141,7 @@ struct NoteListInteractorTests {
         #expect(swiftData.notes.count == 3)
     }
 
-    // =========================================================================
     // MARK: - Update Note
-    // =========================================================================
 
     @MainActor
     @Test("Update note – changes persist to SwiftData")
@@ -218,9 +213,7 @@ struct NoteListInteractorTests {
         #expect(updated?.syncStatus == "pending")
     }
 
-    // =========================================================================
     // MARK: - Delete Note
-    // =========================================================================
 
     @MainActor
     @Test("Delete note – removes from SwiftData and calls presenter")
@@ -271,9 +264,7 @@ struct NoteListInteractorTests {
         #expect(swiftData.notes.isEmpty)
     }
 
-    // =========================================================================
     // MARK: - Fetch Single Note
-    // =========================================================================
 
     @MainActor
     @Test("Fetch single note – returns correct note")

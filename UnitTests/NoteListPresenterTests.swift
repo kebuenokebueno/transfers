@@ -14,9 +14,7 @@ import Foundation
 @Suite("NoteList Presenter Tests", .tags(.unit, .presenter))
 struct NoteListPresenterTests {
 
-    // ---------------------------------------------------------------------------
     // MARK: - Helper
-    // ---------------------------------------------------------------------------
 
     @MainActor private func makeSUT() -> (
         presenter: NoteListPresenter,
@@ -28,10 +26,7 @@ struct NoteListPresenterTests {
         return (presenter, vc)
     }
 
-    // =========================================================================
     // MARK: - Fetch Notes – formatting
-    // =========================================================================
-
 
     @MainActor @Test("Present notes – formats negative amount with € and minus sign")
     func presentNotesFormatsExpense() {
@@ -169,11 +164,6 @@ struct NoteListPresenterTests {
         #expect(vc.lastFetchViewModel?.totalCount == 5)
     }
 
-    // =========================================================================
-    // MARK: - Create Note – formatting
-    // =========================================================================
-
-
     @MainActor @Test("Present create result – success carries message")
     func presentCreateSuccess() {
         let (presenter, vc) = makeSUT()
@@ -203,10 +193,7 @@ struct NoteListPresenterTests {
         #expect(vc.lastCreateViewModel?.message != nil)
     }
 
-    // =========================================================================
     // MARK: - Update Note – formatting
-    // =========================================================================
-
 
     @MainActor @Test("Present update result – success carries message")
     func presentUpdateSuccess() {
@@ -237,10 +224,7 @@ struct NoteListPresenterTests {
         #expect(vc.lastUpdateViewModel?.message != nil)
     }
 
-    // =========================================================================
     // MARK: - Delete Note – formatting
-    // =========================================================================
-
 
     @MainActor @Test("Present delete result – success carries message")
     func presentDeleteSuccess() {
@@ -269,10 +253,7 @@ struct NoteListPresenterTests {
         #expect(vc.lastDeleteViewModel?.message != nil)
     }
 
-    // =========================================================================
     // MARK: - Fetch Single Note – formatting
-    // =========================================================================
-
 
     @MainActor @Test("Present single note – formats all fields")
     func presentNoteSingle() {
