@@ -21,6 +21,7 @@ extension Tag {
     @Tag static var performance: Self
     @Tag static var swiftdata: Self
     @Tag static var supabase: Self
+    @Tag static var e2e: Self
 }
 
 // MARK: - Custom Error Types
