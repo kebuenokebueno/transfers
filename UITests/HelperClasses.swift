@@ -18,14 +18,14 @@ enum UITestConfig {
 
 // MARK: - Page Object Pattern
 
-/// Page Object for Transaction List Screen
-struct TransactionListPage {
+// Page Object for Transaction List Screen
+struct NoteListPage {
     let app: XCUIApplication
     
     // MARK: - Elements
     
     var navigationTitle: XCUIElement {
-        app.staticTexts["Transactions"]
+        app.staticTexts["Notes"]
     }
     
     var logoutButton: XCUIElement {
@@ -36,12 +36,12 @@ struct TransactionListPage {
         app.otherElements["refreshControl"]
     }
     
-    // Transaction Elements
-    func transactionRow(withId id: String) -> XCUIElement {
-        app.otherElements["transaction_\(id)"]
+    // Note Elements
+    func noteRow(withId id: String) -> XCUIElement {
+        app.otherElements["note_\(id)"]
     }
     
-    func transactionDescription(_ text: String) -> XCUIElement {
+    func noteDescription(_ text: String) -> XCUIElement {
         app.staticTexts[text]
     }
     
@@ -53,7 +53,7 @@ struct TransactionListPage {
         app.staticTexts.matching(NSPredicate(format: "label CONTAINS '€'"))
     }
     
-    var allTransactionDescriptions: XCUIElementQuery {
+    var allNoteDescriptions: XCUIElementQuery {
         app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'accusamus' OR label CONTAINS 'reprehenderit' OR label CONTAINS 'officia'"))
     }
     
@@ -72,11 +72,7 @@ struct TransactionListPage {
     }
     
     func tapTransaction(withId id: String) {
-        transactionRow(withId: id).tap()
-    }
-    
-    func tapLogout() {
-        logoutButton.tap()
+        noteRow(withId: id).tap()
     }
     
     // MARK: - Assertions
@@ -84,82 +80,10 @@ struct TransactionListPage {
     func verifyNavigationExists() -> Bool {
         navigationTitle.exists
     }
-    
-    func verifyTransactionExists(_ description: String) -> Bool {
-        transactionDescription(description).exists
-    }
-    
-    func countVisibleTransactions() -> Int {
-        allTransactionDescriptions.count
-    }
-}
-
-/// Page Object for Login Screen
-struct LoginPage {
-    let app: XCUIApplication
-    
-    // MARK: - Elements
-    
-    var emailField: XCUIElement {
-        app.textFields["emailField"]
-    }
-    
-    var passwordField: XCUIElement {
-        app.secureTextFields["passwordField"]
-    }
-    
-    var loginButton: XCUIElement {
-        app.buttons["loginButton"]
-    }
-    
-    var welcomeText: XCUIElement {
-        app.staticTexts["Welcome Back"]
-    }
-    
-    var loadingIndicator: XCUIElement {
-        app.activityIndicators.firstMatch
-    }
-    
-    // MARK: - Actions
-    
-    @discardableResult
-    func waitForLoad(timeout: TimeInterval = UITestConfig.defaultTimeout) -> Bool {
-        welcomeText.waitForExistence(timeout: timeout) || emailField.waitForExistence(timeout: timeout)
-    }
-    
-    func enterEmail(_ email: String) {
-        emailField.tap()
-        emailField.typeText(email)
-    }
-    
-    func enterPassword(_ password: String) {
-        passwordField.tap()
-        passwordField.typeText(password)
-    }
-    
-    func tapLogin() {
-        loginButton.tap()
-    }
-    
-    func performLogin(email: String, password: String) {
-        enterEmail(email)
-        enterPassword(password)
-        tapLogin()
-    }
-    
-    // MARK: - Assertions
-    
-    func verifyLoginScreenDisplayed() -> Bool {
-        welcomeText.exists || emailField.exists
-    }
-    
-    func verifyLoadingIndicatorShown() -> Bool {
-        loadingIndicator.exists
-    }
 }
 
 /// Page Object for Transaction Edit Screen
-struct TransactionEditPage {
+struct NoteEditPage {
     let app: XCUIApplication
     
     // MARK: - Elements

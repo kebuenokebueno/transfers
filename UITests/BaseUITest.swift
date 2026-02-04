@@ -10,10 +10,10 @@ import XCTest
 
 class BaseUITest: XCTestCase {
     var app: XCUIApplication!
-    var transactionListPage: TransactionListPage!
-    var loginPage: LoginPage!
-    var editPage: TransactionEditPage!
-    
+    var transactionListPage: NoteListPage!
+    var editPage: NoteEditPage!
+
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         
@@ -22,15 +22,13 @@ class BaseUITest: XCTestCase {
         app.launch()
         
         // Initialize page objects
-        transactionListPage = TransactionListPage(app: app)
-        loginPage = LoginPage(app: app)
-        editPage = TransactionEditPage(app: app)
+        transactionListPage = NoteListPage(app: app)
+        editPage = NoteEditPage(app: app)
     }
     
     override func tearDownWithError() throws {
         app = nil
         transactionListPage = nil
-        loginPage = nil
         editPage = nil
     }
     
