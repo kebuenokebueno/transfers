@@ -16,6 +16,13 @@ class SwiftDataService: SwiftDataServiceProtocol {
         setupContainer()
     }
     
+    // For testing
+    init(modelContainer: ModelContainer) {
+        self.modelContainer = modelContainer
+        self.modelContext = modelContainer.mainContext
+        print("✅ SwiftData: Using injected container")
+    }
+    
     // MARK: - Setup
     
     private func setupContainer() {

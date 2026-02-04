@@ -158,7 +158,7 @@ struct NoteListE2ETests {
         let noteId = "e2e_update_\(UUID().uuidString)"
         
         // Crear nota inicial
-        var note = Note(
+        let note = Note(
             id: noteId,
             amount: -50.00,
             description: "Original",
@@ -229,7 +229,7 @@ struct NoteListE2ETests {
         let noteId = "e2e_conflict_\(UUID().uuidString)"
         
         // Crear nota base
-        var note = Note(
+        let note = Note(
             id: noteId,
             amount: -100.00,
             description: "Original",
