@@ -28,10 +28,6 @@ struct NoteListPage {
         app.staticTexts["Notes"]
     }
     
-    var logoutButton: XCUIElement {
-        app.buttons["logoutButton"]
-    }
-    
     var refreshControl: XCUIElement {
         app.otherElements["refreshControl"]
     }

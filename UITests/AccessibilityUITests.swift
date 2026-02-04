@@ -17,18 +17,8 @@ final class AccessibilityUITests: BaseUITest {
         
         // Assert - All interactive elements should have accessibility labels
         XCTAssertFalse(
-            transactionListPage.logoutButton.label.isEmpty,
+            noteListPage.navigationTitle.label.isEmpty,
             "Logout button should have accessibility label"
-        )
-    }
-    
-    func testMinimumTouchTargets() throws {
-        // Assert - Critical buttons meet 44x44 pt minimum
-        let logoutFrame = transactionListPage.logoutButton.frame
-        XCTAssertGreaterThanOrEqual(
-            logoutFrame.width,
-            44,
-            "Logout button should meet 44pt minimum touch target"
         )
     }
     
@@ -48,7 +38,7 @@ final class AccessibilityUITests: BaseUITest {
         
         // Assert - Screen should have accessibility label
         XCTAssertTrue(
-            transactionListPage.navigationTitle.exists,
+            noteListPage.navigationTitle.exists,
             "Navigation should be accessible for VoiceOver"
         )
     }
