@@ -53,7 +53,7 @@ struct NoteDetailView: View {
     
     var body: some View {
         ScrollView {
-            if let displayedNote = displayedNote, let note = note {
+            if let displayedNote = displayedNote {
                 VStack(spacing: 24) {
                     // Amount
                     Text(displayedNote.amount)
