@@ -41,7 +41,7 @@ struct NoteListInteractorTests {
         let notes = TestDataBuilder.createMixedNotes()
         swiftData.seed(notes)
 
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
 
         #expect(presenter.presentNotesCalled == true)
         #expect(presenter.lastFetchResponse?.notes.count == 5)
@@ -51,7 +51,7 @@ struct NoteListInteractorTests {
     func fetchNotesEmpty() async {
         let (interactor, presenter, _, _) = makeSUT()
 
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
 
         #expect(presenter.presentNotesCalled == true)
         #expect(presenter.lastFetchResponse?.notes.isEmpty == true)
@@ -62,7 +62,7 @@ struct NoteListInteractorTests {
         let (interactor, presenter, _, swiftData) = makeSUT()
         swiftData.seed(TestDataBuilder.createNotes(count: 1000))
 
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
 
         #expect(presenter.lastFetchResponse?.notes.count == 1000)
     }
@@ -73,7 +73,7 @@ struct NoteListInteractorTests {
         interactor.presenter = nil                          // deliberately nil
         swiftData.seed(TestDataBuilder.createMixedNotes())
 
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
         // success = no crash
         #expect(true)
     }

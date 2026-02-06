@@ -46,7 +46,7 @@ struct NoteListIntegrationTests {
         let (interactor, _, vc, _, local, _) = makeStack()
         local.seed(TestDataBuilder.createMixedNotes())   // 5 notes
 
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
 
         #expect(vc.displayNotesCalled == true)
         #expect(vc.lastFetchViewModel?.displayedNotes.count == 5)
@@ -68,7 +68,7 @@ struct NoteListIntegrationTests {
     func integrationFetchEmpty() async {
         let (interactor, _, vc, _, _, _) = makeStack()
 
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
 
         #expect(vc.displayNotesCalled == true)
         #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
@@ -99,7 +99,7 @@ struct NoteListIntegrationTests {
         #expect(cloud.notes.count == 1)
 
         // 2. Fetch – should appear in formatted list
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
 
         #expect(vc.lastFetchViewModel?.displayedNotes.count == 1)
         #expect(vc.lastFetchViewModel?.displayedNotes.first?.description == "Integration Lunch")
@@ -118,7 +118,7 @@ struct NoteListIntegrationTests {
             isIncome: true
         ))
 
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
 
         let displayed = vc.lastFetchViewModel?.displayedNotes.first
         #expect(displayed != nil)
@@ -151,7 +151,7 @@ struct NoteListIntegrationTests {
         #expect(vc.lastUpdateViewModel?.success == true)
 
         // Fetch – formatted list reflects the change
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
 
         let displayed = vc.lastFetchViewModel?.displayedNotes.first
         #expect(displayed != nil)
@@ -198,7 +198,7 @@ struct NoteListIntegrationTests {
         #expect(cloud.notes.contains(where: { $0.id == "2" }) == false)
 
         // Fetch – formatted list no longer contains it
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
 
         #expect(vc.lastFetchViewModel?.displayedNotes.count == 4)
         #expect(vc.lastFetchViewModel?.displayedNotes.contains(where: { $0.id == "2" }) == false)
@@ -216,7 +216,7 @@ struct NoteListIntegrationTests {
             await interactor.deleteNote(request: NoteScene.DeleteNote.Request(noteId: note.id))
         }
 
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
 
         #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
         #expect(vc.lastFetchViewModel?.displayedNotes.count == 0)
@@ -240,7 +240,7 @@ struct NoteListIntegrationTests {
         let createdId = local.notes.first!.id
 
         // ── FETCH ──
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
         #expect(vc.lastFetchViewModel?.displayedNotes.count == 1)
         #expect(vc.lastFetchViewModel?.displayedNotes.first?.description == "Lifecycle Note")
 
@@ -254,7 +254,7 @@ struct NoteListIntegrationTests {
         #expect(vc.lastUpdateViewModel?.success == true)
 
         // ── FETCH after update ──
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
         #expect(vc.lastFetchViewModel?.displayedNotes.first?.description == "Lifecycle Note – Updated")
         #expect(vc.lastFetchViewModel?.displayedNotes.first?.category == "Entertainment")
 
@@ -264,7 +264,7 @@ struct NoteListIntegrationTests {
         #expect(local.notes.isEmpty)
 
         // ── FETCH after delete ──
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
         #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
     }
 
@@ -288,7 +288,7 @@ struct NoteListIntegrationTests {
         #expect(vc.displayCreateResultCalled == true)
 
         // Fetch still surfaces it
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
         #expect(vc.lastFetchViewModel?.displayedNotes.count == 1)
         #expect(vc.lastFetchViewModel?.displayedNotes.first?.description == "Offline Note")
     }
@@ -313,7 +313,7 @@ struct NoteListIntegrationTests {
         #expect(local.notes.first?.noteDescription == "Offline Update")
 
         // Fetch confirms it comes through formatted
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
         #expect(vc.lastFetchViewModel?.displayedNotes.first?.description == "Offline Update")
     }
 
@@ -329,7 +329,7 @@ struct NoteListIntegrationTests {
 
         #expect(local.notes.isEmpty)
 
-        await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
+        await interactor.fetchNotes()
         #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
     }
 
