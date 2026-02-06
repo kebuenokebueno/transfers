@@ -9,7 +9,7 @@ import Foundation
 internal import Combine
 
 
-protocol NoteDisplayLogic: AnyObject {
+protocol NoteListDisplayLogic: AnyObject {
     func displayNotes(viewModel: NoteScene.FetchNotes.ViewModel)
     func displayCreateResult(viewModel: NoteScene.CreateNote.ViewModel)
     func displayUpdateResult(viewModel: NoteScene.UpdateNote.ViewModel)
@@ -20,7 +20,7 @@ protocol NoteDisplayLogic: AnyObject {
 
 @MainActor
 @Observable
-class NoteListViewController: NoteDisplayLogic {
+class NoteListViewController: NoteListDisplayLogic {
     var interactor: NoteListInteractor?
     
     // View State

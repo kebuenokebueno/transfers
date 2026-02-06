@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol NotePresentationLogic {
+protocol NoteListPresentationLogic {
     func presentNotes(response: NoteScene.FetchNotes.Response)
     func presentCreateResult(response: NoteScene.CreateNote.Response)
     func presentUpdateResult(response: NoteScene.UpdateNote.Response)
@@ -16,8 +16,8 @@ protocol NotePresentationLogic {
 }
 
 @MainActor
-class NoteListPresenter: NotePresentationLogic {
-    weak var viewController: NoteDisplayLogic?
+class NoteListPresenter: NoteListPresentationLogic {
+    weak var viewController: NoteListDisplayLogic?
     
     // MARK: - Present Notes
     

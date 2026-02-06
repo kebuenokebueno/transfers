@@ -7,9 +7,18 @@
 
 import Foundation
 
+
+protocol NoteListBusinessLogic {
+    func fetchNotes() async
+    func createNote(request: NoteScene.CreateNote.Request) async
+    func updateNote(request: NoteScene.UpdateNote.Request) async
+    func deleteNote(request: NoteScene.DeleteNote.Request) async
+    func fetchNote(request: NoteScene.FetchNote.Request) async
+}
+
 @MainActor
-class NoteListInteractor: NoteBusinessLogic {
-    var presenter: NotePresentationLogic?
+class NoteListInteractor: NoteListBusinessLogic {
+    var presenter: NoteListPresentationLogic?
     private let noteWorker: NoteWorkerProtocol
     private let swiftDataService: SwiftDataServiceProtocol
     
