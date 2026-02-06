@@ -3,7 +3,7 @@ import SwiftData
 
 
 protocol NoteBusinessLogic {
-    func fetchNotes(request: NoteScene.FetchNotes.Request) async
+    func fetchNotes() async
     func createNote(request: NoteScene.CreateNote.Request) async
     func updateNote(request: NoteScene.UpdateNote.Request) async
     func deleteNote(request: NoteScene.DeleteNote.Request) async

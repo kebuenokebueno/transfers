@@ -23,7 +23,7 @@ class NoteListPresenter: NotePresentationLogic {
     
     func presentNotes(response: NoteScene.FetchNotes.Response) {
         let displayedNotes = response.notes.map { note in
-            NoteScene.FetchNotes.ViewModel.DisplayedNote(
+            DisplayedNote(
                 id: note.id,
                 amount: formatAmount(note.amount),
                 description: note.noteDescription,
@@ -36,7 +36,6 @@ class NoteListPresenter: NotePresentationLogic {
         
         let viewModel = NoteScene.FetchNotes.ViewModel(
             displayedNotes: displayedNotes,
-            totalCount: displayedNotes.count,
         )
         
         viewController?.displayNotes(viewModel: viewModel)
@@ -76,7 +75,7 @@ class NoteListPresenter: NotePresentationLogic {
     
     func presentNote(response: NoteScene.FetchNote.Response) {
         let displayedNote = response.note.map { note in
-            NoteScene.FetchNote.ViewModel.DisplayedNote(
+            DisplayedNote(
                 id: note.id,
                 amount: formatAmount(note.amount),
                 description: note.noteDescription,

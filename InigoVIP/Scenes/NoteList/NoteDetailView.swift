@@ -37,10 +37,10 @@ struct NoteDetailView: View {
     }
     
     // Formatted display data
-    private var displayedNote: NoteScene.FetchNote.ViewModel.DisplayedNote? {
+    private var displayedNote: DisplayedNote? {
         guard let note = note else { return nil }
         
-        return NoteScene.FetchNote.ViewModel.DisplayedNote(
+        return DisplayedNote(
             id: note.id,
             amount: note.formattedAmount,
             description: note.noteDescription,

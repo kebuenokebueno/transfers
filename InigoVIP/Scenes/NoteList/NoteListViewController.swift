@@ -24,7 +24,7 @@ class NoteListViewController: NoteDisplayLogic {
     var interactor: NoteListInteractor?
     
     // View State
-    var displayedNotes: [NoteScene.FetchNotes.ViewModel.DisplayedNote] = []
+    var displayedNotes: [DisplayedNote] = []
     var isLoading = false
     var errorMessage: String?
     var successMessage: String?
@@ -41,7 +41,7 @@ class NoteListViewController: NoteDisplayLogic {
             successMessage = viewModel.message
             // Refresh list
             Task {
-                await interactor?.fetchNotes(request: NoteScene.FetchNotes.Request())
+                await interactor?.fetchNotes()
             }
         } else {
             errorMessage = viewModel.message
@@ -53,7 +53,7 @@ class NoteListViewController: NoteDisplayLogic {
             successMessage = viewModel.message
             // Refresh list
             Task {
-                await interactor?.fetchNotes(request: NoteScene.FetchNotes.Request())
+                await interactor?.fetchNotes()
             }
         } else {
             errorMessage = viewModel.message
@@ -77,7 +77,7 @@ class NoteListViewController: NoteDisplayLogic {
     func loadNotes() {
         isLoading = true
         Task {
-            await interactor?.fetchNotes(request: NoteScene.FetchNotes.Request())
+            await interactor?.fetchNotes()
         }
     }
     

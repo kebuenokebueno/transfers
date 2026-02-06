@@ -20,7 +20,7 @@ class NoteListInteractor: NoteBusinessLogic {
     
     // MARK: - Fetch Notes
     
-    func fetchNotes(request: NoteScene.FetchNotes.Request) async {
+    func fetchNotes() async {
         // Fetch from SwiftData (local) first
         let localNotes = (try? swiftDataService.fetchNotes()) ?? []
         let isFromSwiftData = !localNotes.isEmpty

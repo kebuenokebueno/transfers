@@ -50,7 +50,7 @@ struct NoteListIntegrationTests {
 
         #expect(vc.displayNotesCalled == true)
         #expect(vc.lastFetchViewModel?.displayedNotes.count == 5)
-        #expect(vc.lastFetchViewModel?.totalCount == 5)
+        #expect(vc.lastFetchViewModel?.displayedNotes.count == 5)
 
         // Spot-check formatting on a known note
         let grocery = vc.lastFetchViewModel?.displayedNotes.first(where: { $0.description == "Grocery Store" })
@@ -72,7 +72,7 @@ struct NoteListIntegrationTests {
 
         #expect(vc.displayNotesCalled == true)
         #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
-        #expect(vc.lastFetchViewModel?.totalCount == 0)
+        #expect(vc.lastFetchViewModel?.displayedNotes.count == 0)
     }
 
     // MARK: - Create → stored → fetch shows it
@@ -219,7 +219,7 @@ struct NoteListIntegrationTests {
         await interactor.fetchNotes(request: NoteScene.FetchNotes.Request())
 
         #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
-        #expect(vc.lastFetchViewModel?.totalCount == 0)
+        #expect(vc.lastFetchViewModel?.displayedNotes.count == 0)
     }
 
     // MARK: - Full lifecycle: create → fetch → update → fetch → delete → fetch

@@ -92,7 +92,7 @@ struct NoteListPresenterTests {
 
         #expect(vc.displayNotesCalled == true)
         #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
-        #expect(vc.lastFetchViewModel?.totalCount == 0)
+        #expect(vc.lastFetchViewModel?.displayedNotes.count == 0)
     }
 
 
@@ -110,7 +110,7 @@ struct NoteListPresenterTests {
 
         let displayed = vc.lastFetchViewModel?.displayedNotes ?? []
         #expect(displayed.count == 3)
-        #expect(vc.lastFetchViewModel?.totalCount == 3)
+        #expect(vc.lastFetchViewModel?.displayedNotes.count == 3)
         #expect(displayed[0].id == "A")
         #expect(displayed[1].id == "B")
         #expect(displayed[2].id == "C")
@@ -161,7 +161,7 @@ struct NoteListPresenterTests {
 
         #expect(vc.displayNotesCallCount == 2)
         #expect(vc.lastFetchViewModel?.displayedNotes.count == 5, "Latest batch wins")
-        #expect(vc.lastFetchViewModel?.totalCount == 5)
+        #expect(vc.lastFetchViewModel?.displayedNotes.count == 5)
     }
 
     @MainActor @Test("Present create result – success carries message")

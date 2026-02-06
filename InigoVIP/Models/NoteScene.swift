@@ -7,12 +7,20 @@
 
 import Foundation
 
+struct DisplayedNote: Identifiable {
+    let id: String
+    let amount: String
+    let description: String
+    let date: String
+    let category: String
+    let isPositive: Bool
+    let syncStatus: String
+}
 
 enum NoteScene {
     
     // MARK: - Fetch Notes
     enum FetchNotes {
-        struct Request { }
         
         struct Response {
             let notes: [Note]
@@ -20,17 +28,6 @@ enum NoteScene {
         
         struct ViewModel {
             let displayedNotes: [DisplayedNote]
-            let totalCount: Int
-            
-            struct DisplayedNote: Identifiable {
-                let id: String
-                let amount: String
-                let description: String
-                let date: String
-                let category: String
-                let isPositive: Bool
-                let syncStatus: String
-            }
         }
     }
 
@@ -103,16 +100,6 @@ enum NoteScene {
         
         struct ViewModel {
             let displayedNote: DisplayedNote?
-            
-            struct DisplayedNote {
-                let id: String
-                let amount: String
-                let description: String
-                let date: String
-                let category: String
-                let isPositive: Bool
-                let syncStatus: String
-            }
         }
     }
 }
