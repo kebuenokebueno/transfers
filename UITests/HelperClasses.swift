@@ -120,12 +120,6 @@ struct NoteEditPage {
         amountField.typeText(amount)
     }
     
-    func selectCategory(_ category: String) {
-        categoryPicker.tap()
-        // Swipe to find category
-        categoryPicker.adjust(toPickerWheelValue: category)
-    }
-    
     func tapSave() {
         saveButton.tap()
     }
