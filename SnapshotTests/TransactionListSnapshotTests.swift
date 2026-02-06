@@ -140,13 +140,6 @@ final class NoteRowSnapshotTests: XCTestCase {
 }
 
 final class NoteListSnapshotTests: XCTestCase {
-    var analyticsService: AnalyticsService!
-    
-    override func setUp() {
-        super.setUp()
-
-        analyticsService = AnalyticsService()
-    }
     
     @MainActor
     func testNoteList_Empty() {
@@ -181,13 +174,7 @@ final class NoteListSnapshotTests: XCTestCase {
 // MARK: - Device-Specific Snapshots
 
 final class DeviceSpecificSnapshotTests: XCTestCase {
-    var analyticsService: AnalyticsService!
-    
-    override func setUp() {
-        super.setUp()
-        analyticsService = AnalyticsService()
-    }
-    
+
     func testNoteList_iPhoneSE() {
         let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
             .frame(width: 320, height: 568)
@@ -253,13 +240,7 @@ final class CategoryIconSnapshotTests: XCTestCase {
 // MARK: - Regression Tests
 
 final class RegressionSnapshotTests: XCTestCase {
-    var analyticsService: AnalyticsService!
-    
-    override func setUp() {
-        super.setUp()
-        analyticsService = AnalyticsService()
-    }
-    
+
     // This test captures the entire note list screen
     // If anything changes visually, this will catch it
     func testFullScreen_NoteList() {

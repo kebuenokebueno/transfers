@@ -217,7 +217,7 @@ class MockNoteWorker: NoteWorkerProtocol {
         isLoading = false
     }
 
-    func createNote(_ note: Note) async {
+    func createNote(_ note: NoteEntity) async {
         createNoteCallCount += 1
         do {
             try swiftDataService.saveNote(note)
@@ -271,7 +271,7 @@ class MockNoteWorker: NoteWorkerProtocol {
 // MARK: - Mock Presenter  (captures what Interactor sends)
 
 
-class MockNoteListPresenter: NotePresentationLogic {
+class MockNoteListPresenter: NoteListPresentationLogic {
     // Fetch
     var presentNotesCalled = false
     var presentNotesCallCount = 0
@@ -323,7 +323,7 @@ class MockNoteListPresenter: NotePresentationLogic {
 // MARK: - Mock ViewController (captures what Presenter sends)
 
 
-class MockNoteListViewController: NoteDisplayLogic {
+class MockNoteListViewController: NoteListDisplayLogic {
     var displayNotesCalled = false
     var displayNotesCallCount = 0
     var lastFetchViewModel: NoteScene.FetchNotes.ViewModel?
@@ -384,11 +384,11 @@ struct TestDataBuilder {
             description: description,
             date: date,
             category: category,
-            syncStatus: Note.SyncStatus(rawValue: syncStatus)!
+            syncStatus: NoteEntity.SyncStatus(rawValue: syncStatus)!
         )
     }
 
-    static func createNotes(count: Int) -> [Note] {
+    static func createNotes(count: Int) -> [NoteEntity] {
         (1...count).map { i in
             createNote(
                 id: "note_\(i)",
