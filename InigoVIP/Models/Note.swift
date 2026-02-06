@@ -12,7 +12,7 @@ protocol NoteBusinessLogic {
 
 
 @Model
-final public class Note {
+final public class NoteEntity {
     @Attribute(.unique) public var id: String
     public var amount: Double
     public var noteDescription: String
@@ -67,7 +67,7 @@ final public class Note {
 
 // MARK: - Codable Conformance for Supabase
 
-extension Note: Codable {
+extension NoteEntity: Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case amount
@@ -125,8 +125,8 @@ extension Note: Codable {
 
 // MARK: - Equatable
 
-extension Note: Equatable {
-    public static func == (lhs: Note, rhs: Note) -> Bool {
+extension NoteEntity: Equatable {
+    public static func == (lhs: NoteEntity, rhs: NoteEntity) -> Bool {
         lhs.id == rhs.id &&
         lhs.amount == rhs.amount &&
         lhs.noteDescription == rhs.noteDescription &&
@@ -138,7 +138,7 @@ extension Note: Equatable {
 
 // MARK: - Helper Methods
 
-public extension Note {
+public extension NoteEntity {
     
     /// Mark as needing sync
     func markForSync() {
@@ -161,7 +161,7 @@ public extension Note {
 
 // MARK: - Display Helpers
 
-extension Note {
+extension NoteEntity {
     /// Formatted amount string
     public var formattedAmount: String {
         let absAmount = abs(amount)

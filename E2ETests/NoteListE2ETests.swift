@@ -29,7 +29,7 @@ struct NoteListE2ETests {
     ) {
         // SwiftData real (in-memory para no contaminar app)
         let container = try ModelContainer(
-            for: Note.self,
+            for: NoteEntity.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         
@@ -75,13 +75,13 @@ struct NoteListE2ETests {
         try await supabase.cleanupAllTestData()
         
         let container = try ModelContainer(
-            for: Note.self,
+            for: NoteEntity.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         let swiftDataService = SwiftDataService(modelContainer: container)
         
         // Crear nota
-        let note = Note(
+        let note = NoteEntity(
             id: "e2e_create_\(UUID().uuidString)",
             amount: -42.50,
             description: "E2E Test Note",
@@ -114,7 +114,7 @@ struct NoteListE2ETests {
         
         // Simular Device A - crea nota
         let noteId = "e2e_sync_\(UUID().uuidString)"
-        let originalNote = Note(
+        let originalNote = NoteEntity(
             id: noteId,
             amount: -100.00,
             description: "Created on Device A",
@@ -126,7 +126,7 @@ struct NoteListE2ETests {
         
         // Simular Device B - fetch desde cloud
         let container = try ModelContainer(
-            for: Note.self,
+            for: NoteEntity.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         let swiftDataService = SwiftDataService(modelContainer: container)
@@ -158,7 +158,7 @@ struct NoteListE2ETests {
         let noteId = "e2e_update_\(UUID().uuidString)"
         
         // Crear nota inicial
-        let note = Note(
+        let note = NoteEntity(
             id: noteId,
             amount: -50.00,
             description: "Original",
@@ -197,7 +197,7 @@ struct NoteListE2ETests {
         let noteId = "e2e_delete_\(UUID().uuidString)"
         
         // Crear
-        let note = Note(
+        let note = NoteEntity(
             id: noteId,
             amount: -25.00,
             description: "To be deleted",
@@ -229,7 +229,7 @@ struct NoteListE2ETests {
         let noteId = "e2e_conflict_\(UUID().uuidString)"
         
         // Crear nota base
-        let note = Note(
+        let note = NoteEntity(
             id: noteId,
             amount: -100.00,
             description: "Original",
@@ -269,7 +269,7 @@ struct NoteListE2ETests {
         
         // Crear múltiples notas
         let notes = (1...10).map { i in
-            Note(
+            NoteEntity(
                 id: "e2e_bulk_\(i)_\(UUID().uuidString)",
                 amount: Double(-i * 10),
                 description: "Bulk note \(i)",
@@ -319,7 +319,7 @@ struct NoteListE2ETests {
         let noteId = "e2e_integrity_\(UUID().uuidString)"
         let testDate = Date()
         
-        let original = Note(
+        let original = NoteEntity(
             id: noteId,
             amount: -123.45,
             description: "Integrity test with special chars: áéíóú 🎉",

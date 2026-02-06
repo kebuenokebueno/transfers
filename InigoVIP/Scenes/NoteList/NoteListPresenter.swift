@@ -23,7 +23,7 @@ class NoteListPresenter: NotePresentationLogic {
     
     func presentNotes(response: NoteScene.FetchNotes.Response) {
         let displayedNotes = response.notes.map { note in
-            DisplayedNote(
+            NoteViewModel(
                 id: note.id,
                 amount: formatAmount(note.amount),
                 description: note.noteDescription,
@@ -75,7 +75,7 @@ class NoteListPresenter: NotePresentationLogic {
     
     func presentNote(response: NoteScene.FetchNote.Response) {
         let displayedNote = response.note.map { note in
-            DisplayedNote(
+            NoteViewModel(
                 id: note.id,
                 amount: formatAmount(note.amount),
                 description: note.noteDescription,

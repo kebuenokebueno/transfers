@@ -24,7 +24,7 @@ class NoteListViewController: NoteDisplayLogic {
     var interactor: NoteListInteractor?
     
     // View State
-    var displayedNotes: [DisplayedNote] = []
+    var displayedNotes: [NoteViewModel] = []
     var isLoading = false
     var errorMessage: String?
     var successMessage: String?

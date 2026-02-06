@@ -2,8 +2,8 @@ import Foundation
 import SwiftData
 
 protocol SwiftDataServiceProtocol: AnyObject {
-    func fetchNotes() throws -> [Note]
-    func fetchNote(id: String) throws -> Note?
+    func fetchNotes() throws -> [NoteEntity]
+    func fetchNote(id: String) throws -> NoteEntity?
 }
 
 @MainActor
@@ -26,7 +26,7 @@ class SwiftDataService: SwiftDataServiceProtocol {
     // MARK: - Setup
     
     private func setupContainer() {
-        let schema = Schema([Note.self])
+        let schema = Schema([NoteEntity.self])
         
         let modelConfiguration = ModelConfiguration(
             schema: schema,
@@ -50,7 +50,7 @@ class SwiftDataService: SwiftDataServiceProtocol {
     // MARK: - 💾 CRUD Operations
     
     /// Save note to local storage
-    func saveNote(_ note: Note) throws {
+    func saveNote(_ note: NoteEntity) throws {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
@@ -62,12 +62,12 @@ class SwiftDataService: SwiftDataServiceProtocol {
     }
     
     /// Fetch all notes from local storage
-    func fetchNotes() throws -> [Note] {
+    func fetchNotes() throws -> [NoteEntity] {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        let descriptor = FetchDescriptor<Note>(
+        let descriptor = FetchDescriptor<NoteEntity>(
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
         
@@ -75,12 +75,12 @@ class SwiftDataService: SwiftDataServiceProtocol {
     }
     
     /// Fetch single note by ID
-    func fetchNote(id: String) throws -> Note? {
+    func fetchNote(id: String) throws -> NoteEntity? {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        let descriptor = FetchDescriptor<Note>(
+        let descriptor = FetchDescriptor<NoteEntity>(
             predicate: #Predicate { $0.id == id }
         )
         
@@ -88,7 +88,7 @@ class SwiftDataService: SwiftDataServiceProtocol {
     }
     
     /// Update note in local storage
-    func updateNote(_ note: Note) throws {
+    func updateNote(_ note: NoteEntity) throws {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
@@ -105,7 +105,7 @@ class SwiftDataService: SwiftDataServiceProtocol {
             throw SwiftDataError.contextNotAvailable
         }
         
-        let descriptor = FetchDescriptor<Note>(
+        let descriptor = FetchDescriptor<NoteEntity>(
             predicate: #Predicate { $0.id == id }
         )
         
@@ -134,12 +134,12 @@ class SwiftDataService: SwiftDataServiceProtocol {
     // MARK: - 🔍 Search & Filter
     
     /// Search notes by description
-    func searchNotes(query: String) throws -> [Note] {
+    func searchNotes(query: String) throws -> [NoteEntity] {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        let descriptor = FetchDescriptor<Note>(
+        let descriptor = FetchDescriptor<NoteEntity>(
             predicate: #Predicate { note in
                 note.noteDescription.localizedStandardContains(query)
             },
@@ -150,12 +150,12 @@ class SwiftDataService: SwiftDataServiceProtocol {
     }
     
     /// Fetch notes by category
-    func fetchNotesByCategory(category: String) throws -> [Note] {
+    func fetchNotesByCategory(category: String) throws -> [NoteEntity] {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        let descriptor = FetchDescriptor<Note>(
+        let descriptor = FetchDescriptor<NoteEntity>(
             predicate: #Predicate { $0.category == category },
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
@@ -164,12 +164,12 @@ class SwiftDataService: SwiftDataServiceProtocol {
     }
     
     /// Fetch notes that need syncing
-    func fetchPendingNotes() throws -> [Note] {
+    func fetchPendingNotes() throws -> [NoteEntity] {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        let descriptor = FetchDescriptor<Note>(
+        let descriptor = FetchDescriptor<NoteEntity>(
             predicate: #Predicate { $0.syncStatus == "pending" }
         )
         

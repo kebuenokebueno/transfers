@@ -11,11 +11,11 @@ import SwiftUI
 
 // MARK: - Vista pura (testable)
 struct NoteListContent: View {
-    let notes: [Note]
+    let notes: [NoteEntity]
     var isLoading: Bool = false
     var lastError: String? = nil
-    var onTapNote: ((Note) -> Void)? = nil
-    var onDeleteNote: ((Note) -> Void)? = nil
+    var onTapNote: ((NoteEntity) -> Void)? = nil
+    var onDeleteNote: ((NoteEntity) -> Void)? = nil
     var onAddNote: (() -> Void)? = nil
     var onFetch: (() async -> Void)? = nil
     var onClearError: (() -> Void)? = nil

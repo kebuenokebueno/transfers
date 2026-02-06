@@ -14,8 +14,8 @@ import Foundation
 @MainActor
 protocol NoteWorkerProtocol: AnyObject {
     func fetchNotes() async
-    func createNote(_ note: Note) async
-    func updateNote(_ updatedNote: Note) async
+    func createNote(_ note: NoteEntity) async
+    func updateNote(_ updatedNote: NoteEntity) async
     func deleteNote(id: String) async
 }
 
@@ -62,7 +62,7 @@ class NoteWorker: NoteWorkerProtocol {
     // MARK: - ➕ Create Note
     
     /// Create note - saves locally immediately, syncs to cloud
-    func createNote(_ note: Note) async {
+    func createNote(_ note: NoteEntity) async {
         do {
             // Save to SwiftData immediately (offline-first)
             try swiftDataService.saveNote(note)
@@ -82,7 +82,7 @@ class NoteWorker: NoteWorkerProtocol {
     // MARK: - ✏️ Update Note
     
     /// Update note - fetches from DB, updates, saves, syncs
-    func updateNote(_ updatedNote: Note) async {
+    func updateNote(_ updatedNote: NoteEntity) async {
         do {
             // Fetch existing note from SwiftData
             guard let existingNote = try? swiftDataService.fetchNote(id: updatedNote.id) else {
@@ -174,7 +174,7 @@ class NoteWorker: NoteWorkerProtocol {
     }
     
     /// Sync single note to Supabase
-    private func syncNoteToCloud(_ note: Note) async {
+    private func syncNoteToCloud(_ note: NoteEntity) async {
         do {
             // Check if exists in cloud
             let cloudNotes = try await supabaseService.fetchNotes()
@@ -220,11 +220,11 @@ class NoteWorker: NoteWorkerProtocol {
     
     // MARK: - 🔍 Search & Filter
     
-    func searchNotes(query: String) async throws -> [Note] {
+    func searchNotes(query: String) async throws -> [NoteEntity] {
         return try swiftDataService.searchNotes(query: query)
     }
     
-    func filterByCategory(category: String) async throws -> [Note] {
+    func filterByCategory(category: String) async throws -> [NoteEntity] {
         return try swiftDataService.fetchNotesByCategory(category: category)
     }
 }

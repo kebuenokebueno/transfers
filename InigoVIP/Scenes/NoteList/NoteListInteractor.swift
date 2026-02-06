@@ -47,7 +47,7 @@ class NoteListInteractor: NoteBusinessLogic {
     // MARK: - Create Note
     
     func createNote(request: NoteScene.CreateNote.Request) async {
-        let note = Note(
+        let note = NoteEntity(
             id: UUID().uuidString,
             amount: request.isIncome ? request.amount : -request.amount,
             description: request.description,
@@ -72,7 +72,7 @@ class NoteListInteractor: NoteBusinessLogic {
     func updateNote(request: NoteScene.UpdateNote.Request) async {
         // Fetch note from SwiftData
         guard let note = try? swiftDataService.fetchNote(id: request.noteId) else {
-            let dummyNote = Note(
+            let dummyNote = NoteEntity(
                 id: UUID().uuidString,
                 amount: request.amount,
                 description: request.description,

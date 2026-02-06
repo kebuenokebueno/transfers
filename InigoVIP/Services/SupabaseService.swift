@@ -33,10 +33,10 @@ class SupabaseService {
     // MARK: - 📝 CRUD Operations
     
     /// Fetch all notes from Supabase
-    func fetchNotes() async throws -> [Note] {
+    func fetchNotes() async throws -> [NoteEntity] {
         print("📥 Fetching notes from Supabase...")
         
-        let response: [Note] = try await client
+        let response: [NoteEntity] = try await client
             .from("notes")
             .select()
             .order("created_at", ascending: false)
@@ -50,7 +50,7 @@ class SupabaseService {
     }
     
     /// Create a new note
-    func createNote(_ note: Note) async throws {
+    func createNote(_ note: NoteEntity) async throws {
         print("💾 Creating note: \(note.id)")
         
         try await client
@@ -62,7 +62,7 @@ class SupabaseService {
     }
     
     /// Update an existing note
-    func updateNote(_ note: Note) async throws {
+    func updateNote(_ note: NoteEntity) async throws {
         print("✏️ Updating note: \(note.id)")
         
         try await client
@@ -88,10 +88,10 @@ class SupabaseService {
     }
     
     /// Fetch a single note by ID
-    func fetchNote(id: String) async throws -> Note? {
+    func fetchNote(id: String) async throws -> NoteEntity? {
         print("📥 Fetching note: \(id)")
         
-        let response: [Note] = try await client
+        let response: [NoteEntity] = try await client
             .from("notes")
             .select()
             .eq("id", value: id)
@@ -104,10 +104,10 @@ class SupabaseService {
     // MARK: - 🔍 Search & Filter
     
     /// Search notes by description
-    func searchNotes(query: String) async throws -> [Note] {
+    func searchNotes(query: String) async throws -> [NoteEntity] {
         print("🔍 Searching notes: \(query)")
         
-        let response: [Note] = try await client
+        let response: [NoteEntity] = try await client
             .from("notes")
             .select()
             .ilike("description", pattern: "%\(query)%")
@@ -119,10 +119,10 @@ class SupabaseService {
     }
     
     /// Filter notes by category
-    func fetchNotesByCategory(category: String) async throws -> [Note] {
+    func fetchNotesByCategory(category: String) async throws -> [NoteEntity] {
         print("📂 Fetching notes for category: \(category)")
         
-        let response: [Note] = try await client
+        let response: [NoteEntity] = try await client
             .from("notes")
             .select()
             .eq("category", value: category)
@@ -134,10 +134,10 @@ class SupabaseService {
     }
     
     /// Filter notes by date range
-    func fetchNotesByDateRange(from: Date, to: Date) async throws -> [Note] {
+    func fetchNotesByDateRange(from: Date, to: Date) async throws -> [NoteEntity] {
         print("📅 Fetching notes from \(from) to \(to)")
         
-        let response: [Note] = try await client
+        let response: [NoteEntity] = try await client
             .from("notes")
             .select()
             .gte("date", value: from.ISO8601Format())

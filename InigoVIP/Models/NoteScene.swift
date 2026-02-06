@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct DisplayedNote: Identifiable {
+struct NoteViewModel: Identifiable {
     let id: String
     let amount: String
     let description: String
@@ -23,11 +23,11 @@ enum NoteScene {
     enum FetchNotes {
         
         struct Response {
-            let notes: [Note]
+            let notes: [NoteEntity]
         }
         
         struct ViewModel {
-            let displayedNotes: [DisplayedNote]
+            let displayedNotes: [NoteViewModel]
         }
     }
 
@@ -41,7 +41,7 @@ enum NoteScene {
         }
         
         struct Response {
-            let note: Note
+            let note: NoteEntity
             let success: Bool
         }
         
@@ -61,7 +61,7 @@ enum NoteScene {
         }
         
         struct Response {
-            let note: Note
+            let note: NoteEntity
             let success: Bool
         }
         
@@ -95,11 +95,11 @@ enum NoteScene {
         }
         
         struct Response {
-            let note: Note?
+            let note: NoteEntity?
         }
         
         struct ViewModel {
-            let displayedNote: DisplayedNote?
+            let displayedNote: NoteViewModel?
         }
     }
 }

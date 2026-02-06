@@ -17,7 +17,7 @@ struct NoteDetailView: View {
     
     let noteId: String
     
-    @Query private var notes: [Note]
+    @Query private var notes: [NoteEntity]
     
     @State private var showDeleteConfirmation = false
     @State private var viewController: NoteListViewController?
@@ -26,21 +26,21 @@ struct NoteDetailView: View {
         self.noteId = noteId
         
         // Query only this specific note from SwiftData
-        let predicate = #Predicate<Note> { note in
+        let predicate = #Predicate<NoteEntity> { note in
             note.id == noteId
         }
-        _notes = Query(filter: predicate, sort: \Note.date, order: .reverse)
+        _notes = Query(filter: predicate, sort: \NoteEntity.date, order: .reverse)
     }
     
-    private var note: Note? {
+    private var note: NoteEntity? {
         notes.first
     }
     
     // Formatted display data
-    private var displayedNote: DisplayedNote? {
+    private var displayedNote: NoteViewModel? {
         guard let note = note else { return nil }
         
-        return DisplayedNote(
+        return NoteViewModel(
             id: note.id,
             amount: note.formattedAmount,
             description: note.noteDescription,

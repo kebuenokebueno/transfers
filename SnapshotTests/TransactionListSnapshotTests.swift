@@ -11,18 +11,18 @@ struct SnapshotTestData {
         amount: Double = -45.50,
         description: String = "Grocery Store",
         category: String = "Food"
-    ) -> Note {
-        Note(
+    ) -> NoteEntity {
+        NoteEntity(
             id: id,
             amount: Double(amount),
             description: description,
             date: Date(),
             category: category,
-            syncStatus: Note.SyncStatus.pending
+            syncStatus: NoteEntity.SyncStatus.pending
         )
     }
     
-    static var sampleNotes: [Note] {
+    static var sampleNotes: [NoteEntity] {
         [
             sampleNote(id: "1", amount: -45.50, description: "Grocery Store", category: "Food"),
             sampleNote(id: "2", amount: -120.00, description: "Electric Bill", category: "Utilities"),
@@ -270,7 +270,7 @@ final class RegressionSnapshotTests: XCTestCase {
     
     // Test with many notes (scrolling)
     func testFullScreen_ManyNotes() {
-        var manyNotes: [Note] = []
+        var manyNotes: [NoteEntity] = []
         for i in 1...20 {
             let amount = (i % 3 == 0) ? Double(i * 100) : -Double(i * 10)
             manyNotes.append(

@@ -8,7 +8,7 @@ struct NoteListView: View {
     @Environment(Router.self) private var router
     @Environment(NoteWorker.self) private var noteWorker
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Note.date, order: .reverse) private var notes: [Note]
+    @Query(sort: \NoteEntity.date, order: .reverse) private var notes: [NoteEntity]
     
     var body: some View {
         NoteListContent(
@@ -33,7 +33,7 @@ struct NoteListView: View {
         )
     }
     
-    private func deleteNote(_ note: Note) {
+    private func deleteNote(_ note: NoteEntity) {
         Task {
             modelContext.delete(note)
             try? modelContext.save()

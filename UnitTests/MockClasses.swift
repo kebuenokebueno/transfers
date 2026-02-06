@@ -39,7 +39,7 @@ enum NoteError: Error, Equatable {
 
 /// In-memory replacement for SwiftDataService — no ModelContext needed
 class MockSwiftDataService: SwiftDataServiceProtocol {
-    var notes: [Note] = []
+    var notes: [NoteEntity] = []
     var saveCount = 0
     var updateCount = 0
     var deleteCount = 0
@@ -47,7 +47,7 @@ class MockSwiftDataService: SwiftDataServiceProtocol {
     var shouldFailOnDelete = false
     var shouldFailOnFetch = false
 
-    func saveNote(_ note: Note) throws {
+    func saveNote(_ note: NoteEntity) throws {
         saveCount += 1
         if shouldFailOnSave { throw NoteError.saveFailed }
         // Replace if same id exists, otherwise append
@@ -58,17 +58,17 @@ class MockSwiftDataService: SwiftDataServiceProtocol {
         }
     }
 
-    func fetchNotes() throws -> [Note] {
+    func fetchNotes() throws -> [NoteEntity] {
         if shouldFailOnFetch { throw NoteError.notFound }
         return notes.sorted { $0.date > $1.date }
     }
 
-    func fetchNote(id: String) throws -> Note? {
+    func fetchNote(id: String) throws -> NoteEntity? {
         if shouldFailOnFetch { throw NoteError.notFound }
         return notes.first(where: { $0.id == id })
     }
 
-    func updateNote(_ note: Note) throws {
+    func updateNote(_ note: NoteEntity) throws {
         updateCount += 1
         if shouldFailOnSave { throw NoteError.saveFailed }
         guard let idx = notes.firstIndex(where: { $0.id == note.id }) else {
@@ -86,7 +86,7 @@ class MockSwiftDataService: SwiftDataServiceProtocol {
         notes.removeAll(where: { $0.id == id })
     }
 
-    func searchNotes(query: String) throws -> [Note] {
+    func searchNotes(query: String) throws -> [NoteEntity] {
         let q = query.lowercased()
         return notes.filter {
             $0.noteDescription.lowercased().contains(q) ||
@@ -94,16 +94,16 @@ class MockSwiftDataService: SwiftDataServiceProtocol {
         }
     }
 
-    func fetchNotesByCategory(category: String) throws -> [Note] {
+    func fetchNotesByCategory(category: String) throws -> [NoteEntity] {
         return notes.filter { $0.category == category }
     }
 
-    func fetchPendingNotes() throws -> [Note] {
+    func fetchPendingNotes() throws -> [NoteEntity] {
         return notes.filter { $0.syncStatus == "pending" }
     }
 
     // Helper to seed
-    func seed(_ noteArray: [Note]) {
+    func seed(_ noteArray: [NoteEntity]) {
         notes = noteArray
     }
 
@@ -122,14 +122,14 @@ class MockSwiftDataService: SwiftDataServiceProtocol {
 
 /// Fake cloud — tracks what was pushed, never hits the network
 class MockSupabaseService {
-    var notes: [Note] = []
+    var notes: [NoteEntity] = []
     var createCount = 0
     var updateCount = 0
     var deleteCount = 0
     var shouldFail = false
     var delayMilliseconds: UInt64 = 0
 
-    func fetchNotes() async throws -> [Note] {
+    func fetchNotes() async throws -> [NoteEntity] {
         if delayMilliseconds > 0 {
             try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000)
         }
@@ -137,7 +137,7 @@ class MockSupabaseService {
         return notes
     }
 
-    func createNote(_ note: Note) async throws {
+    func createNote(_ note: NoteEntity) async throws {
         if delayMilliseconds > 0 {
             try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000)
         }
@@ -146,7 +146,7 @@ class MockSupabaseService {
         notes.append(note)
     }
 
-    func updateNote(_ note: Note) async throws {
+    func updateNote(_ note: NoteEntity) async throws {
         if delayMilliseconds > 0 {
             try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000)
         }
@@ -228,7 +228,7 @@ class MockNoteWorker: NoteWorkerProtocol {
         }
     }
 
-    func updateNote(_ updatedNote: Note) async {
+    func updateNote(_ updatedNote: NoteEntity) async {
         updateNoteCallCount += 1
         do {
             guard let existing = try swiftDataService.fetchNote(id: updatedNote.id) else {
@@ -377,8 +377,8 @@ struct TestDataBuilder {
         date: Date = Date(),
         category: String = "Food",
         syncStatus: String = "pending"
-    ) -> Note {
-        Note(
+    ) -> NoteEntity {
+        NoteEntity(
             id: id,
             amount: amount,
             description: description,
@@ -400,7 +400,7 @@ struct TestDataBuilder {
     }
 
     /// 5 notes — mix of income / expense, every category represented
-    static func createMixedNotes() -> [Note] {
+    static func createMixedNotes() -> [NoteEntity] {
         [
             createNote(id: "1", amount: -45.50,  description: "Grocery Store",  category: "Food"),
             createNote(id: "2", amount: -120.00, description: "Electric Bill",  category: "Utilities"),

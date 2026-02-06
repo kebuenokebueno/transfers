@@ -18,7 +18,7 @@ struct EditNoteView: View {
     
     let noteId: String
     
-    @Query private var notes: [Note]
+    @Query private var notes: [NoteEntity]
     
     @State private var amount = ""
     @State private var description = ""
@@ -32,13 +32,13 @@ struct EditNoteView: View {
         self.noteId = noteId
         
         // Query only this specific note from SwiftData
-        let predicate = #Predicate<Note> { note in
+        let predicate = #Predicate<NoteEntity> { note in
             note.id == noteId
         }
         _notes = Query(filter: predicate)
     }
     
-    private var note: Note? {
+    private var note: NoteEntity? {
         notes.first
     }
     
@@ -151,7 +151,7 @@ struct EditNoteView: View {
         
         Task {
             // Create updated note with same ID
-            let updatedNote = Note(
+            let updatedNote = NoteEntity(
                 id: note.id,
                 amount: note.isPositive ? amountValue : -amountValue,
                 description: description,

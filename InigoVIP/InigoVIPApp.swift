@@ -41,7 +41,7 @@ struct InigoVIPApp: App {
                             .environment(swiftDataService)
                             .environment(router)
                     }
-                    .modelContainer(for: Note.self)
+                    .modelContainer(for: NoteEntity.self)
                 } else {
                     // Initialization screen
                     VStack(spacing: 20) {

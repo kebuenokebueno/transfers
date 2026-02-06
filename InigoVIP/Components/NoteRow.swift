@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct NoteRow: View {
-    let note: Note
+    let note: NoteEntity
     
     var body: some View {
         HStack(spacing: 12) {

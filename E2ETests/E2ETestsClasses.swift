@@ -25,8 +25,8 @@ class TestSupabaseService {
     
     // MARK: - CRUD (igual que SupabaseService pero con tabla de test)
     
-    func fetchNotes() async throws -> [Note] {
-        let response: [Note] = try await client
+    func fetchNotes() async throws -> [NoteEntity] {
+        let response: [NoteEntity] = try await client
             .from(tableName)
             .select()
             .order("created_at", ascending: false)
@@ -35,14 +35,14 @@ class TestSupabaseService {
         return response
     }
     
-    func createNote(_ note: Note) async throws {
+    func createNote(_ note: NoteEntity) async throws {
         try await client
             .from(tableName)
             .insert(note)
             .execute()
     }
     
-    func updateNote(_ note: Note) async throws {
+    func updateNote(_ note: NoteEntity) async throws {
         try await client
             .from(tableName)
             .update(note)
