@@ -2,142 +2,51 @@
 //  NoteListInteractor.swift
 //  InigoVIP
 //
-//  Created by Inigo on 27/1/26.
-//
 
 import Foundation
 
-
 protocol NoteListBusinessLogic {
     func fetchNotes() async
-    func createNote(request: NoteScene.CreateNote.Request) async
-    func updateNote(request: NoteScene.UpdateNote.Request) async
     func deleteNote(request: NoteScene.DeleteNote.Request) async
-    func fetchNote(request: NoteScene.FetchNote.Request) async
+}
+
+// DataStore: exposes data the Router needs to pass to other scenes
+protocol NoteListDataStore: AnyObject {
+    var selectedNoteId: String? { get set }
 }
 
 @MainActor
-class NoteListInteractor: NoteListBusinessLogic {
+class NoteListInteractor: NoteListBusinessLogic, NoteListDataStore {
     var presenter: NoteListPresentationLogic?
+    var selectedNoteId: String?                       // ← Router reads this
+
     private let noteWorker: NoteWorkerProtocol
     private let swiftDataService: SwiftDataServiceProtocol
-    
+
     init(noteWorker: NoteWorkerProtocol, swiftDataService: SwiftDataServiceProtocol) {
         self.noteWorker = noteWorker
         self.swiftDataService = swiftDataService
     }
-    
+
     // MARK: - Fetch Notes
-    
+
     func fetchNotes() async {
-        // Fetch from SwiftData (local) first
         let localNotes = (try? swiftDataService.fetchNotes()) ?? []
-        let isFromSwiftData = !localNotes.isEmpty
-        
-        // Present immediately with local data
-        if isFromSwiftData {
+        if !localNotes.isEmpty {
             let response = NoteScene.FetchNotes.Response(notes: localNotes)
-            await MainActor.run {
-                presenter?.presentNotes(response: response)
-            }
+            await MainActor.run { presenter?.presentNotes(response: response) }
         }
-        
-        // Sync from cloud in background
         await noteWorker.fetchNotes()
-        
-        // Fetch updated notes from SwiftData
         let updatedNotes = (try? swiftDataService.fetchNotes()) ?? []
         let response = NoteScene.FetchNotes.Response(notes: updatedNotes)
-        await MainActor.run {
-            presenter?.presentNotes(response: response)
-        }
-    }
-    
-    // MARK: - Create Note
-    
-    func createNote(request: NoteScene.CreateNote.Request) async {
-        let note = NoteEntity(
-            id: UUID().uuidString,
-            amount: request.isIncome ? request.amount : -request.amount,
-            description: request.description,
-            date: Date(),
-            category: request.category,
-            syncStatus: .pending
-        )
-        
-        await noteWorker.createNote(note)
-        
-        let response = NoteScene.CreateNote.Response(
-            note: note,
-            success: true
-        )
-        await MainActor.run {
-            presenter?.presentCreateResult(response: response)
-        }
-    }
-    
-    // MARK: - Update Note
-    
-    func updateNote(request: NoteScene.UpdateNote.Request) async {
-        // Fetch note from SwiftData
-        guard let note = try? swiftDataService.fetchNote(id: request.noteId) else {
-            let dummyNote = NoteEntity(
-                id: UUID().uuidString,
-                amount: request.amount,
-                description: request.description,
-                date: Date(),
-                category: request.category
-            )
-            let response = NoteScene.UpdateNote.Response(
-                note: dummyNote,
-                success: false
-            )
-            await MainActor.run {
-                presenter?.presentUpdateResult(response: response)
-            }
-            return
-        }
-        
-        // Update note properties
-        note.syncStatus = "pending"
-        note.amount = request.amount
-        note.noteDescription = request.description
-        note.category = request.category
-        
-        await noteWorker.updateNote(note)
-        
-        let response = NoteScene.UpdateNote.Response(
-            note: note,
-            success: true
-        )
-        await MainActor.run {
-            presenter?.presentUpdateResult(response: response)
-        }
-    }
-    
-    // MARK: - Delete Note
-    
-    func deleteNote(request: NoteScene.DeleteNote.Request) async {
-        await noteWorker.deleteNote(id: request.noteId)
-        
-        let response = NoteScene.DeleteNote.Response(
-            success: true,
-            noteId: request.noteId
-        )
-        await MainActor.run {
-            presenter?.presentDeleteResult(response: response)
-        }
+        await MainActor.run { presenter?.presentNotes(response: response) }
     }
 
-    // MARK: - Fetch Single Note
-    
-    func fetchNote(request: NoteScene.FetchNote.Request) async {
-        // Fetch from SwiftData
-        let note = try? swiftDataService.fetchNote(id: request.noteId)
-        
-        let response = NoteScene.FetchNote.Response(note: note)
-        await MainActor.run {
-            presenter?.presentNote(response: response)
-        }
+    // MARK: - Delete Note
+
+    func deleteNote(request: NoteScene.DeleteNote.Request) async {
+        await noteWorker.deleteNote(id: request.noteId)
+        let response = NoteScene.DeleteNote.Response(success: true, noteId: request.noteId)
+        await MainActor.run { presenter?.presentDeleteResult(response: response) }
     }
 }

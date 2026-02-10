@@ -2,113 +2,60 @@
 //  NoteListViewController.swift
 //  InigoVIP
 //
-//  Created by Inigo on 27/1/26.
-//
 
 import Foundation
-internal import Combine
-
 
 protocol NoteListDisplayLogic: AnyObject {
     func displayNotes(viewModel: NoteScene.FetchNotes.ViewModel)
-    func displayCreateResult(viewModel: NoteScene.CreateNote.ViewModel)
-    func displayUpdateResult(viewModel: NoteScene.UpdateNote.ViewModel)
     func displayDeleteResult(viewModel: NoteScene.DeleteNote.ViewModel)
-    func displayNote(viewModel: NoteScene.FetchNote.ViewModel)
 }
-
 
 @MainActor
 @Observable
 class NoteListViewController: NoteListDisplayLogic {
-    var interactor: NoteListInteractor?
-    
+    var interactor: NoteListBusinessLogic?
+    var router: NoteListRoutingLogic?
+
     // View State
     var displayedNotes: [NoteViewModel] = []
     var isLoading = false
     var errorMessage: String?
-    var successMessage: String?
-    
-    // MARK: - Display Methods
-    
+
+    // MARK: - Display (called by Presenter)
+
     func displayNotes(viewModel: NoteScene.FetchNotes.ViewModel) {
         displayedNotes = viewModel.displayedNotes
         isLoading = false
     }
-    
-    func displayCreateResult(viewModel: NoteScene.CreateNote.ViewModel) {
-        if viewModel.success {
-            successMessage = viewModel.message
-            // Refresh list
-            Task {
-                await interactor?.fetchNotes()
-            }
-        } else {
-            errorMessage = viewModel.message
-        }
-    }
-    
-    func displayUpdateResult(viewModel: NoteScene.UpdateNote.ViewModel) {
-        if viewModel.success {
-            successMessage = viewModel.message
-            // Refresh list
-            Task {
-                await interactor?.fetchNotes()
-            }
-        } else {
-            errorMessage = viewModel.message
-        }
-    }
-    
+
     func displayDeleteResult(viewModel: NoteScene.DeleteNote.ViewModel) {
-        if viewModel.success {
-            successMessage = viewModel.message
-        } else {
-            errorMessage = viewModel.message
-        }
+        if !viewModel.success { errorMessage = viewModel.message }
     }
-    
-    func displayNote(viewModel: NoteScene.FetchNote.ViewModel) {
-        // Handle single note display
-    }
-    
-    // MARK: - User Actions
-    
+
+    // MARK: - User Actions → Interactor (business logic)
+
     func loadNotes() {
         isLoading = true
-        Task {
-            await interactor?.fetchNotes()
-        }
+        Task { await interactor?.fetchNotes() }
     }
-    
-    func createNote(amount: Double, description: String, category: String, isIncome: Bool) {
-        Task {
-            let request = NoteScene.CreateNote.Request(
-                amount: amount,
-                description: description,
-                category: category,
-                isIncome: isIncome
-            )
-            await interactor?.createNote(request: request)
-        }
-    }
-    
-    func updateNote(noteId: String, amount: Double, description: String, category: String) {
-        Task {
-            let request = NoteScene.UpdateNote.Request(
-                noteId: noteId,
-                amount: amount,
-                description: description,
-                category: category
-            )
-            await interactor?.updateNote(request: request)
-        }
-    }
-    
+
     func deleteNote(noteId: String) {
         Task {
-            let request = NoteScene.DeleteNote.Request(noteId: noteId)
-            await interactor?.deleteNote(request: request)
+            await interactor?.deleteNote(request: .init(noteId: noteId))
         }
+    }
+
+    // MARK: - User Actions → Router (navigation)
+
+    func didSelectNote(noteId: String) {
+        router?.routeToNoteDetail(noteId: noteId)
+    }
+
+    func didTapAddNote() {
+        router?.routeToAddNote()
+    }
+
+    func didTapEditNote(noteId: String) {
+        router?.routeToEditNote(noteId: noteId)
     }
 }

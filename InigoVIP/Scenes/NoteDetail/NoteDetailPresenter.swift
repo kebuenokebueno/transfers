@@ -1,21 +1,21 @@
 //
-//  NoteListPresenter.swift
+//  NoteDetailPresenter.swift
 //  InigoVIP
 //
 
 import Foundation
 
-protocol NoteListPresentationLogic {
-    func presentNotes(response: NoteScene.FetchNotes.Response)
-    func presentDeleteResult(response: NoteScene.DeleteNote.Response)
+protocol NoteDetailPresentationLogic {
+    func presentNote(response: NoteDetailScene.FetchNote.Response)
+    func presentDeleteResult(response: NoteDetailScene.DeleteNote.Response)
 }
 
 @MainActor
-class NoteListPresenter: NoteListPresentationLogic {
-    weak var viewController: NoteListDisplayLogic?
+class NoteDetailPresenter: NoteDetailPresentationLogic {
+    weak var viewController: NoteDetailDisplayLogic?
 
-    func presentNotes(response: NoteScene.FetchNotes.Response) {
-        let displayedNotes = response.notes.map { note in
+    func presentNote(response: NoteDetailScene.FetchNote.Response) {
+        let vm = response.note.map { note in
             NoteViewModel(
                 id: note.id,
                 amount: formatAmount(note.amount),
@@ -26,16 +26,15 @@ class NoteListPresenter: NoteListPresentationLogic {
                 syncStatus: note.syncStatusEnum.rawValue.capitalized
             )
         }
-        let viewModel = NoteScene.FetchNotes.ViewModel(displayedNotes: displayedNotes)
-        viewController?.displayNotes(viewModel: viewModel)
+        viewController?.displayNote(viewModel: .init(note: vm))
     }
 
-    func presentDeleteResult(response: NoteScene.DeleteNote.Response) {
-        let viewModel = NoteScene.DeleteNote.ViewModel(
+    func presentDeleteResult(response: NoteDetailScene.DeleteNote.Response) {
+        let vm = NoteDetailScene.DeleteNote.ViewModel(
             success: response.success,
             message: response.success ? "Note deleted" : "Failed to delete note"
         )
-        viewController?.displayDeleteResult(viewModel: viewModel)
+        viewController?.displayDeleteResult(viewModel: vm)
     }
 
     private func formatAmount(_ amount: Double) -> String {

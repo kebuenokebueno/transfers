@@ -1,45 +1,64 @@
-// NoteListView.swift
+//
+//  NoteListView.swift
+//  InigoVIP
+//
 
 import SwiftUI
 import SwiftData
 
-// MARK: - Vista principal (con dependencias)
 struct NoteListView: View {
     @Environment(Router.self) private var router
     @Environment(NoteWorker.self) private var noteWorker
-    @Environment(\.modelContext) private var modelContext
-    @Query(sort: \NoteEntity.date, order: .reverse) private var notes: [NoteEntity]
-    
+    @Environment(SwiftDataService.self) private var swiftDataService
+
+    @State private var viewController = NoteListViewController()
+
     var body: some View {
         NoteListContent(
-            notes: notes,
-            isLoading: noteWorker.isLoading,
-            lastError: noteWorker.lastError,
+            notes: viewController.displayedNotes,
+            isLoading: viewController.isLoading,
+            lastError: viewController.errorMessage,
             onTapNote: { note in
-                router.navigate(to: .noteDetail(id: note.id))
+                viewController.didSelectNote(noteId: note.id)
             },
             onDeleteNote: { note in
-                deleteNote(note)
+                viewController.deleteNote(noteId: note.id)
             },
             onAddNote: {
-                router.present(sheet: .addNote)
+                viewController.didTapAddNote()
             },
             onFetch: {
-                await noteWorker.fetchNotes()
+                viewController.loadNotes()
             },
             onClearError: {
-                noteWorker.lastError = nil
+                viewController.errorMessage = nil
             }
         )
+        .task { setup() }
     }
-    
-    private func deleteNote(_ note: NoteEntity) {
-        Task {
-            modelContext.delete(note)
-            try? modelContext.save()
-            await noteWorker.deleteNote(id: note.id)
-        }
+
+    // MARK: - VIP Assembly
+
+    private func setup() {
+        guard viewController.interactor == nil else { return }
+
+        let interactor = NoteListInteractor(
+            noteWorker: noteWorker,
+            swiftDataService: swiftDataService
+        )
+        let presenter = NoteListPresenter()
+        let noteRouter = NoteListRouter(router: router)
+
+        // Wire VIP cycle
+        viewController.interactor = interactor
+        viewController.router = noteRouter
+        interactor.presenter = presenter
+        presenter.viewController = viewController
+
+        // Wire Router ↔ DataStore
+        noteRouter.viewController = viewController
+        noteRouter.dataStore = interactor
+
+        viewController.loadNotes()
     }
 }
-
-

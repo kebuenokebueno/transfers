@@ -2,24 +2,21 @@
 //  NoteListContent.swift
 //  InigoVIP
 //
-//  Created by Inigo on 4/2/26.
-//
 
 import Foundation
 import SwiftUI
 
-
 // MARK: - Vista pura (testable)
 struct NoteListContent: View {
-    let notes: [NoteEntity]
+    let notes: [NoteViewModel]          // ← ViewModel, no Entity
     var isLoading: Bool = false
     var lastError: String? = nil
-    var onTapNote: ((NoteEntity) -> Void)? = nil
-    var onDeleteNote: ((NoteEntity) -> Void)? = nil
+    var onTapNote: ((NoteViewModel) -> Void)? = nil
+    var onDeleteNote: ((NoteViewModel) -> Void)? = nil
     var onAddNote: (() -> Void)? = nil
-    var onFetch: (() async -> Void)? = nil
+    var onFetch: (() -> Void)? = nil
     var onClearError: (() -> Void)? = nil
-    
+
     var body: some View {
         List {
             ForEach(notes) { note in
@@ -59,19 +56,15 @@ struct NoteListContent: View {
             }
         }
         .alert("Error", isPresented: .constant(lastError != nil)) {
-            Button("OK") {
-                onClearError?()
-            }
+            Button("OK") { onClearError?() }
         } message: {
-            if let error = lastError {
-                Text(error)
-            }
+            if let error = lastError { Text(error) }
         }
-        .task {
-            await onFetch?()
+        .onAppear {
+            onFetch?()
         }
         .refreshable {
-            await onFetch?()
+            onFetch?()
         }
     }
 }
