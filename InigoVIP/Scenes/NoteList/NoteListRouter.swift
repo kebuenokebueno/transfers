@@ -13,9 +13,8 @@ protocol NoteListRoutingLogic {
 
 @MainActor
 class NoteListRouter: NoteListRoutingLogic {
-    weak var viewController: NoteListViewController?
 
-    private let router: Router                        // NavigationPath router
+    private let router: Router
 
     init(router: Router) {
         self.router = router
