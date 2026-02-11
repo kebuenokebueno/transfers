@@ -35,12 +35,6 @@ struct InigoVIPApp: App {
                             .environment(swiftDataService)
                             .environment(router)
                     }
-                    .fullScreenCover(item: $router.presentedFullScreen) { route in
-                        RouterView.destination(for: route)
-                            .environment(noteWorker)
-                            .environment(swiftDataService)
-                            .environment(router)
-                    }
                     .modelContainer(for: NoteEntity.self)
                 } else {
                     // Initialization screen

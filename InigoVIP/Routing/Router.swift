@@ -14,7 +14,6 @@ import SwiftUI
 class Router {
     var path = NavigationPath()
     var presentedSheet: Route?
-    var presentedFullScreen: Route?
     
     func navigate(to route: Route) {
         path.append(route)
@@ -34,12 +33,7 @@ class Router {
         presentedSheet = route
     }
     
-    func present(fullScreenCover route: Route) {
-        presentedFullScreen = route
-    }
-    
     func dismiss() {
         presentedSheet = nil
-        presentedFullScreen = nil
     }
 }

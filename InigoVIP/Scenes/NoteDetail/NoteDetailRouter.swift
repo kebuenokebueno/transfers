@@ -12,8 +12,6 @@ protocol NoteDetailRoutingLogic {
 
 @MainActor
 class NoteDetailRouter: NoteDetailRoutingLogic {
-    weak var viewController: NoteDetailViewController?
-    weak var dataStore: NoteDetailDataStore?
 
     private let router: Router
 
@@ -22,7 +20,6 @@ class NoteDetailRouter: NoteDetailRoutingLogic {
     }
 
     func routeToEditNote(noteId: String) {
-        dataStore?.noteId = noteId
         router.navigate(to: .editNote(id: noteId))
     }
 
