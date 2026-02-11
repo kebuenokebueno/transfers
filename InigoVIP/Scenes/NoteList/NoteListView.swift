@@ -34,6 +34,16 @@ struct NoteListView: View {
                 viewController.errorMessage = nil
             }
         )
+        // Reload when AddNote sheet is dismissed
+        .task(id: router.presentedSheet == nil) {
+            guard viewController.interactor != nil else { return }
+            viewController.loadNotes()
+        }
+        // Reload when navigating back from EditNote or NoteDetail
+        .task(id: router.path.count) {
+            guard viewController.interactor != nil else { return }
+            viewController.loadNotes()
+        }
         .task { setup() }
     }
 
@@ -46,18 +56,15 @@ struct NoteListView: View {
             noteWorker: noteWorker,
             swiftDataService: swiftDataService
         )
-        let presenter = NoteListPresenter()
+        let presenter  = NoteListPresenter()
         let noteRouter = NoteListRouter(router: router)
 
-        // Wire VIP cycle
-        viewController.interactor = interactor
-        viewController.router = noteRouter
-        interactor.presenter = presenter
-        presenter.viewController = viewController
-
-        // Wire Router ↔ DataStore
-        noteRouter.viewController = viewController
-        noteRouter.dataStore = interactor
+        viewController.interactor    = interactor
+        viewController.router        = noteRouter
+        interactor.presenter         = presenter
+        presenter.viewController     = viewController
+        noteRouter.viewController    = viewController
+        noteRouter.dataStore         = interactor
 
         viewController.loadNotes()
     }

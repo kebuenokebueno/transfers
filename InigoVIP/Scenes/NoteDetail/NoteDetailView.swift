@@ -72,6 +72,11 @@ struct NoteDetailView: View {
         }
         .navigationTitle("Note Details")
         .navigationBarTitleDisplayMode(.inline)
+        // Reload when navigating back from EditNote
+        .task(id: router.path.count) {
+            guard viewController.interactor != nil else { return }
+            viewController.loadNote(noteId: noteId)
+        }
         .confirmationDialog("Delete Note", isPresented: $showDeleteConfirmation) {
             Button("Delete", role: .destructive) {
                 viewController.deleteNote(noteId: noteId)
@@ -88,8 +93,6 @@ struct NoteDetailView: View {
         .task { setup() }
     }
 
-    // MARK: - VIP Assembly
-
     private func setup() {
         guard viewController.interactor == nil else { return }
 
@@ -100,12 +103,10 @@ struct NoteDetailView: View {
         let presenter  = NoteDetailPresenter()
         let noteRouter = NoteDetailRouter(router: router)
 
-        viewController.interactor = interactor
-        viewController.router = noteRouter
-        interactor.presenter = presenter
-        presenter.viewController = viewController
-        noteRouter.viewController = viewController
-        noteRouter.dataStore = interactor
+        viewController.interactor    = interactor
+        viewController.router        = noteRouter
+        interactor.presenter         = presenter
+        presenter.viewController     = viewController
 
         viewController.loadNote(noteId: noteId)
     }
