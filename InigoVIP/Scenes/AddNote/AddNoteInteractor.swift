@@ -9,10 +9,8 @@ protocol AddNoteBusinessLogic {
     func saveNote(request: AddNoteScene.SaveNote.Request) async
 }
 
-protocol AddNoteDataStore: AnyObject {}
-
 @MainActor
-class AddNoteInteractor: AddNoteBusinessLogic, AddNoteDataStore {
+class AddNoteInteractor: AddNoteBusinessLogic {
     var presenter: AddNotePresentationLogic?
 
     private let noteWorker: NoteWorkerProtocol
