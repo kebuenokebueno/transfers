@@ -1,20 +1,17 @@
 //
 //  E2ETestsClasses.swift
-//  InigoVIP
-//
-//  Created by Inigo on 4/2/26.
+//  InigoVIPTests
 //
 
 import Foundation
 import Supabase
 @testable import InigoVIP
 
-
 @MainActor
 class TestSupabaseService {
     private let client: SupabaseClient
     private let tableName: String
-    
+
     init(tableName: String = "notes_test") {
         self.tableName = tableName
         self.client = SupabaseClient(
@@ -22,9 +19,9 @@ class TestSupabaseService {
             supabaseKey: SupabaseConfig.supabaseAnonTestKey
         )
     }
-    
-    // MARK: - CRUD (igual que SupabaseService pero con tabla de test)
-    
+
+    // MARK: - CRUD
+
     func fetchNotes() async throws -> [NoteEntity] {
         let response: [NoteEntity] = try await client
             .from(tableName)
@@ -34,14 +31,14 @@ class TestSupabaseService {
             .value
         return response
     }
-    
+
     func createNote(_ note: NoteEntity) async throws {
         try await client
             .from(tableName)
             .insert(note)
             .execute()
     }
-    
+
     func updateNote(_ note: NoteEntity) async throws {
         try await client
             .from(tableName)
@@ -49,7 +46,7 @@ class TestSupabaseService {
             .eq("id", value: note.id)
             .execute()
     }
-    
+
     func deleteNote(id: String) async throws {
         try await client
             .from(tableName)
@@ -57,25 +54,23 @@ class TestSupabaseService {
             .eq("id", value: id)
             .execute()
     }
-    
+
     // MARK: - Test Helpers
-    
-    /// Limpia todos los datos de test
+
     func cleanupAllTestData() async throws {
         try await client
             .from(tableName)
             .delete()
-            .neq("id", value: "")  // Borra todo
+            .neq("id", value: "")
             .execute()
     }
-    
-    /// Verifica conexión
+
     func testConnection() async -> Bool {
         do {
             _ = try await fetchNotes()
             return true
         } catch {
-            print("❌ E2E: Supabase connection failed: \(error)")
+            print("E2E: Supabase connection failed: \(error)")
             return false
         }
     }

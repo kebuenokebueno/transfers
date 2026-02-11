@@ -237,17 +237,8 @@ class MockNoteListPresenter: NoteListPresentationLogic {
     var presentNotesCallCount = 0
     var lastFetchResponse: NoteScene.FetchNotes.Response?
 
-    var presentCreateResultCalled = false
-    var lastCreateResponse: NoteScene.CreateNote.Response?
-
-    var presentUpdateResultCalled = false
-    var lastUpdateResponse: NoteScene.UpdateNote.Response?
-
     var presentDeleteResultCalled = false
     var lastDeleteResponse: NoteScene.DeleteNote.Response?
-
-    var presentNoteCalled = false
-    var lastNoteResponse: NoteScene.FetchNote.Response?
 
     func presentNotes(response: NoteScene.FetchNotes.Response) {
         presentNotesCalled = true
@@ -255,24 +246,9 @@ class MockNoteListPresenter: NoteListPresentationLogic {
         lastFetchResponse = response
     }
 
-    func presentCreateResult(response: NoteScene.CreateNote.Response) {
-        presentCreateResultCalled = true
-        lastCreateResponse = response
-    }
-
-    func presentUpdateResult(response: NoteScene.UpdateNote.Response) {
-        presentUpdateResultCalled = true
-        lastUpdateResponse = response
-    }
-
     func presentDeleteResult(response: NoteScene.DeleteNote.Response) {
         presentDeleteResultCalled = true
         lastDeleteResponse = response
-    }
-
-    func presentNote(response: NoteScene.FetchNote.Response) {
-        presentNoteCalled = true
-        lastNoteResponse = response
     }
 }
 
@@ -283,17 +259,8 @@ class MockNoteListViewController: NoteListDisplayLogic {
     var displayNotesCallCount = 0
     var lastFetchViewModel: NoteScene.FetchNotes.ViewModel?
 
-    var displayCreateResultCalled = false
-    var lastCreateViewModel: NoteScene.CreateNote.ViewModel?
-
-    var displayUpdateResultCalled = false
-    var lastUpdateViewModel: NoteScene.UpdateNote.ViewModel?
-
     var displayDeleteResultCalled = false
     var lastDeleteViewModel: NoteScene.DeleteNote.ViewModel?
-
-    var displayNoteCalled = false
-    var lastNoteViewModel: NoteScene.FetchNote.ViewModel?
 
     func displayNotes(viewModel: NoteScene.FetchNotes.ViewModel) {
         displayNotesCalled = true
@@ -301,24 +268,9 @@ class MockNoteListViewController: NoteListDisplayLogic {
         lastFetchViewModel = viewModel
     }
 
-    func displayCreateResult(viewModel: NoteScene.CreateNote.ViewModel) {
-        displayCreateResultCalled = true
-        lastCreateViewModel = viewModel
-    }
-
-    func displayUpdateResult(viewModel: NoteScene.UpdateNote.ViewModel) {
-        displayUpdateResultCalled = true
-        lastUpdateViewModel = viewModel
-    }
-
     func displayDeleteResult(viewModel: NoteScene.DeleteNote.ViewModel) {
         displayDeleteResultCalled = true
         lastDeleteViewModel = viewModel
-    }
-
-    func displayNote(viewModel: NoteScene.FetchNote.ViewModel) {
-        displayNoteCalled = true
-        lastNoteViewModel = viewModel
     }
 }
 
