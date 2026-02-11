@@ -2,14 +2,11 @@
 //  MockClasses.swift
 //  InigoVIPTests
 //
-//  Created by Inigo on 29/1/26.
-//
 
 import Foundation
 import Testing
 import SwiftData
 @testable import InigoVIP
-
 
 // MARK: - Tags
 
@@ -37,7 +34,6 @@ enum NoteError: Error, Equatable {
 
 // MARK: - Mock SwiftDataService
 
-/// In-memory replacement for SwiftDataService — no ModelContext needed
 class MockSwiftDataService: SwiftDataServiceProtocol {
     var notes: [NoteEntity] = []
     var saveCount = 0
@@ -50,7 +46,6 @@ class MockSwiftDataService: SwiftDataServiceProtocol {
     func saveNote(_ note: NoteEntity) throws {
         saveCount += 1
         if shouldFailOnSave { throw NoteError.saveFailed }
-        // Replace if same id exists, otherwise append
         if let idx = notes.firstIndex(where: { $0.id == note.id }) {
             notes[idx] = note
         } else {
@@ -102,10 +97,7 @@ class MockSwiftDataService: SwiftDataServiceProtocol {
         return notes.filter { $0.syncStatus == "pending" }
     }
 
-    // Helper to seed
-    func seed(_ noteArray: [NoteEntity]) {
-        notes = noteArray
-    }
+    func seed(_ noteArray: [NoteEntity]) { notes = noteArray }
 
     func reset() {
         notes = []
@@ -120,7 +112,6 @@ class MockSwiftDataService: SwiftDataServiceProtocol {
 
 // MARK: - Mock SupabaseService
 
-/// Fake cloud — tracks what was pushed, never hits the network
 class MockSupabaseService {
     var notes: [NoteEntity] = []
     var createCount = 0
@@ -130,37 +121,27 @@ class MockSupabaseService {
     var delayMilliseconds: UInt64 = 0
 
     func fetchNotes() async throws -> [NoteEntity] {
-        if delayMilliseconds > 0 {
-            try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000)
-        }
+        if delayMilliseconds > 0 { try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000) }
         if shouldFail { throw NoteError.connectionFailed }
         return notes
     }
 
     func createNote(_ note: NoteEntity) async throws {
-        if delayMilliseconds > 0 {
-            try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000)
-        }
+        if delayMilliseconds > 0 { try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000) }
         if shouldFail { throw NoteError.connectionFailed }
         createCount += 1
         notes.append(note)
     }
 
     func updateNote(_ note: NoteEntity) async throws {
-        if delayMilliseconds > 0 {
-            try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000)
-        }
+        if delayMilliseconds > 0 { try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000) }
         if shouldFail { throw NoteError.connectionFailed }
         updateCount += 1
-        if let idx = notes.firstIndex(where: { $0.id == note.id }) {
-            notes[idx] = note
-        }
+        if let idx = notes.firstIndex(where: { $0.id == note.id }) { notes[idx] = note }
     }
 
     func deleteNote(id: String) async throws {
-        if delayMilliseconds > 0 {
-            try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000)
-        }
+        if delayMilliseconds > 0 { try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000) }
         if shouldFail { throw NoteError.connectionFailed }
         deleteCount += 1
         notes.removeAll(where: { $0.id == id })
@@ -178,18 +159,13 @@ class MockSupabaseService {
 
 // MARK: - Mock NoteWorker
 
-/// Mirrors NoteWorker behaviour using the two mocks above.
-/// Every method matches the real NoteWorker signature so tests stay realistic.
-
 class MockNoteWorker: NoteWorkerProtocol {
     let swiftDataService: MockSwiftDataService
     let supabaseService: MockSupabaseService
 
     var isLoading = false
-    var isSyncing = false
     var lastError: String?
 
-    // Call-count tracking
     var fetchNotesCallCount = 0
     var createNoteCallCount = 0
     var updateNoteCallCount = 0
@@ -203,17 +179,11 @@ class MockNoteWorker: NoteWorkerProtocol {
         self.supabaseService = supabaseService
     }
 
-    // MARK: - CRUD (mirrors NoteWorker)
-
     func fetchNotes() async {
         fetchNotesCallCount += 1
         isLoading = true
         lastError = nil
-        do {
-            _ = try swiftDataService.fetchNotes()
-        } catch {
-            lastError = error.localizedDescription
-        }
+        do { _ = try swiftDataService.fetchNotes() } catch { lastError = error.localizedDescription }
         isLoading = false
     }
 
@@ -221,11 +191,8 @@ class MockNoteWorker: NoteWorkerProtocol {
         createNoteCallCount += 1
         do {
             try swiftDataService.saveNote(note)
-            // fire-and-forget cloud sync (same as real worker)
             try await supabaseService.createNote(note)
-        } catch {
-            lastError = error.localizedDescription
-        }
+        } catch { lastError = error.localizedDescription }
     }
 
     func updateNote(_ updatedNote: NoteEntity) async {
@@ -241,9 +208,7 @@ class MockNoteWorker: NoteWorkerProtocol {
             existing.markForSync()
             try swiftDataService.updateNote(existing)
             try await supabaseService.updateNote(existing)
-        } catch {
-            lastError = error.localizedDescription
-        }
+        } catch { lastError = error.localizedDescription }
     }
 
     func deleteNote(id: String) async {
@@ -251,12 +216,9 @@ class MockNoteWorker: NoteWorkerProtocol {
         do {
             try swiftDataService.deleteNote(id: id)
             try await supabaseService.deleteNote(id: id)
-        } catch {
-            lastError = error.localizedDescription
-        }
+        } catch { lastError = error.localizedDescription }
     }
 
-    // helpers
     func reset() {
         swiftDataService.reset()
         supabaseService.reset()
@@ -268,28 +230,22 @@ class MockNoteWorker: NoteWorkerProtocol {
     }
 }
 
-// MARK: - Mock Presenter  (captures what Interactor sends)
-
+// MARK: - Mock NoteList Presenter
 
 class MockNoteListPresenter: NoteListPresentationLogic {
-    // Fetch
     var presentNotesCalled = false
     var presentNotesCallCount = 0
     var lastFetchResponse: NoteScene.FetchNotes.Response?
 
-    // Create
     var presentCreateResultCalled = false
     var lastCreateResponse: NoteScene.CreateNote.Response?
 
-    // Update
     var presentUpdateResultCalled = false
     var lastUpdateResponse: NoteScene.UpdateNote.Response?
 
-    // Delete
     var presentDeleteResultCalled = false
     var lastDeleteResponse: NoteScene.DeleteNote.Response?
 
-    // Single note
     var presentNoteCalled = false
     var lastNoteResponse: NoteScene.FetchNote.Response?
 
@@ -320,8 +276,7 @@ class MockNoteListPresenter: NoteListPresentationLogic {
     }
 }
 
-// MARK: - Mock ViewController (captures what Presenter sends)
-
+// MARK: - Mock NoteList ViewController
 
 class MockNoteListViewController: NoteListDisplayLogic {
     var displayNotesCalled = false
@@ -367,6 +322,110 @@ class MockNoteListViewController: NoteListDisplayLogic {
     }
 }
 
+// MARK: - Mock AddNote Presenter
+
+class MockAddNotePresenter: AddNotePresentationLogic {
+    var presentSaveResultCalled = false
+    var lastSaveResponse: AddNoteScene.SaveNote.Response?
+
+    func presentSaveResult(response: AddNoteScene.SaveNote.Response) {
+        presentSaveResultCalled = true
+        lastSaveResponse = response
+    }
+}
+
+// MARK: - Mock AddNote ViewController
+
+class MockAddNoteViewController: AddNoteDisplayLogic {
+    var displaySaveResultCalled = false
+    var lastSaveViewModel: AddNoteScene.SaveNote.ViewModel?
+
+    func displaySaveResult(viewModel: AddNoteScene.SaveNote.ViewModel) {
+        displaySaveResultCalled = true
+        lastSaveViewModel = viewModel
+    }
+}
+
+// MARK: - Mock EditNote Presenter
+
+class MockEditNotePresenter: EditNotePresentationLogic {
+    var presentNoteCalled = false
+    var lastLoadResponse: EditNoteScene.LoadNote.Response?
+
+    var presentSaveResultCalled = false
+    var lastSaveResponse: EditNoteScene.SaveNote.Response?
+
+    func presentNote(response: EditNoteScene.LoadNote.Response) {
+        presentNoteCalled = true
+        lastLoadResponse = response
+    }
+
+    func presentSaveResult(response: EditNoteScene.SaveNote.Response) {
+        presentSaveResultCalled = true
+        lastSaveResponse = response
+    }
+}
+
+// MARK: - Mock EditNote ViewController
+
+class MockEditNoteViewController: EditNoteDisplayLogic {
+    var displayNoteCalled = false
+    var lastNoteViewModel: EditNoteScene.LoadNote.ViewModel?
+
+    var displaySaveResultCalled = false
+    var lastSaveViewModel: EditNoteScene.SaveNote.ViewModel?
+
+    func displayNote(viewModel: EditNoteScene.LoadNote.ViewModel) {
+        displayNoteCalled = true
+        lastNoteViewModel = viewModel
+    }
+
+    func displaySaveResult(viewModel: EditNoteScene.SaveNote.ViewModel) {
+        displaySaveResultCalled = true
+        lastSaveViewModel = viewModel
+    }
+}
+
+// MARK: - Mock NoteDetail Presenter
+
+class MockNoteDetailPresenter: NoteDetailPresentationLogic {
+    var presentNoteCalled = false
+    var lastFetchResponse: NoteDetailScene.FetchNote.Response?
+
+    var presentDeleteResultCalled = false
+    var lastDeleteResponse: NoteDetailScene.DeleteNote.Response?
+
+    func presentNote(response: NoteDetailScene.FetchNote.Response) {
+        presentNoteCalled = true
+        lastFetchResponse = response
+    }
+
+    func presentDeleteResult(response: NoteDetailScene.DeleteNote.Response) {
+        presentDeleteResultCalled = true
+        lastDeleteResponse = response
+    }
+}
+
+// MARK: - Mock NoteDetail ViewController
+
+class MockNoteDetailViewController: NoteDetailDisplayLogic {
+    var displayNoteCalled = false
+    var lastNoteViewModel: NoteDetailScene.FetchNote.ViewModel?
+
+    var displayDeleteResultCalled = false
+    var lastDeleteViewModel: NoteDetailScene.DeleteNote.ViewModel?
+
+    func displayNote(viewModel: NoteDetailScene.FetchNote.ViewModel) {
+        displayNoteCalled = true
+        lastNoteViewModel = viewModel
+    }
+
+    func displayDeleteResult(viewModel: NoteDetailScene.DeleteNote.ViewModel) {
+        displayDeleteResultCalled = true
+        lastDeleteViewModel = viewModel
+    }
+}
+
 // MARK: - Test Data Builder
 
 struct TestDataBuilder {
@@ -399,7 +458,6 @@ struct TestDataBuilder {
         }
     }
 
-    /// 5 notes — mix of income / expense, every category represented
     static func createMixedNotes() -> [NoteEntity] {
         [
             createNote(id: "1", amount: -45.50,  description: "Grocery Store",  category: "Food"),
