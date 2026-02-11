@@ -11,24 +11,28 @@ struct SnapshotTestData {
         amount: Double = -45.50,
         description: String = "Grocery Store",
         category: String = "Food"
-    ) -> NoteEntity {
-        NoteEntity(
+    ) -> NoteViewModel {
+        let formatted = amount >= 0
+            ? "+€\(String(format: "%.2f", amount))"
+            : "-€\(String(format: "%.2f", abs(amount)))"
+        return NoteViewModel(
             id: id,
-            amount: Double(amount),
+            amount: formatted,
             description: description,
-            date: Date(),
+            date: "Jan 25, 2026",
             category: category,
-            syncStatus: NoteEntity.SyncStatus.pending
+            isPositive: amount >= 0,
+            syncStatus: "Pending"
         )
     }
-    
-    static var sampleNotes: [NoteEntity] {
+
+    static var sampleNotes: [NoteViewModel] {
         [
-            sampleNote(id: "1", amount: -45.50, description: "Grocery Store", category: "Food"),
-            sampleNote(id: "2", amount: -120.00, description: "Electric Bill", category: "Utilities"),
-            sampleNote(id: "3", amount: 2500.00, description: "Salary", category: "Income"),
-            sampleNote(id: "4", amount: -30.00, description: "Gas Station", category: "Transport"),
-            sampleNote(id: "5", amount: 150.00, description: "Freelance Work", category: "Income")
+            sampleNote(id: "1", amount: -45.50,  description: "Grocery Store",  category: "Food"),
+            sampleNote(id: "2", amount: -120.00, description: "Electric Bill",  category: "Utilities"),
+            sampleNote(id: "3", amount: 2500.00, description: "Salary",         category: "Income"),
+            sampleNote(id: "4", amount: -30.00,  description: "Gas Station",    category: "Transport"),
+            sampleNote(id: "5", amount: 150.00,  description: "Freelance Work", category: "Income")
         ]
     }
 }
@@ -251,16 +255,9 @@ final class RegressionSnapshotTests: XCTestCase {
     
     // Test with many notes (scrolling)
     func testFullScreen_ManyNotes() {
-        var manyNotes: [NoteEntity] = []
-        for i in 1...20 {
+        let manyNotes: [NoteViewModel] = (1...20).map { i in
             let amount = (i % 3 == 0) ? Double(i * 100) : -Double(i * 10)
-            manyNotes.append(
-                SnapshotTestData.sampleNote(
-                    id: "\(i)",
-                    amount: amount,
-                    description: "Note \(i)"
-                )
-            )
+            return SnapshotTestData.sampleNote(id: "\(i)", amount: amount, description: "Note \(i)")
         }
         
         let view = NoteListContent(notes: manyNotes)
