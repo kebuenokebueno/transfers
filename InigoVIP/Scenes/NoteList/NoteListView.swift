@@ -64,7 +64,6 @@ struct NoteListView: View {
         interactor.presenter         = presenter
         presenter.viewController     = viewController
         noteRouter.viewController    = viewController
-        noteRouter.dataStore         = interactor
 
         viewController.loadNotes()
     }

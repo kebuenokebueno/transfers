@@ -10,13 +10,8 @@ protocol NoteListBusinessLogic {
     func deleteNote(request: NoteScene.DeleteNote.Request) async
 }
 
-// DataStore: exposes data the Router needs to pass to other scenes
-protocol NoteListDataStore: AnyObject {
-    var selectedNoteId: String? { get set }
-}
-
 @MainActor
-class NoteListInteractor: NoteListBusinessLogic, NoteListDataStore {
+class NoteListInteractor: NoteListBusinessLogic {
     var presenter: NoteListPresentationLogic?
     var selectedNoteId: String?                       // ← Router reads this
 

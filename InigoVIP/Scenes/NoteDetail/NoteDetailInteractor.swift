@@ -10,14 +10,10 @@ protocol NoteDetailBusinessLogic {
     func deleteNote(request: NoteDetailScene.DeleteNote.Request) async
 }
 
-protocol NoteDetailDataStore: AnyObject {
-    var noteId: String? { get set }
-}
-
 @MainActor
-class NoteDetailInteractor: NoteDetailBusinessLogic, NoteDetailDataStore {
+class NoteDetailInteractor: NoteDetailBusinessLogic {
     var presenter: NoteDetailPresentationLogic?
-    var noteId: String?                               // ← set by NoteListRouter
+    var noteId: String?
 
     private let noteWorker: NoteWorkerProtocol
     private let swiftDataService: SwiftDataServiceProtocol

@@ -10,12 +10,8 @@ protocol EditNoteBusinessLogic {
     func saveNote(request: EditNoteScene.SaveNote.Request) async
 }
 
-protocol EditNoteDataStore: AnyObject {
-    var noteId: String? { get set }
-}
-
 @MainActor
-class EditNoteInteractor: EditNoteBusinessLogic, EditNoteDataStore {
+class EditNoteInteractor: EditNoteBusinessLogic {
     var presenter: EditNotePresentationLogic?
     var noteId: String?
 
