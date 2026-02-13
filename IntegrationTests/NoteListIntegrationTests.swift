@@ -7,91 +7,132 @@ import Testing
 import Foundation
 @testable import Transfers
 
-@Suite("NoteList - Full VIP Integration", .tags(.integration))
+@Suite("NoteList - Full MVVM Integration", .tags(.integration))
 struct NoteListIntegrationTests {
 
     @MainActor
     private func makeStack() -> (
-        interactor: NoteListInteractor,
-        vc: MockNoteListViewController,
+        viewModel: NoteListViewModel,
         worker: MockNoteWorker,
         local: MockSwiftDataService,
-        cloud: MockSupabaseService
+        cloud: MockSupabaseService,
+        router: MockRouter
     ) {
-        let local      = MockSwiftDataService()
-        let cloud      = MockSupabaseService()
-        let worker     = MockNoteWorker(swiftDataService: local, supabaseService: cloud)
-        let interactor = NoteListInteractor(noteWorker: worker, swiftDataService: local)
-        let presenter  = NoteListPresenter()
-        let vc         = MockNoteListViewController()
-        interactor.presenter     = presenter
-        presenter.viewController = vc
-        return (interactor, vc, worker, local, cloud)
+        let local  = MockSwiftDataService()
+        let cloud  = MockSupabaseService()
+        let worker = MockNoteWorker(swiftDataService: local, supabaseService: cloud)
+        let router = MockRouter()
+        let viewModel = NoteListViewModel(
+            noteWorker: worker,
+            swiftDataService: local,
+            router: router
+        )
+        return (viewModel, worker, local, cloud, router)
     }
 
     // MARK: - Fetch
 
-    @MainActor @Test("Integration: Fetch - notes reach ViewController formatted")
-    func integrationFetch() async {
-        let (interactor, vc, _, local, _) = makeStack()
+    @MainActor @Test("Integration: Fetch - notes reach ViewModel formatted")
+    func integrationFetch() async throws {
+        let (viewModel, _, local, _, _) = makeStack()
         local.seed(TestDataBuilder.createMixedNotes())
-        await interactor.fetchNotes()
-        #expect(vc.displayNotesCalled == true)
-        #expect(vc.lastFetchViewModel?.displayedNotes.count == 5)
-        let grocery = vc.lastFetchViewModel?.displayedNotes.first(where: { $0.description == "Grocery Store" })
+        
+        viewModel.loadNotes()
+        try await Task.sleep(nanoseconds: 100_000_000)
+        
+        #expect(viewModel.displayedNotes.count == 5)
+        
+        let grocery = viewModel.displayedNotes.first(where: { $0.description == "Grocery Store" })
         #expect(grocery?.isPositive == false)
-        let salary = vc.lastFetchViewModel?.displayedNotes.first(where: { $0.description == "Salary" })
+        
+        let salary = viewModel.displayedNotes.first(where: { $0.description == "Salary" })
         #expect(salary?.isPositive == true)
     }
 
     @MainActor @Test("Integration: Fetch - empty store shows empty list")
-    func integrationFetchEmpty() async {
-        let (interactor, vc, _, _, _) = makeStack()
-        await interactor.fetchNotes()
-        #expect(vc.displayNotesCalled == true)
-        #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
+    func integrationFetchEmpty() async throws {
+        let (viewModel, _, _, _, _) = makeStack()
+        
+        viewModel.loadNotes()
+        try await Task.sleep(nanoseconds: 100_000_000)
+        
+        #expect(viewModel.displayedNotes.isEmpty == true)
     }
 
     // MARK: - Delete then fetch
 
     @MainActor @Test("Integration: Delete - note gone from stores and next fetch")
-    func integrationDeleteThenFetch() async {
-        let (interactor, vc, _, local, cloud) = makeStack()
+    func integrationDeleteThenFetch() async throws {
+        let (viewModel, _, local, cloud, _) = makeStack()
         let notes = TestDataBuilder.createMixedNotes()
         local.seed(notes)
         cloud.notes = notes
-        await interactor.deleteNote(request: NoteScene.DeleteNote.Request(noteId: "2"))
-        #expect(vc.displayDeleteResultCalled == true)
-        #expect(vc.lastDeleteViewModel?.success == true)
+        
+        viewModel.deleteNote(noteId: "2")
+        try await Task.sleep(nanoseconds: 100_000_000)
+        
         #expect(local.notes.contains(where: { $0.id == "2" }) == false)
         #expect(cloud.notes.contains(where: { $0.id == "2" }) == false)
-        await interactor.fetchNotes()
-        #expect(vc.lastFetchViewModel?.displayedNotes.count == 4)
-        #expect(vc.lastFetchViewModel?.displayedNotes.contains(where: { $0.id == "2" }) == false)
+        
+        // After deletion, the list should be refreshed automatically
+        #expect(viewModel.displayedNotes.count == 4)
+        #expect(viewModel.displayedNotes.contains(where: { $0.id == "2" }) == false)
     }
 
     @MainActor @Test("Integration: Delete all - list becomes empty")
-    func integrationDeleteAll() async {
-        let (interactor, vc, _, local, _) = makeStack()
+    func integrationDeleteAll() async throws {
+        let (viewModel, _, local, _, _) = makeStack()
         let notes = TestDataBuilder.createMixedNotes()
         local.seed(notes)
+        
         for note in notes {
-            await interactor.deleteNote(request: NoteScene.DeleteNote.Request(noteId: note.id))
+            viewModel.deleteNote(noteId: note.id)
+            try await Task.sleep(nanoseconds: 50_000_000)
         }
-        await interactor.fetchNotes()
-        #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
+        
+        try await Task.sleep(nanoseconds: 100_000_000)
+        #expect(viewModel.displayedNotes.isEmpty == true)
     }
 
     // MARK: - Cloud failure paths
 
     @MainActor @Test("Integration: Cloud down - delete still removes locally")
-    func integrationCloudDownDelete() async {
-        let (interactor, vc, _, local, cloud) = makeStack()
+    func integrationCloudDownDelete() async throws {
+        let (viewModel, _, local, cloud, _) = makeStack()
         local.seed([TestDataBuilder.createNote(id: "offline_d")])
         cloud.shouldFail = true
-        await interactor.deleteNote(request: NoteScene.DeleteNote.Request(noteId: "offline_d"))
+        
+        viewModel.deleteNote(noteId: "offline_d")
+        try await Task.sleep(nanoseconds: 100_000_000)
+        
         #expect(local.notes.isEmpty)
-        await interactor.fetchNotes()
-        #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
+        #expect(viewModel.displayedNotes.isEmpty == true)
+    }
+    
+    // MARK: - Navigation
+    
+    @MainActor @Test("Integration: Navigation - select note navigates to detail")
+    func integrationNavigateToDetail() async throws {
+        let (viewModel, _, local, _, router) = makeStack()
+        local.seed(TestDataBuilder.createMixedNotes())
+        
+        viewModel.didSelectNote(noteId: "3")
+        
+        #expect(router.navigateToCallCount == 1)
+        if case .noteDetail(let id) = router.lastNavigatedRoute {
+            #expect(id == "3")
+        } else {
+            Issue.record("Expected noteDetail route")
+        }
+    }
+    
+    @MainActor @Test("Integration: Navigation - add note presents sheet")
+    func integrationPresentAddNote() async throws {
+        let (viewModel, _, _, _, router) = makeStack()
+        
+        viewModel.didTapAddNote()
+        
+        #expect(router.presentSheetCallCount == 1)
+        #expect(router.lastPresentedSheet == .addNote)
     }
 }

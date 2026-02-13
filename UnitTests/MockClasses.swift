@@ -6,6 +6,7 @@
 import Foundation
 import Testing
 import SwiftData
+import SwiftUI
 @testable import Transfers
 
 // MARK: - Tags
@@ -236,7 +237,7 @@ class MockRouter: Router {
     var navigateToCallCount = 0
     var lastNavigatedRoute: Route?
     var presentSheetCallCount = 0
-    var lastPresentedSheet: Sheet?
+    var lastPresentedSheet: Route?
     var dismissCallCount = 0
     var navigateBackCallCount = 0
     
@@ -246,10 +247,10 @@ class MockRouter: Router {
         super.navigate(to: route)
     }
     
-    override func present(sheet: Sheet) {
+    override func present(sheet route: Route) {
         presentSheetCallCount += 1
-        lastPresentedSheet = sheet
-        super.present(sheet: sheet)
+        lastPresentedSheet = route
+        super.present(sheet: route)
     }
     
     override func dismiss() {
@@ -269,7 +270,7 @@ class MockRouter: Router {
         lastPresentedSheet = nil
         dismissCallCount = 0
         navigateBackCallCount = 0
-        path = []
+        path = NavigationPath()
         presentedSheet = nil
     }
 }
