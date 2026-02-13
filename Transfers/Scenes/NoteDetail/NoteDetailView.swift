@@ -12,12 +12,12 @@ struct NoteDetailView: View {
 
     let noteId: String
 
-    @State private var viewController = NoteDetailViewController()
+    @State private var viewModel: NoteDetailViewModel?
     @State private var showDeleteConfirmation = false
 
     var body: some View {
         ScrollView {
-            if let note = viewController.note {
+            if let note = viewModel?.note {
                 VStack(spacing: 24) {
                     Text(note.amount)
                         .font(.system(size: 48, weight: .bold))
@@ -44,7 +44,7 @@ struct NoteDetailView: View {
                     Spacer()
 
                     Button {
-                        viewController.didTapEdit(noteId: note.id)
+                        viewModel?.didTapEdit(noteId: note.id)
                     } label: {
                         Label("Edit Note", systemImage: "pencil")
                             .frame(maxWidth: .infinity)
@@ -74,41 +74,34 @@ struct NoteDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         // Reload when navigating back from EditNote
         .task(id: router.path.count) {
-            guard viewController.interactor != nil else { return }
-            viewController.loadNote(noteId: noteId)
+            guard viewModel != nil else { return }
+            viewModel?.loadNote(noteId: noteId)
         }
         .confirmationDialog("Delete Note", isPresented: $showDeleteConfirmation) {
             Button("Delete", role: .destructive) {
-                viewController.deleteNote(noteId: noteId)
+                viewModel?.deleteNote(noteId: noteId)
             }
             Button("Cancel", role: .cancel) { }
         } message: {
             Text("Are you sure? This cannot be undone.")
         }
-        .alert("Error", isPresented: .constant(viewController.errorMessage != nil)) {
-            Button("OK") { viewController.errorMessage = nil }
+        .alert("Error", isPresented: .constant(viewModel?.errorMessage != nil)) {
+            Button("OK") { viewModel?.errorMessage = nil }
         } message: {
-            Text(viewController.errorMessage ?? "")
+            Text(viewModel?.errorMessage ?? "")
         }
         .task { setup() }
     }
 
     private func setup() {
-        guard viewController.interactor == nil else { return }
-
-        let interactor = NoteDetailInteractor(
+        guard viewModel == nil else { return }
+        
+        viewModel = NoteDetailViewModel(
             noteWorker: noteWorker,
-            swiftDataService: swiftDataService
+            swiftDataService: swiftDataService,
+            router: router
         )
-        let presenter  = NoteDetailPresenter()
-        let noteRouter = NoteDetailRouter(router: router)
-
-        viewController.interactor    = interactor
-        viewController.router        = noteRouter
-        interactor.presenter         = presenter
-        presenter.viewController     = viewController
-
-        viewController.loadNote(noteId: noteId)
+        viewModel?.loadNote(noteId: noteId)
     }
 }
 

@@ -11,59 +11,56 @@ struct NoteListView: View {
     @Environment(NoteWorker.self) private var noteWorker
     @Environment(SwiftDataService.self) private var swiftDataService
 
-    @State private var viewController = NoteListViewController()
+    @State private var viewModel: NoteListViewModel?
 
     var body: some View {
-        NoteListContent(
-            notes: viewController.displayedNotes,
-            isLoading: viewController.isLoading,
-            lastError: viewController.errorMessage,
-            onTapNote: { note in
-                viewController.didSelectNote(noteId: note.id)
-            },
-            onDeleteNote: { note in
-                viewController.deleteNote(noteId: note.id)
-            },
-            onAddNote: {
-                viewController.didTapAddNote()
-            },
-            onFetch: {
-                viewController.loadNotes()
-            },
-            onClearError: {
-                viewController.errorMessage = nil
+        Group {
+            if let viewModel {
+                NoteListContent(
+                    notes: viewModel.displayedNotes,
+                    isLoading: viewModel.isLoading,
+                    lastError: viewModel.errorMessage,
+                    onTapNote: { note in
+                        viewModel.didSelectNote(noteId: note.id)
+                    },
+                    onDeleteNote: { note in
+                        viewModel.deleteNote(noteId: note.id)
+                    },
+                    onAddNote: {
+                        viewModel.didTapAddNote()
+                    },
+                    onFetch: {
+                        viewModel.loadNotes()
+                    },
+                    onClearError: {
+                        viewModel.errorMessage = nil
+                    }
+                )
+                // Reload when AddNote sheet is dismissed
+                .task(id: router.presentedSheet == nil) {
+                    viewModel.loadNotes()
+                }
+                // Reload when navigating back from EditNote or NoteDetail
+                .task(id: router.path.count) {
+                    viewModel.loadNotes()
+                }
+            } else {
+                ProgressView()
+                    .task { setup() }
             }
-        )
-        // Reload when AddNote sheet is dismissed
-        .task(id: router.presentedSheet == nil) {
-            guard viewController.interactor != nil else { return }
-            viewController.loadNotes()
         }
-        // Reload when navigating back from EditNote or NoteDetail
-        .task(id: router.path.count) {
-            guard viewController.interactor != nil else { return }
-            viewController.loadNotes()
-        }
-        .task { setup() }
     }
 
-    // MARK: - VIP Assembly
+    // MARK: - Setup
 
     private func setup() {
-        guard viewController.interactor == nil else { return }
-
-        let interactor = NoteListInteractor(
+        guard viewModel == nil else { return }
+        
+        viewModel = NoteListViewModel(
             noteWorker: noteWorker,
-            swiftDataService: swiftDataService
+            swiftDataService: swiftDataService,
+            router: router
         )
-        let presenter  = NoteListPresenter()
-        let noteRouter = NoteListRouter(router: router)
-
-        viewController.interactor    = interactor
-        viewController.router        = noteRouter
-        interactor.presenter         = presenter
-        presenter.viewController     = viewController
-
-        viewController.loadNotes()
+        viewModel?.loadNotes()
     }
 }

@@ -9,7 +9,7 @@ struct AddNoteView: View {
     @Environment(Router.self) private var router
     @Environment(NoteWorker.self) private var noteWorker
 
-    @State private var viewController = AddNoteViewController()
+    @State private var viewModel: AddNoteViewModel?
     @State private var amount = ""
     @State private var description = ""
     @State private var category = "Food"
@@ -41,43 +41,35 @@ struct AddNoteView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { router.dismiss() }
-                        .disabled(viewController.isSaving)
+                    Button("Cancel") { viewModel?.dismiss() }
+                        .disabled(viewModel?.isSaving ?? false)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         guard let value = Double(amount) else { return }
-                        viewController.saveNote(
+                        viewModel?.saveNote(
                             amount: value,
                             description: description,
                             category: category,
                             isIncome: isIncome
                         )
                     }
-                    .disabled(amount.isEmpty || description.isEmpty || viewController.isSaving)
+                    .disabled(amount.isEmpty || description.isEmpty || (viewModel?.isSaving ?? false))
                 }
             }
-            .disabled(viewController.isSaving)
-            .overlay { if viewController.isSaving { ProgressView("Saving...") } }
-            .alert("Error", isPresented: .constant(viewController.errorMessage != nil)) {
-                Button("OK") { viewController.errorMessage = nil }
+            .disabled(viewModel?.isSaving ?? false)
+            .overlay { if viewModel?.isSaving ?? false { ProgressView("Saving...") } }
+            .alert("Error", isPresented: .constant(viewModel?.errorMessage != nil)) {
+                Button("OK") { viewModel?.errorMessage = nil }
             } message: {
-                Text(viewController.errorMessage ?? "")
+                Text(viewModel?.errorMessage ?? "")
             }
         }
         .task { setup() }
     }
 
     private func setup() {
-        guard viewController.interactor == nil else { return }
-
-        let interactor = AddNoteInteractor(noteWorker: noteWorker)
-        let presenter  = AddNotePresenter()
-        let noteRouter = AddNoteRouter(router: router)
-
-        viewController.interactor = interactor
-        viewController.router = noteRouter
-        interactor.presenter = presenter
-        presenter.viewController = viewController
+        guard viewModel == nil else { return }
+        viewModel = AddNoteViewModel(noteWorker: noteWorker, router: router)
     }
 }

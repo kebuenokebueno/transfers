@@ -12,23 +12,34 @@ struct EditNoteView: View {
 
     let noteId: String
 
-    @State private var viewController = EditNoteViewController()
+    @State private var viewModel: EditNoteViewModel?
 
     let categories = ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"]
 
     var body: some View {
         Form {
-            if viewController.isLoading {
-                ProgressView("Loading...")
-            } else {
+            if let viewModel, !viewModel.isLoading {
                 Section("Details") {
-                    TextField("Amount", text: $viewController.amount)
-                        .keyboardType(.decimalPad)
-                    TextField("Description", text: $viewController.description)
-                    Picker("Category", selection: $viewController.category) {
+                    TextField("Amount", text: Binding(
+                        get: { viewModel.amount },
+                        set: { viewModel.amount = $0 }
+                    ))
+                    .keyboardType(.decimalPad)
+                    
+                    TextField("Description", text: Binding(
+                        get: { viewModel.description },
+                        set: { viewModel.description = $0 }
+                    ))
+                    
+                    Picker("Category", selection: Binding(
+                        get: { viewModel.category },
+                        set: { viewModel.category = $0 }
+                    )) {
                         ForEach(categories, id: \.self) { Text($0).tag($0) }
                     }
                 }
+            } else {
+                ProgressView("Loading...")
             }
         }
         .navigationTitle("Edit Note")
@@ -36,40 +47,33 @@ struct EditNoteView: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
-                    viewController.saveNote(noteId: noteId)
+                    viewModel?.saveNote(noteId: noteId)
                 }
                 .disabled(
-                    viewController.amount.isEmpty ||
-                    viewController.description.isEmpty ||
-                    viewController.isSaving
+                    (viewModel?.amount.isEmpty ?? true) ||
+                    (viewModel?.description.isEmpty ?? true) ||
+                    (viewModel?.isSaving ?? false)
                 )
             }
         }
-        .disabled(viewController.isSaving)
-        .overlay { if viewController.isSaving { ProgressView("Saving...") } }
-        .alert("Error", isPresented: .constant(viewController.errorMessage != nil)) {
-            Button("OK") { viewController.errorMessage = nil }
+        .disabled(viewModel?.isSaving ?? false)
+        .overlay { if viewModel?.isSaving ?? false { ProgressView("Saving...") } }
+        .alert("Error", isPresented: .constant(viewModel?.errorMessage != nil)) {
+            Button("OK") { viewModel?.errorMessage = nil }
         } message: {
-            Text(viewController.errorMessage ?? "")
+            Text(viewModel?.errorMessage ?? "")
         }
         .task { setup() }
     }
 
     private func setup() {
-        guard viewController.interactor == nil else { return }
-
-        let interactor = EditNoteInteractor(
+        guard viewModel == nil else { return }
+        
+        viewModel = EditNoteViewModel(
             noteWorker: noteWorker,
-            swiftDataService: swiftDataService
+            swiftDataService: swiftDataService,
+            router: router
         )
-        let presenter  = EditNotePresenter()
-        let noteRouter = EditNoteRouter(router: router)
-
-        viewController.interactor = interactor
-        viewController.router = noteRouter
-        interactor.presenter = presenter
-        presenter.viewController = viewController
-
-        viewController.loadNote(noteId: noteId)
+        viewModel?.loadNote(noteId: noteId)
     }
 }

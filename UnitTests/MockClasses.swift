@@ -12,8 +12,7 @@ import SwiftData
 
 extension Tag {
     @Tag static var unit: Self
-    @Tag static var interactor: Self
-    @Tag static var presenter: Self
+    @Tag static var viewModel: Self
     @Tag static var integration: Self
     @Tag static var performance: Self
     @Tag static var swiftdata: Self
@@ -230,151 +229,48 @@ class MockNoteWorker: NoteWorkerProtocol {
     }
 }
 
-// MARK: - Mock NoteList Presenter
+// MARK: - Mock Router
 
-class MockNoteListPresenter: NoteListPresentationLogic {
-    var presentNotesCalled = false
-    var presentNotesCallCount = 0
-    var lastFetchResponse: NoteScene.FetchNotes.Response?
-
-    var presentDeleteResultCalled = false
-    var lastDeleteResponse: NoteScene.DeleteNote.Response?
-
-    func presentNotes(response: NoteScene.FetchNotes.Response) {
-        presentNotesCalled = true
-        presentNotesCallCount += 1
-        lastFetchResponse = response
+@MainActor
+class MockRouter: Router {
+    var navigateToCallCount = 0
+    var lastNavigatedRoute: Route?
+    var presentSheetCallCount = 0
+    var lastPresentedSheet: Sheet?
+    var dismissCallCount = 0
+    var navigateBackCallCount = 0
+    
+    override func navigate(to route: Route) {
+        navigateToCallCount += 1
+        lastNavigatedRoute = route
+        super.navigate(to: route)
     }
-
-    func presentDeleteResult(response: NoteScene.DeleteNote.Response) {
-        presentDeleteResultCalled = true
-        lastDeleteResponse = response
+    
+    override func present(sheet: Sheet) {
+        presentSheetCallCount += 1
+        lastPresentedSheet = sheet
+        super.present(sheet: sheet)
     }
-}
-
-// MARK: - Mock NoteList ViewController
-
-class MockNoteListViewController: NoteListDisplayLogic {
-    var displayNotesCalled = false
-    var displayNotesCallCount = 0
-    var lastFetchViewModel: NoteScene.FetchNotes.ViewModel?
-
-    var displayDeleteResultCalled = false
-    var lastDeleteViewModel: NoteScene.DeleteNote.ViewModel?
-
-    func displayNotes(viewModel: NoteScene.FetchNotes.ViewModel) {
-        displayNotesCalled = true
-        displayNotesCallCount += 1
-        lastFetchViewModel = viewModel
+    
+    override func dismiss() {
+        dismissCallCount += 1
+        super.dismiss()
     }
-
-    func displayDeleteResult(viewModel: NoteScene.DeleteNote.ViewModel) {
-        displayDeleteResultCalled = true
-        lastDeleteViewModel = viewModel
+    
+    override func navigateBack() {
+        navigateBackCallCount += 1
+        super.navigateBack()
     }
-}
-
-// MARK: - Mock AddNote Presenter
-
-class MockAddNotePresenter: AddNotePresentationLogic {
-    var presentSaveResultCalled = false
-    var lastSaveResponse: AddNoteScene.SaveNote.Response?
-
-    func presentSaveResult(response: AddNoteScene.SaveNote.Response) {
-        presentSaveResultCalled = true
-        lastSaveResponse = response
-    }
-}
-
-// MARK: - Mock AddNote ViewController
-
-class MockAddNoteViewController: AddNoteDisplayLogic {
-    var displaySaveResultCalled = false
-    var lastSaveViewModel: AddNoteScene.SaveNote.ViewModel?
-
-    func displaySaveResult(viewModel: AddNoteScene.SaveNote.ViewModel) {
-        displaySaveResultCalled = true
-        lastSaveViewModel = viewModel
-    }
-}
-
-// MARK: - Mock EditNote Presenter
-
-class MockEditNotePresenter: EditNotePresentationLogic {
-    var presentNoteCalled = false
-    var lastLoadResponse: EditNoteScene.LoadNote.Response?
-
-    var presentSaveResultCalled = false
-    var lastSaveResponse: EditNoteScene.SaveNote.Response?
-
-    func presentNote(response: EditNoteScene.LoadNote.Response) {
-        presentNoteCalled = true
-        lastLoadResponse = response
-    }
-
-    func presentSaveResult(response: EditNoteScene.SaveNote.Response) {
-        presentSaveResultCalled = true
-        lastSaveResponse = response
-    }
-}
-
-// MARK: - Mock EditNote ViewController
-
-class MockEditNoteViewController: EditNoteDisplayLogic {
-    var displayNoteCalled = false
-    var lastNoteViewModel: EditNoteScene.LoadNote.ViewModel?
-
-    var displaySaveResultCalled = false
-    var lastSaveViewModel: EditNoteScene.SaveNote.ViewModel?
-
-    func displayNote(viewModel: EditNoteScene.LoadNote.ViewModel) {
-        displayNoteCalled = true
-        lastNoteViewModel = viewModel
-    }
-
-    func displaySaveResult(viewModel: EditNoteScene.SaveNote.ViewModel) {
-        displaySaveResultCalled = true
-        lastSaveViewModel = viewModel
-    }
-}
-
-// MARK: - Mock NoteDetail Presenter
-
-class MockNoteDetailPresenter: NoteDetailPresentationLogic {
-    var presentNoteCalled = false
-    var lastFetchResponse: NoteDetailScene.FetchNote.Response?
-
-    var presentDeleteResultCalled = false
-    var lastDeleteResponse: NoteDetailScene.DeleteNote.Response?
-
-    func presentNote(response: NoteDetailScene.FetchNote.Response) {
-        presentNoteCalled = true
-        lastFetchResponse = response
-    }
-
-    func presentDeleteResult(response: NoteDetailScene.DeleteNote.Response) {
-        presentDeleteResultCalled = true
-        lastDeleteResponse = response
-    }
-}
-
-// MARK: - Mock NoteDetail ViewController
-
-class MockNoteDetailViewController: NoteDetailDisplayLogic {
-    var displayNoteCalled = false
-    var lastNoteViewModel: NoteDetailScene.FetchNote.ViewModel?
-
-    var displayDeleteResultCalled = false
-    var lastDeleteViewModel: NoteDetailScene.DeleteNote.ViewModel?
-
-    func displayNote(viewModel: NoteDetailScene.FetchNote.ViewModel) {
-        displayNoteCalled = true
-        lastNoteViewModel = viewModel
-    }
-
-    func displayDeleteResult(viewModel: NoteDetailScene.DeleteNote.ViewModel) {
-        displayDeleteResultCalled = true
-        lastDeleteViewModel = viewModel
+    
+    func reset() {
+        navigateToCallCount = 0
+        lastNavigatedRoute = nil
+        presentSheetCallCount = 0
+        lastPresentedSheet = nil
+        dismissCallCount = 0
+        navigateBackCallCount = 0
+        path = []
+        presentedSheet = nil
     }
 }
 
