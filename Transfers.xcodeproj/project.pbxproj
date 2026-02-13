@@ -37,9 +37,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		6AABCC2B2F2938C6009E5D12 /* InigoVIP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InigoVIP.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6AABCC382F2938C8009E5D12 /* InigoVIPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InigoVIPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		6AABCC422F2938C8009E5D12 /* InigoVIPUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InigoVIPUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6AABCC2B2F2938C6009E5D12 /* Transfers.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transfers.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6AABCC382F2938C8009E5D12 /* TransfersTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TransfersTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6AABCC422F2938C8009E5D12 /* TransfersUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TransfersUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -48,9 +48,9 @@
 			path = E2ETests;
 			sourceTree = "<group>";
 		};
-		6AABCC2D2F2938C6009E5D12 /* InigoVIP */ = {
+		6AABCC2D2F2938C6009E5D12 /* Transfers */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = InigoVIP;
+			path = Transfers;
 			sourceTree = "<group>";
 		};
 		6AABCC3B2F2938C8009E5D12 /* UnitTests */ = {
@@ -113,7 +113,7 @@
 		6AABCC222F2938C6009E5D12 = {
 			isa = PBXGroup;
 			children = (
-				6AABCC2D2F2938C6009E5D12 /* InigoVIP */,
+				6AABCC2D2F2938C6009E5D12 /* Transfers */,
 				6AABCC3B2F2938C8009E5D12 /* UnitTests */,
 				6AE31A8D2F2C84C7004EFB5E /* UITests */,
 				6AE31AB92F2CCF84004EFB5E /* SnapshotTests */,
@@ -126,9 +126,9 @@
 		6AABCC2C2F2938C6009E5D12 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6AABCC2B2F2938C6009E5D12 /* InigoVIP.app */,
-				6AABCC382F2938C8009E5D12 /* InigoVIPTests.xctest */,
-				6AABCC422F2938C8009E5D12 /* InigoVIPUITests.xctest */,
+				6AABCC2B2F2938C6009E5D12 /* Transfers.app */,
+				6AABCC382F2938C8009E5D12 /* TransfersTests.xctest */,
+				6AABCC422F2938C8009E5D12 /* TransfersUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -136,9 +136,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6AABCC2A2F2938C6009E5D12 /* InigoVIP */ = {
+		6AABCC2A2F2938C6009E5D12 /* Transfers */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6AABCC4C2F2938C8009E5D12 /* Build configuration list for PBXNativeTarget "InigoVIP" */;
+			buildConfigurationList = 6AABCC4C2F2938C8009E5D12 /* Build configuration list for PBXNativeTarget "Transfers" */;
 			buildPhases = (
 				6AABCC272F2938C6009E5D12 /* Sources */,
 				6AABCC282F2938C6009E5D12 /* Frameworks */,
@@ -149,9 +149,9 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				6AABCC2D2F2938C6009E5D12 /* InigoVIP */,
+				6AABCC2D2F2938C6009E5D12 /* Transfers */,
 			);
-			name = InigoVIP;
+			name = Transfers;
 			packageProductDependencies = (
 				6A5D88FD2F326FA8001EC024 /* Auth */,
 				6A5D88FF2F326FA8001EC024 /* Functions */,
@@ -161,12 +161,12 @@
 				6A5D89072F326FA8001EC024 /* Supabase */,
 			);
 			productName = InigoVIP;
-			productReference = 6AABCC2B2F2938C6009E5D12 /* InigoVIP.app */;
+			productReference = 6AABCC2B2F2938C6009E5D12 /* Transfers.app */;
 			productType = "com.apple.product-type.application";
 		};
-		6AABCC372F2938C8009E5D12 /* InigoVIPTests */ = {
+		6AABCC372F2938C8009E5D12 /* TransfersTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6AABCC4F2F2938C8009E5D12 /* Build configuration list for PBXNativeTarget "InigoVIPTests" */;
+			buildConfigurationList = 6AABCC4F2F2938C8009E5D12 /* Build configuration list for PBXNativeTarget "TransfersTests" */;
 			buildPhases = (
 				6AABCC342F2938C8009E5D12 /* Sources */,
 				6AABCC352F2938C8009E5D12 /* Frameworks */,
@@ -183,19 +183,19 @@
 				6AE31AB62F2CAE21004EFB5E /* IntegrationTests */,
 				6AE31AB92F2CCF84004EFB5E /* SnapshotTests */,
 			);
-			name = InigoVIPTests;
+			name = TransfersTests;
 			packageProductDependencies = (
 				6A1DA7A42F2CE29C0053E98C /* InlineSnapshotTesting */,
 				6A1DA7A62F2CE29C0053E98C /* SnapshotTesting */,
 				6A1DA7A82F2CE29C0053E98C /* SnapshotTestingCustomDump */,
 			);
 			productName = InigoVIPTests;
-			productReference = 6AABCC382F2938C8009E5D12 /* InigoVIPTests.xctest */;
+			productReference = 6AABCC382F2938C8009E5D12 /* TransfersTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		6AABCC412F2938C8009E5D12 /* InigoVIPUITests */ = {
+		6AABCC412F2938C8009E5D12 /* TransfersUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6AABCC522F2938C8009E5D12 /* Build configuration list for PBXNativeTarget "InigoVIPUITests" */;
+			buildConfigurationList = 6AABCC522F2938C8009E5D12 /* Build configuration list for PBXNativeTarget "TransfersUITests" */;
 			buildPhases = (
 				6AABCC3E2F2938C8009E5D12 /* Sources */,
 				6AABCC3F2F2938C8009E5D12 /* Frameworks */,
@@ -209,12 +209,12 @@
 			fileSystemSynchronizedGroups = (
 				6AE31A8D2F2C84C7004EFB5E /* UITests */,
 			);
-			name = InigoVIPUITests;
+			name = TransfersUITests;
 			packageProductDependencies = (
 				6A5D890A2F327085001EC024 /* Supabase */,
 			);
 			productName = InigoVIPUITests;
-			productReference = 6AABCC422F2938C8009E5D12 /* InigoVIPUITests.xctest */;
+			productReference = 6AABCC422F2938C8009E5D12 /* TransfersUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -240,7 +240,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 6AABCC262F2938C6009E5D12 /* Build configuration list for PBXProject "InigoVIP" */;
+			buildConfigurationList = 6AABCC262F2938C6009E5D12 /* Build configuration list for PBXProject "Transfers" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -258,9 +258,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6AABCC2A2F2938C6009E5D12 /* InigoVIP */,
-				6AABCC372F2938C8009E5D12 /* InigoVIPTests */,
-				6AABCC412F2938C8009E5D12 /* InigoVIPUITests */,
+				6AABCC2A2F2938C6009E5D12 /* Transfers */,
+				6AABCC372F2938C8009E5D12 /* TransfersTests */,
+				6AABCC412F2938C8009E5D12 /* TransfersUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -316,12 +316,12 @@
 /* Begin PBXTargetDependency section */
 		6AABCC3A2F2938C8009E5D12 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 6AABCC2A2F2938C6009E5D12 /* InigoVIP */;
+			target = 6AABCC2A2F2938C6009E5D12 /* Transfers */;
 			targetProxy = 6AABCC392F2938C8009E5D12 /* PBXContainerItemProxy */;
 		};
 		6AABCC442F2938C8009E5D12 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 6AABCC2A2F2938C6009E5D12 /* InigoVIP */;
+			target = 6AABCC2A2F2938C6009E5D12 /* Transfers */;
 			targetProxy = 6AABCC432F2938C8009E5D12 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -468,7 +468,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.inigos.InigoVIP;
+				PRODUCT_BUNDLE_IDENTIFIER = com.inigos.InioVIP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -501,7 +501,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.inigos.InigoVIP;
+				PRODUCT_BUNDLE_IDENTIFIER = com.inigos.InioVIP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -533,7 +533,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/InigoVIP.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/InigoVIP";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Transfers.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Transfers";
 			};
 			name = Debug;
 		};
@@ -556,7 +556,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/InigoVIP.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/InigoVIP";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Transfers.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Transfers";
 			};
 			name = Release;
 		};
@@ -605,7 +605,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6AABCC262F2938C6009E5D12 /* Build configuration list for PBXProject "InigoVIP" */ = {
+		6AABCC262F2938C6009E5D12 /* Build configuration list for PBXProject "Transfers" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6AABCC4A2F2938C8009E5D12 /* Debug */,
@@ -614,7 +614,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6AABCC4C2F2938C8009E5D12 /* Build configuration list for PBXNativeTarget "InigoVIP" */ = {
+		6AABCC4C2F2938C8009E5D12 /* Build configuration list for PBXNativeTarget "Transfers" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6AABCC4D2F2938C8009E5D12 /* Debug */,
@@ -623,7 +623,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6AABCC4F2F2938C8009E5D12 /* Build configuration list for PBXNativeTarget "InigoVIPTests" */ = {
+		6AABCC4F2F2938C8009E5D12 /* Build configuration list for PBXNativeTarget "TransfersTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6AABCC502F2938C8009E5D12 /* Debug */,
@@ -632,7 +632,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6AABCC522F2938C8009E5D12 /* Build configuration list for PBXNativeTarget "InigoVIPUITests" */ = {
+		6AABCC522F2938C8009E5D12 /* Build configuration list for PBXNativeTarget "TransfersUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6AABCC532F2938C8009E5D12 /* Debug */,

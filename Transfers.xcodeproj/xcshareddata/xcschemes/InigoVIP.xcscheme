@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6AABCC2A2F2938C6009E5D12"
-               BuildableName = "InigoVIP.app"
-               BlueprintName = "InigoVIP"
-               ReferencedContainer = "container:InigoVIP.xcodeproj">
+               BuildableName = "Transfers.app"
+               BlueprintName = "Transfers"
+               ReferencedContainer = "container:Transfers.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -36,9 +36,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6AABCC372F2938C8009E5D12"
-               BuildableName = "InigoVIPTests.xctest"
-               BlueprintName = "InigoVIPTests"
-               ReferencedContainer = "container:InigoVIP.xcodeproj">
+               BuildableName = "TransfersTests.xctest"
+               BlueprintName = "TransfersTests"
+               ReferencedContainer = "container:Transfers.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -47,9 +47,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6AABCC412F2938C8009E5D12"
-               BuildableName = "InigoVIPUITests.xctest"
-               BlueprintName = "InigoVIPUITests"
-               ReferencedContainer = "container:InigoVIP.xcodeproj">
+               BuildableName = "TransfersUITests.xctest"
+               BlueprintName = "TransfersUITests"
+               ReferencedContainer = "container:Transfers.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -70,9 +70,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6AABCC2A2F2938C6009E5D12"
-            BuildableName = "InigoVIP.app"
-            BlueprintName = "InigoVIP"
-            ReferencedContainer = "container:InigoVIP.xcodeproj">
+            BuildableName = "Transfers.app"
+            BlueprintName = "Transfers"
+            ReferencedContainer = "container:Transfers.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -87,9 +87,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6AABCC2A2F2938C6009E5D12"
-            BuildableName = "InigoVIP.app"
-            BlueprintName = "InigoVIP"
-            ReferencedContainer = "container:InigoVIP.xcodeproj">
+            BuildableName = "Transfers.app"
+            BlueprintName = "Transfers"
+            ReferencedContainer = "container:Transfers.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
