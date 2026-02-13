@@ -1,6 +1,6 @@
 //
 //  CategoryIcon.swift
-//  InigoVIP
+//  Transfers
 //
 //  Created by Inigo on 28/1/26.
 //

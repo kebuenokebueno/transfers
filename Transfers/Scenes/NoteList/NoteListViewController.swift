@@ -1,8 +1,3 @@
-//
-//  NoteListViewController.swift
-//  InigoVIP
-//
-
 import Foundation
 
 protocol NoteListDisplayLogic: AnyObject {

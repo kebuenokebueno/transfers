@@ -1,6 +1,6 @@
 //
 //  EditNotePresenter.swift
-//  InigoVIP
+//  Transfers
 //
 
 import Foundation

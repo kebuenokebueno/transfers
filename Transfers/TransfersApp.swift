@@ -1,12 +1,8 @@
-// MARK: - InigoVIP App Entry Point (Final)
-// File: InigoVIPApp.swift
-// Final Production Version with SwiftDataService
-
 import SwiftUI
 import SwiftData
 
 @main
-struct InigoVIPApp: App {
+struct TransfersApp: App {
     // Services
     @State private var swiftDataService = SwiftDataService()
     @State private var supabaseService = SupabaseService()

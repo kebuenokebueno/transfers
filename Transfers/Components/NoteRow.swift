@@ -1,6 +1,6 @@
 //
 //  NoteRow.swift
-//  InigoVIP
+//  Transfers
 //
 
 import SwiftUI

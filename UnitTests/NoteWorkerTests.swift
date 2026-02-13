@@ -1,13 +1,13 @@
 //
 //  NoteWorkerTests.swift
-//  InigoVIPTests
+//  TransfersTests
 //
 //  Created by Inigo on 29/1/26.
 //
 
 import Testing
 import Foundation
-@testable import InigoVIP
+@testable import Transfers
 
 // MARK: - NoteWorker CRUD Tests
 

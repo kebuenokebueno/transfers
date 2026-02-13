@@ -1,6 +1,6 @@
 //
 //  NoteScene.swift
-//  InigoVIP
+//  Transfers
 //
 //  Created by Inigo on 3/2/26.
 //

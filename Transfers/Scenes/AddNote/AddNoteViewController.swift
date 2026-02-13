@@ -1,6 +1,6 @@
 //
 //  AddNoteViewController.swift
-//  InigoVIP
+//  Transfers
 //
 
 import Foundation

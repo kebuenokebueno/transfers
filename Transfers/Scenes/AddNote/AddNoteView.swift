@@ -1,6 +1,6 @@
 //
 //  AddNoteView.swift
-//  InigoVIP
+//  Transfers
 //
 
 import SwiftUI

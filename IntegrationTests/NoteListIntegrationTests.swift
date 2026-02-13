@@ -1,11 +1,11 @@
 //
 //  NoteListIntegrationTests.swift
-//  InigoVIPTests
+//  TransfersTests
 //
 
 import Testing
 import Foundation
-@testable import InigoVIP
+@testable import Transfers
 
 @Suite("NoteList - Full VIP Integration", .tags(.integration))
 struct NoteListIntegrationTests {

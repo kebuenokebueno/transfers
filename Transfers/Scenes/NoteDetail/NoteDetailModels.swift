@@ -1,6 +1,6 @@
 //
 //  NoteDetailModels.swift
-//  InigoVIP
+//  Transfers
 //
 
 import Foundation

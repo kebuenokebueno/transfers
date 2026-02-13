@@ -1,12 +1,12 @@
 //
 //  MockClasses.swift
-//  InigoVIPTests
+//  TransfersTests
 //
 
 import Foundation
 import Testing
 import SwiftData
-@testable import InigoVIP
+@testable import Transfers
 
 // MARK: - Tags
 

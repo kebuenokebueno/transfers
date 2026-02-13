@@ -1,11 +1,11 @@
 //
 //  NoteListPresenterTests.swift
-//  InigoVIPTests
+//  TransfersTests
 //
 
 import Testing
 import Foundation
-@testable import InigoVIP
+@testable import Transfers
 
 @Suite("NoteList Presenter Tests", .tags(.unit, .presenter))
 struct NoteListPresenterTests {

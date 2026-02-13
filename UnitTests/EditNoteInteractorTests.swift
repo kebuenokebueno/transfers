@@ -1,11 +1,11 @@
 //
 //  EditNoteInteractorTests.swift
-//  InigoVIPTests
+//  TransfersTests
 //
 
 import Testing
 import Foundation
-@testable import InigoVIP
+@testable import Transfers
 
 @MainActor
 @Suite("EditNote Interactor Tests", .tags(.unit, .interactor))

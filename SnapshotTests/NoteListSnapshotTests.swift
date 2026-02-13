@@ -3,7 +3,7 @@ import SwiftData
 import XCTest
 import SnapshotTesting
 import SwiftUI
-@testable import InigoVIP
+@testable import Transfers
 
 struct SnapshotTestData {
     static func sampleNote(

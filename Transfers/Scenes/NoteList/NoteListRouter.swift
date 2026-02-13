@@ -1,6 +1,6 @@
 //
 //  NoteListRouter.swift
-//  InigoVIP
+//  Transfers
 //
 
 import Foundation

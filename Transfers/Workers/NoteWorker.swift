@@ -1,12 +1,8 @@
 import Foundation
 import SwiftData
 
-/// Manages notes with offline-first architecture
-/// Saves to SwiftData immediately, syncs to Supabase in background
-
-//
 //  NoteWorkerProtocol.swift
-//  InigoVIP
+//  Transfers
 //
 
 import Foundation

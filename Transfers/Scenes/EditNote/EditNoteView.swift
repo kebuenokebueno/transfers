@@ -1,6 +1,6 @@
 //
 //  EditNoteView.swift
-//  InigoVIP
+//  Transfers
 //
 
 import SwiftUI

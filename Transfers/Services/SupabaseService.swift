@@ -1,7 +1,3 @@
-//
-//  SupabaseService.swift
-//  InigoVIP
-//
 //  Created by Inigo on 2/2/26.
 //
 

@@ -1,12 +1,12 @@
 //
 //  NoteListE2ETests.swift
-//  InigoVIPTests
+//  TransfersTests
 //
 
 import Testing
 import Foundation
 import SwiftData
-@testable import InigoVIP
+@testable import Transfers
 
 @Suite("NoteList - E2E Tests", .tags(.e2e))
 struct NoteListE2ETests {

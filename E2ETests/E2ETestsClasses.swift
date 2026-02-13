@@ -1,11 +1,11 @@
 //
 //  E2ETestsClasses.swift
-//  InigoVIPTests
+//  TransfersTests
 //
 
 import Foundation
 import Supabase
-@testable import InigoVIP
+@testable import Transfers
 
 @MainActor
 class TestSupabaseService {
