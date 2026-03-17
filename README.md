@@ -2,7 +2,7 @@
 
 A modern iOS banking application demonstrating best practices and industry-standard architecture patterns. This sample project showcases a complete transfer management system with full CRUD operations, built using Apple's latest technologies and frameworks.
 
-![Demo](https://github.com/kebuenokebueno/transfers/blob/main/demo.mp4)
+![Demo](https://github.com/kebuenokebueno/transfers/blob/main/demo.gif)
 
 ## 📱 Overview
 
