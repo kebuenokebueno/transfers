@@ -242,36 +242,6 @@
             endingLineNumber = "32"
             landmarkName = "body"
             landmarkType = "24">
-            <Locations>
-               <Location
-                  uuid = "FA3E310C-EE8E-4F6D-B3D2-893F140B707C - e5a683dc3fe0c7f2"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 () -&gt; SwiftUI._ConditionalContent&lt;&lt;&lt;opaque return type of SwiftUI.View.modelContainer(for: SwiftData.PersistentModel.Type, inMemory: Swift.Bool, isAutosaveEnabled: Swift.Bool, isUndoEnabled: Swift.Bool, onSetup: (Swift.Result&lt;SwiftData.ModelContainer, Swift.Error&gt;) -&gt; ()) -&gt; some&gt;&gt;.0, SwiftUI.VStack&lt;SwiftUI.TupleView&lt;(SwiftUI.ProgressView&lt;SwiftUI.EmptyView, SwiftUI.EmptyView&gt;, SwiftUI.Text)&gt;&gt;&gt; in closure #1 () -&gt; &lt;&lt;opaque return type of SwiftUI.View.task(priority: Swift.TaskPriority, _: @Sendable () async -&gt; ()) -&gt; some&gt;&gt;.0 in InigoVIP.InigoVIPApp.body.getter : some"
-                  moduleName = "InigoVIP.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/inigo/ios/InigoVIP/InigoVIP/InigoVIPApp.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "32"
-                  endingLineNumber = "32">
-               </Location>
-               <Location
-                  uuid = "FA3E310C-EE8E-4F6D-B3D2-893F140B707C - a26a73b5ef3beb17"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 (InigoVIP.Route) -&gt; &lt;&lt;opaque return type of SwiftUI.View.environment&lt;&#x3c4;_0_0 where &#x3c4;_1_0: AnyObject, &#x3c4;_1_0: Observation.Observable&gt;(Swift.Optional&lt;&#x3c4;_1_0&gt;) -&gt; some&gt;&gt;.0 in closure #1 () -&gt; SwiftUI._ConditionalContent&lt;&lt;&lt;opaque return type of SwiftUI.View.modelContainer(for: SwiftData.PersistentModel.Type, inMemory: Swift.Bool, isAutosaveEnabled: Swift.Bool, isUndoEnabled: Swift.Bool, onSetup: (Swift.Result&lt;SwiftData.ModelContainer, Swift.Error&gt;) -&gt; ()) -&gt; some&gt;&gt;.0, SwiftUI.VStack&lt;SwiftUI.TupleView&lt;(SwiftUI.ProgressView&lt;SwiftUI.EmptyView, SwiftUI.EmptyView&gt;, SwiftUI.Text)&gt;&gt;&gt; in closure #1 () -&gt; &lt;&lt;opaque return type of SwiftUI.View.task(priority: Swift.TaskPriority, _: @Sendable () async -&gt; ()) -&gt; some&gt;&gt;.0 in InigoVIP.InigoVIPApp.body.getter : some"
-                  moduleName = "InigoVIP.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/inigo/ios/InigoVIP/InigoVIP/InigoVIPApp.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "32"
-                  endingLineNumber = "32">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
