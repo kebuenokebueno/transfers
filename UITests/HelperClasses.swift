@@ -19,20 +19,20 @@ enum UITestConfig {
 // MARK: - Page Object Pattern
 
 // Page Object for Transaction List Screen
-struct NoteListPage {
+struct TransferListPage {
     let app: XCUIApplication
     
     // MARK: - Elements
     
     var navigationTitle: XCUIElement {
-        app.staticTexts["Notes"]
+        app.staticTexts["Transfers"]
     }
     
     var refreshControl: XCUIElement {
         app.otherElements["refreshControl"]
     }
     
-    // Note Elements
+    // Transfer Elements
     func noteRow(withId id: String) -> XCUIElement {
         app.otherElements["note_\(id)"]
     }

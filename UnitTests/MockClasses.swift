@@ -23,7 +23,7 @@ extension Tag {
 
 // MARK: - Custom Error Types
 
-enum NoteError: Error, Equatable {
+enum TransferError: Error, Equatable {
     case notFound
     case saveFailed
     case deleteFailed
@@ -35,7 +35,7 @@ enum NoteError: Error, Equatable {
 // MARK: - Mock SwiftDataService
 
 class MockSwiftDataService: SwiftDataServiceProtocol {
-    var notes: [NoteEntity] = []
+    var transfers: [TransferEntity] = []
     var saveCount = 0
     var updateCount = 0
     var deleteCount = 0
@@ -43,64 +43,64 @@ class MockSwiftDataService: SwiftDataServiceProtocol {
     var shouldFailOnDelete = false
     var shouldFailOnFetch = false
 
-    func saveNote(_ note: NoteEntity) throws {
+    func saveTransfer(_ transfer: TransferEntity) throws {
         saveCount += 1
-        if shouldFailOnSave { throw NoteError.saveFailed }
-        if let idx = notes.firstIndex(where: { $0.id == note.id }) {
-            notes[idx] = note
+        if shouldFailOnSave { throw TransferError.saveFailed }
+        if let idx = transfers.firstIndex(where: { $0.id == transfer.id }) {
+            transfers[idx] = transfer
         } else {
-            notes.append(note)
+            transfers.append(transfer)
         }
     }
 
-    func fetchNotes() throws -> [NoteEntity] {
-        if shouldFailOnFetch { throw NoteError.notFound }
-        return notes.sorted { $0.date > $1.date }
+    func fetchTransfers() throws -> [TransferEntity] {
+        if shouldFailOnFetch { throw TransferError.notFound }
+        return transfers.sorted { $0.date > $1.date }
     }
 
-    func fetchNote(id: String) throws -> NoteEntity? {
-        if shouldFailOnFetch { throw NoteError.notFound }
-        return notes.first(where: { $0.id == id })
+    func fetchTransfer(id: String) throws -> TransferEntity? {
+        if shouldFailOnFetch { throw TransferError.notFound }
+        return transfers.first(where: { $0.id == id })
     }
 
-    func updateNote(_ note: NoteEntity) throws {
+    func updateTransfer(_ transfer: TransferEntity) throws {
         updateCount += 1
-        if shouldFailOnSave { throw NoteError.saveFailed }
-        guard let idx = notes.firstIndex(where: { $0.id == note.id }) else {
-            throw NoteError.notFound
+        if shouldFailOnSave { throw TransferError.saveFailed }
+        guard let idx = transfers.firstIndex(where: { $0.id == transfer.id }) else {
+            throw TransferError.notFound
         }
-        notes[idx] = note
+        transfers[idx] = transfer
     }
 
-    func deleteNote(id: String) throws {
+    func deleteTransfer(id: String) throws {
         deleteCount += 1
-        if shouldFailOnDelete { throw NoteError.deleteFailed }
-        guard notes.contains(where: { $0.id == id }) else {
-            throw NoteError.notFound
+        if shouldFailOnDelete { throw TransferError.deleteFailed }
+        guard transfers.contains(where: { $0.id == id }) else {
+            throw TransferError.notFound
         }
-        notes.removeAll(where: { $0.id == id })
+        transfers.removeAll(where: { $0.id == id })
     }
 
-    func searchNotes(query: String) throws -> [NoteEntity] {
+    func searchNotes(query: String) throws -> [TransferEntity] {
         let q = query.lowercased()
-        return notes.filter {
+        return transfers.filter {
             $0.noteDescription.lowercased().contains(q) ||
             $0.category.lowercased().contains(q)
         }
     }
 
-    func fetchNotesByCategory(category: String) throws -> [NoteEntity] {
-        return notes.filter { $0.category == category }
+    func fetchTransfersByCategory(category: String) throws -> [TransferEntity] {
+        return transfers.filter { $0.category == category }
     }
 
-    func fetchPendingNotes() throws -> [NoteEntity] {
-        return notes.filter { $0.syncStatus == "pending" }
+    func fetchPendingNotes() throws -> [TransferEntity] {
+        return transfers.filter { $0.syncStatus == "pending" }
     }
 
-    func seed(_ noteArray: [NoteEntity]) { notes = noteArray }
+    func seed(_ noteArray: [TransferEntity]) { transfers = noteArray }
 
     func reset() {
-        notes = []
+        transfers = []
         saveCount = 0
         updateCount = 0
         deleteCount = 0
@@ -113,42 +113,42 @@ class MockSwiftDataService: SwiftDataServiceProtocol {
 // MARK: - Mock SupabaseService
 
 class MockSupabaseService {
-    var notes: [NoteEntity] = []
+    var transfers: [TransferEntity] = []
     var createCount = 0
     var updateCount = 0
     var deleteCount = 0
     var shouldFail = false
     var delayMilliseconds: UInt64 = 0
 
-    func fetchNotes() async throws -> [NoteEntity] {
+    func fetchTransfers() async throws -> [TransferEntity] {
         if delayMilliseconds > 0 { try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000) }
-        if shouldFail { throw NoteError.connectionFailed }
-        return notes
+        if shouldFail { throw TransferError.connectionFailed }
+        return transfers
     }
 
-    func createNote(_ note: NoteEntity) async throws {
+    func createTransfer(_ transfer: TransferEntity) async throws {
         if delayMilliseconds > 0 { try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000) }
-        if shouldFail { throw NoteError.connectionFailed }
+        if shouldFail { throw TransferError.connectionFailed }
         createCount += 1
-        notes.append(note)
+        transfers.append(transfer)
     }
 
-    func updateNote(_ note: NoteEntity) async throws {
+    func updateTransfer(_ transfer: TransferEntity) async throws {
         if delayMilliseconds > 0 { try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000) }
-        if shouldFail { throw NoteError.connectionFailed }
+        if shouldFail { throw TransferError.connectionFailed }
         updateCount += 1
-        if let idx = notes.firstIndex(where: { $0.id == note.id }) { notes[idx] = note }
+        if let idx = transfers.firstIndex(where: { $0.id == transfer.id }) { transfers[idx] = transfer }
     }
 
-    func deleteNote(id: String) async throws {
+    func deleteTransfer(id: String) async throws {
         if delayMilliseconds > 0 { try await Task.sleep(nanoseconds: delayMilliseconds * 1_000_000) }
-        if shouldFail { throw NoteError.connectionFailed }
+        if shouldFail { throw TransferError.connectionFailed }
         deleteCount += 1
-        notes.removeAll(where: { $0.id == id })
+        transfers.removeAll(where: { $0.id == id })
     }
 
     func reset() {
-        notes = []
+        transfers = []
         createCount = 0
         updateCount = 0
         deleteCount = 0
@@ -157,19 +157,19 @@ class MockSupabaseService {
     }
 }
 
-// MARK: - Mock NoteWorker
+// MARK: - Mock TransferWorker
 
-class MockNoteWorker: NoteWorkerProtocol {
+class MockTransferWorker: TransferWorkerProtocol {
     let swiftDataService: MockSwiftDataService
     let supabaseService: MockSupabaseService
 
     var isLoading = false
     var lastError: String?
 
-    var fetchNotesCallCount = 0
-    var createNoteCallCount = 0
-    var updateNoteCallCount = 0
-    var deleteNoteCallCount = 0
+    var fetchTransfersCallCount = 0
+    var createTransferCallCount = 0
+    var updateTransferCallCount = 0
+    var deleteTransferCallCount = 0
 
     init(
         swiftDataService: MockSwiftDataService = MockSwiftDataService(),
@@ -179,200 +179,200 @@ class MockNoteWorker: NoteWorkerProtocol {
         self.supabaseService = supabaseService
     }
 
-    func fetchNotes() async {
-        fetchNotesCallCount += 1
+    func fetchTransfers() async {
+        fetchTransfersCallCount += 1
         isLoading = true
         lastError = nil
-        do { _ = try swiftDataService.fetchNotes() } catch { lastError = error.localizedDescription }
+        do { _ = try swiftDataService.fetchTransfers() } catch { lastError = error.localizedDescription }
         isLoading = false
     }
 
-    func createNote(_ note: NoteEntity) async {
-        createNoteCallCount += 1
+    func createTransfer(_ transfer: TransferEntity) async {
+        createTransferCallCount += 1
         do {
-            try swiftDataService.saveNote(note)
-            try await supabaseService.createNote(note)
+            try swiftDataService.saveTransfer(transfer)
+            try await supabaseService.createTransfer(transfer)
         } catch { lastError = error.localizedDescription }
     }
 
-    func updateNote(_ updatedNote: NoteEntity) async {
-        updateNoteCallCount += 1
+    func updateTransfer(_ updatedTransfer: TransferEntity) async {
+        updateTransferCallCount += 1
         do {
-            guard let existing = try swiftDataService.fetchNote(id: updatedNote.id) else {
-                lastError = "Note not found"
+            guard let existing = try swiftDataService.fetchTransfer(id: updatedTransfer.id) else {
+                lastError = "Transfer not found"
                 return
             }
-            existing.amount = updatedNote.amount
-            existing.noteDescription = updatedNote.noteDescription
-            existing.category = updatedNote.category
+            existing.amount = updatedTransfer.amount
+            existing.noteDescription = updatedTransfer.noteDescription
+            existing.category = updatedTransfer.category
             existing.markForSync()
-            try swiftDataService.updateNote(existing)
-            try await supabaseService.updateNote(existing)
+            try swiftDataService.updateTransfer(existing)
+            try await supabaseService.updateTransfer(existing)
         } catch { lastError = error.localizedDescription }
     }
 
-    func deleteNote(id: String) async {
-        deleteNoteCallCount += 1
+    func deleteTransfer(id: String) async {
+        deleteTransferCallCount += 1
         do {
-            try swiftDataService.deleteNote(id: id)
-            try await supabaseService.deleteNote(id: id)
+            try swiftDataService.deleteTransfer(id: id)
+            try await supabaseService.deleteTransfer(id: id)
         } catch { lastError = error.localizedDescription }
     }
 
     func reset() {
         swiftDataService.reset()
         supabaseService.reset()
-        fetchNotesCallCount = 0
-        createNoteCallCount = 0
-        updateNoteCallCount = 0
-        deleteNoteCallCount = 0
+        fetchTransfersCallCount = 0
+        createTransferCallCount = 0
+        updateTransferCallCount = 0
+        deleteTransferCallCount = 0
         lastError = nil
     }
 }
 
-// MARK: - Mock NoteList Presenter
+// MARK: - Mock TransferList Presenter
 
-class MockNoteListPresenter: NoteListPresentationLogic {
-    var presentNotesCalled = false
-    var presentNotesCallCount = 0
-    var lastFetchResponse: NoteScene.FetchNotes.Response?
+class MockTransferListPresenter: TransferListPresentationLogic {
+    var presentTransfersCalled = false
+    var presentTransfersCallCount = 0
+    var lastFetchResponse: TransferScene.FetchTransfers.Response?
 
     var presentDeleteResultCalled = false
-    var lastDeleteResponse: NoteScene.DeleteNote.Response?
+    var lastDeleteResponse: TransferScene.DeleteTransfer.Response?
 
-    func presentNotes(response: NoteScene.FetchNotes.Response) {
-        presentNotesCalled = true
-        presentNotesCallCount += 1
+    func presentTransfers(response: TransferScene.FetchTransfers.Response) {
+        presentTransfersCalled = true
+        presentTransfersCallCount += 1
         lastFetchResponse = response
     }
 
-    func presentDeleteResult(response: NoteScene.DeleteNote.Response) {
+    func presentDeleteResult(response: TransferScene.DeleteTransfer.Response) {
         presentDeleteResultCalled = true
         lastDeleteResponse = response
     }
 }
 
-// MARK: - Mock NoteList ViewController
+// MARK: - Mock TransferList ViewController
 
-class MockNoteListViewController: NoteListDisplayLogic {
-    var displayNotesCalled = false
-    var displayNotesCallCount = 0
-    var lastFetchViewModel: NoteScene.FetchNotes.ViewModel?
+class MockTransferListViewController: TransferListDisplayLogic {
+    var displayTransfersCalled = false
+    var displayTransfersCallCount = 0
+    var lastFetchViewModel: TransferScene.FetchTransfers.ViewModel?
 
     var displayDeleteResultCalled = false
-    var lastDeleteViewModel: NoteScene.DeleteNote.ViewModel?
+    var lastDeleteViewModel: TransferScene.DeleteTransfer.ViewModel?
 
-    func displayNotes(viewModel: NoteScene.FetchNotes.ViewModel) {
-        displayNotesCalled = true
-        displayNotesCallCount += 1
+    func displayTransfers(viewModel: TransferScene.FetchTransfers.ViewModel) {
+        displayTransfersCalled = true
+        displayTransfersCallCount += 1
         lastFetchViewModel = viewModel
     }
 
-    func displayDeleteResult(viewModel: NoteScene.DeleteNote.ViewModel) {
+    func displayDeleteResult(viewModel: TransferScene.DeleteTransfer.ViewModel) {
         displayDeleteResultCalled = true
         lastDeleteViewModel = viewModel
     }
 }
 
-// MARK: - Mock AddNote Presenter
+// MARK: - Mock AddTransfer Presenter
 
-class MockAddNotePresenter: AddNotePresentationLogic {
+class MockAddTransferPresenter: AddTransferPresentationLogic {
     var presentSaveResultCalled = false
-    var lastSaveResponse: AddNoteScene.SaveNote.Response?
+    var lastSaveResponse: AddTransferScene.SaveNote.Response?
 
-    func presentSaveResult(response: AddNoteScene.SaveNote.Response) {
+    func presentSaveResult(response: AddTransferScene.SaveNote.Response) {
         presentSaveResultCalled = true
         lastSaveResponse = response
     }
 }
 
-// MARK: - Mock AddNote ViewController
+// MARK: - Mock AddTransfer ViewController
 
-class MockAddNoteViewController: AddNoteDisplayLogic {
+class MockAddTransferViewController: AddTransferDisplayLogic {
     var displaySaveResultCalled = false
-    var lastSaveViewModel: AddNoteScene.SaveNote.ViewModel?
+    var lastSaveViewModel: AddTransferScene.SaveNote.ViewModel?
 
-    func displaySaveResult(viewModel: AddNoteScene.SaveNote.ViewModel) {
+    func displaySaveResult(viewModel: AddTransferScene.SaveNote.ViewModel) {
         displaySaveResultCalled = true
         lastSaveViewModel = viewModel
     }
 }
 
-// MARK: - Mock EditNote Presenter
+// MARK: - Mock EditTransfer Presenter
 
-class MockEditNotePresenter: EditNotePresentationLogic {
-    var presentNoteCalled = false
-    var lastLoadResponse: EditNoteScene.LoadNote.Response?
+class MockEditTransferPresenter: EditTransferPresentationLogic {
+    var presentTransferCalled = false
+    var lastLoadResponse: EditTransferScene.LoadNote.Response?
 
     var presentSaveResultCalled = false
-    var lastSaveResponse: EditNoteScene.SaveNote.Response?
+    var lastSaveResponse: EditTransferScene.SaveNote.Response?
 
-    func presentNote(response: EditNoteScene.LoadNote.Response) {
-        presentNoteCalled = true
+    func presentTransfer(response: EditTransferScene.LoadNote.Response) {
+        presentTransferCalled = true
         lastLoadResponse = response
     }
 
-    func presentSaveResult(response: EditNoteScene.SaveNote.Response) {
+    func presentSaveResult(response: EditTransferScene.SaveNote.Response) {
         presentSaveResultCalled = true
         lastSaveResponse = response
     }
 }
 
-// MARK: - Mock EditNote ViewController
+// MARK: - Mock EditTransfer ViewController
 
-class MockEditNoteViewController: EditNoteDisplayLogic {
-    var displayNoteCalled = false
-    var lastNoteViewModel: EditNoteScene.LoadNote.ViewModel?
+class MockEditTransferViewController: EditTransferDisplayLogic {
+    var displayTransferCalled = false
+    var lastTransferViewModel: EditTransferScene.LoadNote.ViewModel?
 
     var displaySaveResultCalled = false
-    var lastSaveViewModel: EditNoteScene.SaveNote.ViewModel?
+    var lastSaveViewModel: EditTransferScene.SaveNote.ViewModel?
 
-    func displayNote(viewModel: EditNoteScene.LoadNote.ViewModel) {
-        displayNoteCalled = true
-        lastNoteViewModel = viewModel
+    func displayTransfer(viewModel: EditTransferScene.LoadNote.ViewModel) {
+        displayTransferCalled = true
+        lastTransferViewModel = viewModel
     }
 
-    func displaySaveResult(viewModel: EditNoteScene.SaveNote.ViewModel) {
+    func displaySaveResult(viewModel: EditTransferScene.SaveNote.ViewModel) {
         displaySaveResultCalled = true
         lastSaveViewModel = viewModel
     }
 }
 
-// MARK: - Mock NoteDetail Presenter
+// MARK: - Mock TransferDetail Presenter
 
-class MockNoteDetailPresenter: NoteDetailPresentationLogic {
-    var presentNoteCalled = false
-    var lastFetchResponse: NoteDetailScene.FetchNote.Response?
+class MockTransferDetailPresenter: TransferDetailPresentationLogic {
+    var presentTransferCalled = false
+    var lastFetchResponse: TransferDetailScene.FetchNote.Response?
 
     var presentDeleteResultCalled = false
-    var lastDeleteResponse: NoteDetailScene.DeleteNote.Response?
+    var lastDeleteResponse: TransferDetailScene.DeleteTransfer.Response?
 
-    func presentNote(response: NoteDetailScene.FetchNote.Response) {
-        presentNoteCalled = true
+    func presentTransfer(response: TransferDetailScene.FetchNote.Response) {
+        presentTransferCalled = true
         lastFetchResponse = response
     }
 
-    func presentDeleteResult(response: NoteDetailScene.DeleteNote.Response) {
+    func presentDeleteResult(response: TransferDetailScene.DeleteTransfer.Response) {
         presentDeleteResultCalled = true
         lastDeleteResponse = response
     }
 }
 
-// MARK: - Mock NoteDetail ViewController
+// MARK: - Mock TransferDetail ViewController
 
-class MockNoteDetailViewController: NoteDetailDisplayLogic {
-    var displayNoteCalled = false
-    var lastNoteViewModel: NoteDetailScene.FetchNote.ViewModel?
+class MockTransferDetailViewController: TransferDetailDisplayLogic {
+    var displayTransferCalled = false
+    var lastTransferViewModel: TransferDetailScene.FetchNote.ViewModel?
 
     var displayDeleteResultCalled = false
-    var lastDeleteViewModel: NoteDetailScene.DeleteNote.ViewModel?
+    var lastDeleteViewModel: TransferDetailScene.DeleteTransfer.ViewModel?
 
-    func displayNote(viewModel: NoteDetailScene.FetchNote.ViewModel) {
-        displayNoteCalled = true
-        lastNoteViewModel = viewModel
+    func displayTransfer(viewModel: TransferDetailScene.FetchNote.ViewModel) {
+        displayTransferCalled = true
+        lastTransferViewModel = viewModel
     }
 
-    func displayDeleteResult(viewModel: NoteDetailScene.DeleteNote.ViewModel) {
+    func displayDeleteResult(viewModel: TransferDetailScene.DeleteTransfer.ViewModel) {
         displayDeleteResultCalled = true
         lastDeleteViewModel = viewModel
     }
@@ -381,42 +381,42 @@ class MockNoteDetailViewController: NoteDetailDisplayLogic {
 // MARK: - Test Data Builder
 
 struct TestDataBuilder {
-    static func createNote(
+    static func createTransfer(
         id: String = "test_1",
         amount: Double = -100.0,
-        description: String = "Test Note",
+        description: String = "Test Transfer",
         date: Date = Date(),
         category: String = "Food",
         syncStatus: String = "pending"
-    ) -> NoteEntity {
-        NoteEntity(
+    ) -> TransferEntity {
+        TransferEntity(
             id: id,
             amount: amount,
             description: description,
             date: date,
             category: category,
-            syncStatus: NoteEntity.SyncStatus(rawValue: syncStatus)!
+            syncStatus: TransferEntity.SyncStatus(rawValue: syncStatus)!
         )
     }
 
-    static func createNotes(count: Int) -> [NoteEntity] {
+    static func createTransfers(count: Int) -> [TransferEntity] {
         (1...count).map { i in
-            createNote(
+            createTransfer(
                 id: "note_\(i)",
                 amount: (i % 3 == 0) ? Double(i * 100) : -Double(i * 10),
-                description: "Note \(i)",
+                description: "Transfer \(i)",
                 category: ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"][i % 6]
             )
         }
     }
 
-    static func createMixedNotes() -> [NoteEntity] {
+    static func createMixedNotes() -> [TransferEntity] {
         [
-            createNote(id: "1", amount: -45.50,  description: "Grocery Store",  category: "Food"),
-            createNote(id: "2", amount: -120.00, description: "Electric Bill",  category: "Utilities"),
-            createNote(id: "3", amount: 2500.00, description: "Salary",         category: "Income"),
-            createNote(id: "4", amount: -30.00,  description: "Gas Station",    category: "Transport"),
-            createNote(id: "5", amount: 150.00,  description: "Freelance Work", category: "Income")
+            createTransfer(id: "1", amount: -45.50,  description: "Grocery Store",  category: "Food"),
+            createTransfer(id: "2", amount: -120.00, description: "Electric Bill",  category: "Utilities"),
+            createTransfer(id: "3", amount: 2500.00, description: "Salary",         category: "Income"),
+            createTransfer(id: "4", amount: -30.00,  description: "Gas Station",    category: "Transport"),
+            createTransfer(id: "5", amount: 150.00,  description: "Freelance Work", category: "Income")
         ]
     }
 }

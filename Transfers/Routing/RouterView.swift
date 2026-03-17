@@ -13,13 +13,13 @@ struct RouterView {
     static func destination(for route: Route) -> some View {
         switch route {
         case .noteDetail(let id):
-            NoteDetailView(noteId: id)
+            TransferDetailView(transferId: id)
 
         case .addNote:
-            AddNoteView()
+            AddTransferView()
             
         case .editNote(let id):
-            EditNoteView(noteId: id)
+            EditTransferView(transferId: id)
         }
     }
 }

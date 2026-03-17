@@ -28,67 +28,67 @@ class SupabaseService {
     
     // MARK: - 📝 CRUD Operations
     
-    /// Fetch all notes from Supabase
-    func fetchNotes() async throws -> [NoteEntity] {
-        print("📥 Fetching notes from Supabase...")
+    /// Fetch all transfers from Supabase
+    func fetchTransfers() async throws -> [TransferEntity] {
+        print("📥 Fetching transfers from Supabase...")
         
-        let response: [NoteEntity] = try await client
-            .from("notes")
+        let response: [TransferEntity] = try await client
+            .from("transfers")
             .select()
             .order("created_at", ascending: false)
             .execute()
             .value
         
-        print("✅ Fetched \(response.count) notes")
+        print("✅ Fetched \(response.count) transfers")
         
-        // Convert to Note model
+        // Convert to Transfer model
         return response
     }
     
-    /// Create a new note
-    func createNote(_ note: NoteEntity) async throws {
-        print("💾 Creating note: \(note.id)")
+    /// Create a new transfer
+    func createTransfer(_ transfer: TransferEntity) async throws {
+        print("💾 Creating transfer: \(transfer.id)")
         
         try await client
-            .from("notes")
-            .insert(note)
+            .from("transfers")
+            .insert(transfer)
             .execute()
         
-        print("✅ Note created successfully")
+        print("✅ Transfer created successfully")
     }
     
-    /// Update an existing note
-    func updateNote(_ note: NoteEntity) async throws {
-        print("✏️ Updating note: \(note.id)")
+    /// Update an existing transfer
+    func updateTransfer(_ transfer: TransferEntity) async throws {
+        print("✏️ Updating transfer: \(transfer.id)")
         
         try await client
-            .from("notes")
-            .update(note)
-            .eq("id", value: note.id)
+            .from("transfers")
+            .update(transfer)
+            .eq("id", value: transfer.id)
             .execute()
         
-        print("✅ Note updated successfully")
+        print("✅ Transfer updated successfully")
     }
     
-    /// Delete a note
-    func deleteNote(id: String) async throws {
-        print("🗑️ Deleting note: \(id)")
+    /// Delete a transfer
+    func deleteTransfer(id: String) async throws {
+        print("🗑️ Deleting transfer: \(id)")
         
         try await client
-            .from("notes")
+            .from("transfers")
             .delete()
             .eq("id", value: id)
             .execute()
         
-        print("✅ Note deleted successfully")
+        print("✅ Transfer deleted successfully")
     }
     
-    /// Fetch a single note by ID
-    func fetchNote(id: String) async throws -> NoteEntity? {
-        print("📥 Fetching note: \(id)")
+    /// Fetch a single transfer by ID
+    func fetchTransfer(id: String) async throws -> TransferEntity? {
+        print("📥 Fetching transfer: \(id)")
         
-        let response: [NoteEntity] = try await client
-            .from("notes")
+        let response: [TransferEntity] = try await client
+            .from("transfers")
             .select()
             .eq("id", value: id)
             .execute()
@@ -99,12 +99,12 @@ class SupabaseService {
     
     // MARK: - 🔍 Search & Filter
     
-    /// Search notes by description
-    func searchNotes(query: String) async throws -> [NoteEntity] {
-        print("🔍 Searching notes: \(query)")
+    /// Search transfers by description
+    func searchNotes(query: String) async throws -> [TransferEntity] {
+        print("🔍 Searching transfers: \(query)")
         
-        let response: [NoteEntity] = try await client
-            .from("notes")
+        let response: [TransferEntity] = try await client
+            .from("transfers")
             .select()
             .ilike("description", pattern: "%\(query)%")
             .order("created_at", ascending: false)
@@ -114,12 +114,12 @@ class SupabaseService {
         return response
     }
     
-    /// Filter notes by category
-    func fetchNotesByCategory(category: String) async throws -> [NoteEntity] {
-        print("📂 Fetching notes for category: \(category)")
+    /// Filter transfers by category
+    func fetchTransfersByCategory(category: String) async throws -> [TransferEntity] {
+        print("📂 Fetching transfers for category: \(category)")
         
-        let response: [NoteEntity] = try await client
-            .from("notes")
+        let response: [TransferEntity] = try await client
+            .from("transfers")
             .select()
             .eq("category", value: category)
             .order("created_at", ascending: false)
@@ -129,12 +129,12 @@ class SupabaseService {
         return response
     }
     
-    /// Filter notes by date range
-    func fetchNotesByDateRange(from: Date, to: Date) async throws -> [NoteEntity] {
-        print("📅 Fetching notes from \(from) to \(to)")
+    /// Filter transfers by date range
+    func fetchTransfersByDateRange(from: Date, to: Date) async throws -> [TransferEntity] {
+        print("📅 Fetching transfers from \(from) to \(to)")
         
-        let response: [NoteEntity] = try await client
-            .from("notes")
+        let response: [TransferEntity] = try await client
+            .from("transfers")
             .select()
             .gte("date", value: from.ISO8601Format())
             .lte("date", value: to.ISO8601Format())
@@ -149,7 +149,7 @@ class SupabaseService {
     
     func testConnection() async -> Bool {
         do {
-            _ = try await fetchNotes()
+            _ = try await fetchTransfers()
             isConnected = true
             lastError = nil
             print("✅ Supabase connection successful")
@@ -176,7 +176,7 @@ enum SupabaseError: Error, LocalizedError {
         case .connectionFailed:
             return "Failed to connect to Supabase"
         case .notFound:
-            return "Note not found"
+            return "Transfer not found"
         case .invalidData:
             return "Invalid data format"
         case .unauthorized:

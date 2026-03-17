@@ -2,8 +2,8 @@ import Foundation
 import SwiftData
 
 protocol SwiftDataServiceProtocol: AnyObject {
-    func fetchNotes() throws -> [NoteEntity]
-    func fetchNote(id: String) throws -> NoteEntity?
+    func fetchTransfers() throws -> [TransferEntity]
+    func fetchTransfer(id: String) throws -> TransferEntity?
 }
 
 @MainActor
@@ -26,7 +26,7 @@ class SwiftDataService: SwiftDataServiceProtocol {
     // MARK: - Setup
     
     private func setupContainer() {
-        let schema = Schema([NoteEntity.self])
+        let schema = Schema([TransferEntity.self])
         
         let modelConfiguration = ModelConfiguration(
             schema: schema,
@@ -49,99 +49,99 @@ class SwiftDataService: SwiftDataServiceProtocol {
     
     // MARK: - 💾 CRUD Operations
     
-    /// Save note to local storage
-    func saveNote(_ note: NoteEntity) throws {
+    /// Save transfer to local storage
+    func saveTransfer(_ transfer: TransferEntity) throws {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        context.insert(note)
+        context.insert(transfer)
         try context.save()
         
-        print("💾 SwiftData: Note saved: \(note.id)")
+        print("💾 SwiftData: Transfer saved: \(transfer.id)")
     }
     
-    /// Fetch all notes from local storage
-    func fetchNotes() throws -> [NoteEntity] {
+    /// Fetch all transfers from local storage
+    func fetchTransfers() throws -> [TransferEntity] {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        let descriptor = FetchDescriptor<NoteEntity>(
+        let descriptor = FetchDescriptor<TransferEntity>(
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
         
         return try context.fetch(descriptor)
     }
     
-    /// Fetch single note by ID
-    func fetchNote(id: String) throws -> NoteEntity? {
+    /// Fetch single transfer by ID
+    func fetchTransfer(id: String) throws -> TransferEntity? {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        let descriptor = FetchDescriptor<NoteEntity>(
+        let descriptor = FetchDescriptor<TransferEntity>(
             predicate: #Predicate { $0.id == id }
         )
         
         return try context.fetch(descriptor).first
     }
     
-    /// Update note in local storage
-    func updateNote(_ note: NoteEntity) throws {
+    /// Update transfer in local storage
+    func updateTransfer(_ transfer: TransferEntity) throws {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        note.updatedAt = Date()
+        transfer.updatedAt = Date()
         try context.save()
         
-        print("✏️ SwiftData: Note updated: \(note.id)")
+        print("✏️ SwiftData: Transfer updated: \(transfer.id)")
     }
     
-    /// Delete note from local storage
-    func deleteNote(id: String) throws {
+    /// Delete transfer from local storage
+    func deleteTransfer(id: String) throws {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        let descriptor = FetchDescriptor<NoteEntity>(
+        let descriptor = FetchDescriptor<TransferEntity>(
             predicate: #Predicate { $0.id == id }
         )
         
-        if let note = try context.fetch(descriptor).first {
-            context.delete(note)
+        if let transfer = try context.fetch(descriptor).first {
+            context.delete(transfer)
             try context.save()
-            print("🗑️ SwiftData: Note deleted: \(id)")
+            print("🗑️ SwiftData: Transfer deleted: \(id)")
         }
     }
     
-    /// Delete all notes
+    /// Delete all transfers
     func deleteAllNotes() throws {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        let notes = try fetchNotes()
-        for note in notes {
-            context.delete(note)
+        let transfers = try fetchTransfers()
+        for transfer in transfers {
+            context.delete(transfer)
         }
         try context.save()
         
-        print("🗑️ SwiftData: All notes deleted")
+        print("🗑️ SwiftData: All transfers deleted")
     }
     
     // MARK: - 🔍 Search & Filter
     
-    /// Search notes by description
-    func searchNotes(query: String) throws -> [NoteEntity] {
+    /// Search transfers by description
+    func searchNotes(query: String) throws -> [TransferEntity] {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        let descriptor = FetchDescriptor<NoteEntity>(
-            predicate: #Predicate { note in
-                note.noteDescription.localizedStandardContains(query)
+        let descriptor = FetchDescriptor<TransferEntity>(
+            predicate: #Predicate { transfer in
+                transfer.noteDescription.localizedStandardContains(query)
             },
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
@@ -149,13 +149,13 @@ class SwiftDataService: SwiftDataServiceProtocol {
         return try context.fetch(descriptor)
     }
     
-    /// Fetch notes by category
-    func fetchNotesByCategory(category: String) throws -> [NoteEntity] {
+    /// Fetch transfers by category
+    func fetchTransfersByCategory(category: String) throws -> [TransferEntity] {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        let descriptor = FetchDescriptor<NoteEntity>(
+        let descriptor = FetchDescriptor<TransferEntity>(
             predicate: #Predicate { $0.category == category },
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
@@ -163,13 +163,13 @@ class SwiftDataService: SwiftDataServiceProtocol {
         return try context.fetch(descriptor)
     }
     
-    /// Fetch notes that need syncing
-    func fetchPendingNotes() throws -> [NoteEntity] {
+    /// Fetch transfers that need syncing
+    func fetchPendingNotes() throws -> [TransferEntity] {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
-        let descriptor = FetchDescriptor<NoteEntity>(
+        let descriptor = FetchDescriptor<TransferEntity>(
             predicate: #Predicate { $0.syncStatus == "pending" }
         )
         

@@ -31,7 +31,7 @@ final class AccessibilityUITests: BaseUITest {
     
     func testVoiceOverNavigationFlow() throws {
         // Enable VoiceOver for testing
-        // Note: This requires accessibility permissions
+        // Transfer: This requires accessibility permissions
         
         // Wait for load
         sleep(2)

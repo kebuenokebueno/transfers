@@ -10,7 +10,7 @@ import XCTest
 
 class BaseUITest: XCTestCase {
     var app: XCUIApplication!
-    var noteListPage: NoteListPage!
+    var noteListPage: TransferListPage!
     var editPage: NoteEditPage!
 
 
@@ -22,7 +22,7 @@ class BaseUITest: XCTestCase {
         app.launch()
         
         // Initialize page objects
-        noteListPage = NoteListPage(app: app)
+        noteListPage = TransferListPage(app: app)
         editPage = NoteEditPage(app: app)
     }
     

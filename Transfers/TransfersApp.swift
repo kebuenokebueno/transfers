@@ -6,32 +6,32 @@ struct TransfersApp: App {
     // Services
     @State private var swiftDataService = SwiftDataService()
     @State private var supabaseService = SupabaseService()
-    @State private var noteWorker: NoteWorker?
+    @State private var transferWorker: TransferWorker?
     @State private var router = Router()
     
     var body: some Scene {
         WindowGroup {
             Group {
-                if let noteWorker = noteWorker {
+                if let transferWorker = transferWorker {
                     NavigationStack(path: $router.path) {
-                        NoteListView()
-                            .environment(noteWorker)
+                        TransferListView()
+                            .environment(transferWorker)
                             .environment(swiftDataService)
                             .environment(router)
                             .navigationDestination(for: Route.self) { route in
                                 RouterView.destination(for: route)
-                                    .environment(noteWorker)
+                                    .environment(transferWorker)
                                     .environment(swiftDataService)
                                     .environment(router)
                             }
                     }
                     .sheet(item: $router.presentedSheet) { route in
                         RouterView.destination(for: route)
-                            .environment(noteWorker)
+                            .environment(transferWorker)
                             .environment(swiftDataService)
                             .environment(router)
                     }
-                    .modelContainer(for: NoteEntity.self)
+                    .modelContainer(for: TransferEntity.self)
                 } else {
                     // Initialization screen
                     VStack(spacing: 20) {
@@ -42,9 +42,9 @@ struct TransfersApp: App {
                 }
             }
             .task {
-                // Initialize NoteWorker on first launch
-                if noteWorker == nil {
-                    noteWorker = NoteWorker(
+                // Initialize TransferWorker on first launch
+                if transferWorker == nil {
+                    transferWorker = TransferWorker(
                         swiftDataService: swiftDataService,
                         supabaseService: supabaseService
                     )
