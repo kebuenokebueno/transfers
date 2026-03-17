@@ -31,20 +31,20 @@ struct TransferDetailInteractorTests {
     @Test("Fetch transfer – returns correct transfer")
     func fetchTransferSuccess() async {
         let (interactor, presenter, _, swiftData) = makeSUT()
-        swiftData.seed(TestDataBuilder.createMixedNotes())
+        swiftData.seed(TestDataBuilder.createMixedTransfers())
 
-        await interactor.fetchTransfer(request: TransferDetailScene.FetchNote.Request(transferId: "3"))
+        await interactor.fetchTransfer(request: TransferDetailScene.FetchTransfer.Request(transferId: "3"))
 
         #expect(presenter.presentTransferCalled == true)
         #expect(presenter.lastFetchResponse?.transfer?.id == "3")
-        #expect(presenter.lastFetchResponse?.transfer?.noteDescription == "Salary")
+        #expect(presenter.lastFetchResponse?.transfer?.transferDescription == "Salary")
     }
 
     @Test("Fetch transfer – missing id returns nil")
     func fetchTransferMissing() async {
         let (interactor, presenter, _, _) = makeSUT()
 
-        await interactor.fetchTransfer(request: TransferDetailScene.FetchNote.Request(transferId: "missing"))
+        await interactor.fetchTransfer(request: TransferDetailScene.FetchTransfer.Request(transferId: "missing"))
 
         #expect(presenter.presentTransferCalled == true)
         #expect(presenter.lastFetchResponse?.transfer == nil)
@@ -54,9 +54,9 @@ struct TransferDetailInteractorTests {
     func fetchTransferNilPresenter() async {
         let (interactor, _, _, swiftData) = makeSUT()
         interactor.presenter = nil
-        swiftData.seed(TestDataBuilder.createMixedNotes())
+        swiftData.seed(TestDataBuilder.createMixedTransfers())
 
-        await interactor.fetchTransfer(request: TransferDetailScene.FetchNote.Request(transferId: "1"))
+        await interactor.fetchTransfer(request: TransferDetailScene.FetchTransfer.Request(transferId: "1"))
         #expect(true)
     }
 
@@ -65,7 +65,7 @@ struct TransferDetailInteractorTests {
     @Test("Delete transfer – removes from SwiftData and calls presenter")
     func deleteTransferSuccess() async {
         let (interactor, presenter, worker, swiftData) = makeSUT()
-        swiftData.seed(TestDataBuilder.createMixedNotes())
+        swiftData.seed(TestDataBuilder.createMixedTransfers())
 
         await interactor.deleteTransfer(request: TransferDetailScene.DeleteTransfer.Request(transferId: "3"))
 

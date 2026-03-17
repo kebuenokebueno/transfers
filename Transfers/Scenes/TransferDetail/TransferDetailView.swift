@@ -101,10 +101,10 @@ struct TransferDetailView: View {
             swiftDataService: swiftDataService
         )
         let presenter  = TransferDetailPresenter()
-        let noteRouter = TransferDetailRouter(router: router)
+        let transferRouter = TransferDetailRouter(router: router)
 
         viewController.interactor    = interactor
-        viewController.router        = noteRouter
+        viewController.router        = transferRouter
         interactor.presenter         = presenter
         presenter.viewController     = viewController
 

@@ -15,7 +15,7 @@ final class TransferListScreenUITests: BaseUITest {
     func testNavigationBarDisplaysCorrectly() throws {
         // Assert
         assertExists(
-            noteListPage.navigationTitle,
+            transferListPage.navigationTitle,
             "Navigation title 'Transfers' should be visible"
         )
     }
@@ -34,7 +34,7 @@ final class TransferListScreenUITests: BaseUITest {
     func testListExists() throws {
         // SwiftUI List doesn't always appear as scrollView in accessibility tree
         // Just verify navigation and content exist
-        XCTAssertTrue(noteListPage.navigationTitle.exists, "Navigation should exist")
-        XCTAssertTrue(noteListPage.allAmounts.element.exists, "TransferListPage should exist")
+        XCTAssertTrue(transferListPage.navigationTitle.exists, "Navigation should exist")
+        XCTAssertTrue(transferListPage.allAmounts.element.exists, "TransferListPage should exist")
     }
 }

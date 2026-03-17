@@ -15,11 +15,11 @@ struct TransferListView: View {
 
     var body: some View {
         TransferListContent(
-            transfers: viewController.displayedNotes,
+            transfers: viewController.displayedTransfers,
             isLoading: viewController.isLoading,
             lastError: viewController.errorMessage,
-            onTapNote: { transfer in
-                viewController.didSelectNote(transferId: transfer.id)
+            onTapTransfer: { transfer in
+                viewController.didSelectTransfer(transferId: transfer.id)
             },
             onDeleteTransfer: { transfer in
                 viewController.deleteTransfer(transferId: transfer.id)
@@ -57,10 +57,10 @@ struct TransferListView: View {
             swiftDataService: swiftDataService
         )
         let presenter  = TransferListPresenter()
-        let noteRouter = TransferListRouter(router: router)
+        let transferRouter = TransferListRouter(router: router)
 
         viewController.interactor    = interactor
-        viewController.router        = noteRouter
+        viewController.router        = transferRouter
         interactor.presenter         = presenter
         presenter.viewController     = viewController
 

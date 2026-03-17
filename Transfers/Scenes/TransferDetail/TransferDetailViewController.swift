@@ -6,7 +6,7 @@
 import Foundation
 
 protocol TransferDetailDisplayLogic: AnyObject {
-    func displayTransfer(viewModel: TransferDetailScene.FetchNote.ViewModel)
+    func displayTransfer(viewModel: TransferDetailScene.FetchTransfer.ViewModel)
     func displayDeleteResult(viewModel: TransferDetailScene.DeleteTransfer.ViewModel)
 }
 
@@ -23,7 +23,7 @@ class TransferDetailViewController: TransferDetailDisplayLogic {
 
     // MARK: - Display (called by Presenter)
 
-    func displayTransfer(viewModel: TransferDetailScene.FetchNote.ViewModel) {
+    func displayTransfer(viewModel: TransferDetailScene.FetchTransfer.ViewModel) {
         transfer = viewModel.transfer
     }
 

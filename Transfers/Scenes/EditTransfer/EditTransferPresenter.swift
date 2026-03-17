@@ -6,20 +6,20 @@
 import Foundation
 
 protocol EditTransferPresentationLogic {
-    func presentTransfer(response: EditTransferScene.LoadNote.Response)
-    func presentSaveResult(response: EditTransferScene.SaveNote.Response)
+    func presentTransfer(response: EditTransferScene.LoadTransfer.Response)
+    func presentSaveResult(response: EditTransferScene.SaveTransfer.Response)
 }
 
 protocol EditTransferDisplayLogic: AnyObject {
-    func displayTransfer(viewModel: EditTransferScene.LoadNote.ViewModel)
-    func displaySaveResult(viewModel: EditTransferScene.SaveNote.ViewModel)
+    func displayTransfer(viewModel: EditTransferScene.LoadTransfer.ViewModel)
+    func displaySaveResult(viewModel: EditTransferScene.SaveTransfer.ViewModel)
 }
 
 @MainActor
 class EditTransferPresenter: EditTransferPresentationLogic {
     weak var viewController: EditTransferDisplayLogic?
 
-    func presentTransfer(response: EditTransferScene.LoadNote.Response) {
+    func presentTransfer(response: EditTransferScene.LoadTransfer.Response) {
         guard let transfer = response.transfer else {
             viewController?.displayTransfer(viewModel: .init(transfer: nil, amount: "", description: "", category: ""))
             return
@@ -27,7 +27,7 @@ class EditTransferPresenter: EditTransferPresentationLogic {
         let vm = TransferViewModel(
             id: transfer.id,
             amount: formatAmount(transfer.amount),
-            description: transfer.noteDescription,
+            description: transfer.transferDescription,
             date: formatDate(transfer.date),
             category: transfer.category,
             isPositive: transfer.isPositive,
@@ -36,13 +36,13 @@ class EditTransferPresenter: EditTransferPresentationLogic {
         viewController?.displayTransfer(viewModel: .init(
             transfer: vm,
             amount: String(abs(transfer.amount)),
-            description: transfer.noteDescription,
+            description: transfer.transferDescription,
             category: transfer.category
         ))
     }
 
-    func presentSaveResult(response: EditTransferScene.SaveNote.Response) {
-        let vm = EditTransferScene.SaveNote.ViewModel(
+    func presentSaveResult(response: EditTransferScene.SaveTransfer.Response) {
+        let vm = EditTransferScene.SaveTransfer.ViewModel(
             success: response.success,
             message: response.success ? "Transfer updated successfully" : "Failed to update transfer"
         )

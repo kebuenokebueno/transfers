@@ -30,7 +30,7 @@ struct AddTransferInteractorTests {
     func saveTransferExpense() async {
         let (interactor, presenter, worker, swiftData) = makeSUT()
 
-        await interactor.saveTransfer(request: AddTransferScene.SaveNote.Request(
+        await interactor.saveTransfer(request: AddTransferScene.SaveTransfer.Request(
             amount: 75.00,
             description: "Coffee Shop",
             category: "Food",
@@ -42,14 +42,14 @@ struct AddTransferInteractorTests {
         #expect(worker.createTransferCallCount == 1)
         #expect(swiftData.transfers.count == 1)
         #expect(swiftData.transfers.first?.amount == -75.00)
-        #expect(swiftData.transfers.first?.noteDescription == "Coffee Shop")
+        #expect(swiftData.transfers.first?.transferDescription == "Coffee Shop")
     }
 
     @Test("Save transfer – income flag keeps amount positive")
     func saveTransferIncome() async {
         let (interactor, presenter, _, swiftData) = makeSUT()
 
-        await interactor.saveTransfer(request: AddTransferScene.SaveNote.Request(
+        await interactor.saveTransfer(request: AddTransferScene.SaveTransfer.Request(
             amount: 2500.00,
             description: "Salary",
             category: "Income",
@@ -65,7 +65,7 @@ struct AddTransferInteractorTests {
         let (interactor, _, _, swiftData) = makeSUT()
 
         for i in 1...3 {
-            await interactor.saveTransfer(request: AddTransferScene.SaveNote.Request(
+            await interactor.saveTransfer(request: AddTransferScene.SaveTransfer.Request(
                 amount: Double(i * 10),
                 description: "Transfer \(i)",
                 category: "Food",
@@ -81,7 +81,7 @@ struct AddTransferInteractorTests {
         let (interactor, _, _, _) = makeSUT()
         interactor.presenter = nil
 
-        await interactor.saveTransfer(request: AddTransferScene.SaveNote.Request(
+        await interactor.saveTransfer(request: AddTransferScene.SaveTransfer.Request(
             amount: 10.00,
             description: "Test",
             category: "Other",

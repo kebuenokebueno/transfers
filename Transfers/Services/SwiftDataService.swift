@@ -117,7 +117,7 @@ class SwiftDataService: SwiftDataServiceProtocol {
     }
     
     /// Delete all transfers
-    func deleteAllNotes() throws {
+    func deleteAllTransfers() throws {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
@@ -134,14 +134,14 @@ class SwiftDataService: SwiftDataServiceProtocol {
     // MARK: - 🔍 Search & Filter
     
     /// Search transfers by description
-    func searchNotes(query: String) throws -> [TransferEntity] {
+    func searchTransfers(query: String) throws -> [TransferEntity] {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }
         
         let descriptor = FetchDescriptor<TransferEntity>(
             predicate: #Predicate { transfer in
-                transfer.noteDescription.localizedStandardContains(query)
+                transfer.transferDescription.localizedStandardContains(query)
             },
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
@@ -164,7 +164,7 @@ class SwiftDataService: SwiftDataServiceProtocol {
     }
     
     /// Fetch transfers that need syncing
-    func fetchPendingNotes() throws -> [TransferEntity] {
+    func fetchPendingTransfers() throws -> [TransferEntity] {
         guard let context = modelContext else {
             throw SwiftDataError.contextNotAvailable
         }

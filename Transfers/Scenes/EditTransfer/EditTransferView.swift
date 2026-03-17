@@ -63,10 +63,10 @@ struct EditTransferView: View {
             swiftDataService: swiftDataService
         )
         let presenter  = EditTransferPresenter()
-        let noteRouter = EditTransferRouter(router: router)
+        let transferRouter = EditTransferRouter(router: router)
 
         viewController.interactor = interactor
-        viewController.router = noteRouter
+        viewController.router = transferRouter
         interactor.presenter = presenter
         presenter.viewController = viewController
 

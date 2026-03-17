@@ -18,12 +18,12 @@ enum TransferScene {
         }
         
         struct ViewModel {
-            let displayedNotes: [TransferViewModel]
+            let displayedTransfers: [TransferViewModel]
         }
     }
 
     // MARK: - Create Transfer
-    enum CreateNote {
+    enum CreateTransfer {
         struct Request {
             let amount: Double
             let description: String
@@ -43,7 +43,7 @@ enum TransferScene {
     }
     
     // MARK: - Update Transfer
-    enum UpdateNote {
+    enum UpdateTransfer {
         struct Request {
             let transferId: String
             let amount: Double
@@ -80,7 +80,7 @@ enum TransferScene {
     }
     
     // MARK: - Fetch Single Transfer
-    enum FetchNote {
+    enum FetchTransfer {
         struct Request {
             let transferId: String
         }
@@ -90,7 +90,7 @@ enum TransferScene {
         }
         
         struct ViewModel {
-            let displayedNote: TransferViewModel?
+            let displayedTransfer: TransferViewModel?
         }
     }
 }

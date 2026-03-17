@@ -33,7 +33,7 @@ struct TransferWorkerCRUDTests {
     @Test("Fetch – loads existing transfers from SwiftData")
     func fetchLoadsLocal() async {
         let (worker, local, _) = makeWorker()
-        local.seed(TestDataBuilder.createMixedNotes())   // 5 transfers
+        local.seed(TestDataBuilder.createMixedTransfers())   // 5 transfers
 
         await worker.fetchTransfers()
 
@@ -124,7 +124,7 @@ struct TransferWorkerCRUDTests {
         await worker.updateTransfer(updated)
 
         let stored = local.transfers.first(where: { $0.id == "u1" })
-        #expect(stored?.noteDescription == "Changed")
+        #expect(stored?.transferDescription == "Changed")
         #expect(stored?.category == "Other")
         #expect(stored?.amount == 99.0)
     }
@@ -180,7 +180,7 @@ struct TransferWorkerCRUDTests {
         await worker.updateTransfer(TestDataBuilder.createTransfer(id: "ucf", description: "After"))
 
         // Local updated
-        #expect(local.transfers.first?.noteDescription == "After")
+        #expect(local.transfers.first?.transferDescription == "After")
         // Cloud error recorded
         #expect(worker.lastError != nil)
     }
@@ -191,7 +191,7 @@ struct TransferWorkerCRUDTests {
     @Test("Delete – removes transfer from SwiftData")
     func deleteRemovesLocal() async {
         let (worker, local, _) = makeWorker()
-        local.seed(TestDataBuilder.createMixedNotes())   // 5 transfers
+        local.seed(TestDataBuilder.createMixedTransfers())   // 5 transfers
 
         await worker.deleteTransfer(id: "2")
 
@@ -204,7 +204,7 @@ struct TransferWorkerCRUDTests {
     @Test("Delete – also removes from Supabase")
     func deleteSyncesToCloud() async {
         let (worker, local, cloud) = makeWorker()
-        let transfers = TestDataBuilder.createMixedNotes()
+        let transfers = TestDataBuilder.createMixedTransfers()
         local.seed(transfers)
         cloud.transfers = transfers
 
@@ -218,7 +218,7 @@ struct TransferWorkerCRUDTests {
     @Test("Delete – all transfers one by one empties SwiftData")
     func deleteAll() async {
         let (worker, local, _) = makeWorker()
-        let transfers = TestDataBuilder.createMixedNotes()
+        let transfers = TestDataBuilder.createMixedTransfers()
         local.seed(transfers)
 
         for transfer in transfers {
@@ -279,8 +279,8 @@ struct TransferWorkerCRUDTests {
     func resetClearsState() async {
         let (worker, local, cloud) = makeWorker()
 
-        local.seed(TestDataBuilder.createMixedNotes())
-        cloud.transfers = TestDataBuilder.createMixedNotes()
+        local.seed(TestDataBuilder.createMixedTransfers())
+        cloud.transfers = TestDataBuilder.createMixedTransfers()
         await worker.createTransfer(TestDataBuilder.createTransfer(id: "r1"))
 
         worker.reset()

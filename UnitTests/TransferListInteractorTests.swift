@@ -31,7 +31,7 @@ struct TransferListInteractorTests {
     @Test("Fetch transfers - returns all transfers from SwiftData")
     func fetchTransfersSuccess() async {
         let (interactor, presenter, _, swiftData) = makeSUT()
-        swiftData.seed(TestDataBuilder.createMixedNotes())
+        swiftData.seed(TestDataBuilder.createMixedTransfers())
         await interactor.fetchTransfers()
         #expect(presenter.presentTransfersCalled == true)
         #expect(presenter.lastFetchResponse?.transfers.count == 5)
@@ -57,7 +57,7 @@ struct TransferListInteractorTests {
     func fetchTransfersNilPresenter() async {
         let (interactor, _, _, swiftData) = makeSUT()
         interactor.presenter = nil
-        swiftData.seed(TestDataBuilder.createMixedNotes())
+        swiftData.seed(TestDataBuilder.createMixedTransfers())
         await interactor.fetchTransfers()
         #expect(true)
     }
@@ -72,7 +72,7 @@ struct TransferListInteractorTests {
     @Test("Fetch transfers - presenter called twice when SwiftData has data")
     func fetchTransfersCallCountWithData() async {
         let (interactor, presenter, _, swiftData) = makeSUT()
-        swiftData.seed(TestDataBuilder.createMixedNotes())
+        swiftData.seed(TestDataBuilder.createMixedTransfers())
         await interactor.fetchTransfers()
         #expect(presenter.presentTransfersCallCount == 2)
     }
@@ -82,7 +82,7 @@ struct TransferListInteractorTests {
     @Test("Delete transfer - removes from SwiftData and calls presenter")
     func deleteTransferSuccess() async {
         let (interactor, presenter, worker, swiftData) = makeSUT()
-        swiftData.seed(TestDataBuilder.createMixedNotes())
+        swiftData.seed(TestDataBuilder.createMixedTransfers())
         await interactor.deleteTransfer(request: TransferScene.DeleteTransfer.Request(transferId: "3"))
         #expect(presenter.presentDeleteResultCalled == true)
         #expect(presenter.lastDeleteResponse?.success == true)
@@ -102,7 +102,7 @@ struct TransferListInteractorTests {
     @Test("Delete transfer - delete all transfers one by one")
     func deleteTransferAll() async {
         let (interactor, _, _, swiftData) = makeSUT()
-        let transfers = TestDataBuilder.createMixedNotes()
+        let transfers = TestDataBuilder.createMixedTransfers()
         swiftData.seed(transfers)
         for transfer in transfers {
             await interactor.deleteTransfer(request: TransferScene.DeleteTransfer.Request(transferId: transfer.id))

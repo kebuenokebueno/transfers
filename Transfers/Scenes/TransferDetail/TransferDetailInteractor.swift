@@ -6,7 +6,7 @@
 import Foundation
 
 protocol TransferDetailBusinessLogic {
-    func fetchTransfer(request: TransferDetailScene.FetchNote.Request) async
+    func fetchTransfer(request: TransferDetailScene.FetchTransfer.Request) async
     func deleteTransfer(request: TransferDetailScene.DeleteTransfer.Request) async
 }
 
@@ -23,9 +23,9 @@ class TransferDetailInteractor: TransferDetailBusinessLogic {
         self.swiftDataService = swiftDataService
     }
 
-    func fetchTransfer(request: TransferDetailScene.FetchNote.Request) async {
+    func fetchTransfer(request: TransferDetailScene.FetchTransfer.Request) async {
         let transfer = try? swiftDataService.fetchTransfer(id: request.transferId)
-        let response = TransferDetailScene.FetchNote.Response(transfer: transfer)
+        let response = TransferDetailScene.FetchTransfer.Response(transfer: transfer)
         await MainActor.run { presenter?.presentTransfer(response: response) }
     }
 

@@ -6,7 +6,7 @@
 import Foundation
 
 protocol TransferDetailPresentationLogic {
-    func presentTransfer(response: TransferDetailScene.FetchNote.Response)
+    func presentTransfer(response: TransferDetailScene.FetchTransfer.Response)
     func presentDeleteResult(response: TransferDetailScene.DeleteTransfer.Response)
 }
 
@@ -14,12 +14,12 @@ protocol TransferDetailPresentationLogic {
 class TransferDetailPresenter: TransferDetailPresentationLogic {
     weak var viewController: TransferDetailDisplayLogic?
 
-    func presentTransfer(response: TransferDetailScene.FetchNote.Response) {
+    func presentTransfer(response: TransferDetailScene.FetchTransfer.Response) {
         let vm = response.transfer.map { transfer in
             TransferViewModel(
                 id: transfer.id,
                 amount: formatAmount(transfer.amount),
-                description: transfer.noteDescription,
+                description: transfer.transferDescription,
                 date: formatDate(transfer.date),
                 category: transfer.category,
                 isPositive: transfer.isPositive,

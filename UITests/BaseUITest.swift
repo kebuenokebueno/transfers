@@ -10,8 +10,8 @@ import XCTest
 
 class BaseUITest: XCTestCase {
     var app: XCUIApplication!
-    var noteListPage: TransferListPage!
-    var editPage: NoteEditPage!
+    var transferListPage: TransferListPage!
+    var editPage: TransferEditPage!
 
 
     override func setUpWithError() throws {
@@ -22,13 +22,13 @@ class BaseUITest: XCTestCase {
         app.launch()
         
         // Initialize page objects
-        noteListPage = TransferListPage(app: app)
-        editPage = NoteEditPage(app: app)
+        transferListPage = TransferListPage(app: app)
+        editPage = TransferEditPage(app: app)
     }
     
     override func tearDownWithError() throws {
         app = nil
-        noteListPage = nil
+        transferListPage = nil
         editPage = nil
     }
     

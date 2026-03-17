@@ -73,10 +73,10 @@ struct AddTransferView: View {
 
         let interactor = AddTransferInteractor(transferWorker: transferWorker)
         let presenter  = AddTransferPresenter()
-        let noteRouter = AddTransferRouter(router: router)
+        let transferRouter = AddTransferRouter(router: router)
 
         viewController.interactor = interactor
-        viewController.router = noteRouter
+        viewController.router = transferRouter
         interactor.presenter = presenter
         presenter.viewController = viewController
     }

@@ -254,15 +254,15 @@ final class RegressionSnapshotTests: XCTestCase {
     }
     
     // Test with many transfers (scrolling)
-    func testFullScreen_ManyNotes() {
-        let manyNotes: [TransferViewModel] = (1...20).map { i in
+    func testFullScreen_ManyTransfers() {
+        let manyTransfers: [TransferViewModel] = (1...20).map { i in
             let amount = (i % 3 == 0) ? Double(i * 100) : -Double(i * 10)
             return SnapshotTestData.sampleTransfer(id: "\(i)", amount: amount, description: "Transfer \(i)")
         }
         
-        let view = TransferListContent(transfers: manyNotes)
+        let view = TransferListContent(transfers: manyTransfers)
             .frame(width: 375, height: 812)
-        assertSnapshot(of: view, as: .image, named: "many_notes", record: recording)
+        assertSnapshot(of: view, as: .image, named: "many_transfers", record: recording)
     }
 }
 

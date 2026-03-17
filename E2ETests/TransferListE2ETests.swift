@@ -25,7 +25,7 @@ struct TransferListE2ETests {
 
     @MainActor
     @Test("E2E: Create transfer syncs to Supabase")
-    func e2eCreateNote() async throws {
+    func e2eCreateTransfer() async throws {
         let supabase = TestSupabaseService()
         try await supabase.cleanupAllTestData()
 
@@ -48,7 +48,7 @@ struct TransferListE2ETests {
 
         let cloudTransfers = try await supabase.fetchTransfers()
         #expect(cloudTransfers.contains(where: { $0.id == transfer.id }))
-        #expect(cloudTransfers.first(where: { $0.id == transfer.id })?.noteDescription == "E2E Test Transfer")
+        #expect(cloudTransfers.first(where: { $0.id == transfer.id })?.transferDescription == "E2E Test Transfer")
 
         try await supabase.deleteTransfer(id: transfer.id)
     }
@@ -62,7 +62,7 @@ struct TransferListE2ETests {
         try await supabase.cleanupAllTestData()
 
         let transferId = "e2e_sync_\(UUID().uuidString)"
-        let originalNote = TransferEntity(
+        let originalTransfer = TransferEntity(
             id: transferId,
             amount: -100.00,
             description: "Created on Device A",
@@ -70,7 +70,7 @@ struct TransferListE2ETests {
             category: "Shopping"
         )
 
-        try await supabase.createTransfer(originalNote)
+        try await supabase.createTransfer(originalTransfer)
 
         let container = try ModelContainer(
             for: TransferEntity.self,
@@ -85,7 +85,7 @@ struct TransferListE2ETests {
 
         let localTransfers = try swiftDataService.fetchTransfers()
         #expect(localTransfers.contains(where: { $0.id == transferId }))
-        #expect(localTransfers.first(where: { $0.id == transferId })?.noteDescription == "Created on Device A")
+        #expect(localTransfers.first(where: { $0.id == transferId })?.transferDescription == "Created on Device A")
 
         try await supabase.cleanupAllTestData()
     }
@@ -108,7 +108,7 @@ struct TransferListE2ETests {
         )
         try await supabase.createTransfer(transfer)
 
-        transfer.noteDescription = "Updated via E2E"
+        transfer.transferDescription = "Updated via E2E"
         transfer.amount = -75.00
         transfer.category = "Entertainment"
         try await supabase.updateTransfer(transfer)
@@ -116,7 +116,7 @@ struct TransferListE2ETests {
         let cloudTransfers = try await supabase.fetchTransfers()
         let updated = cloudTransfers.first(where: { $0.id == transferId })
         #expect(updated != nil)
-        #expect(updated?.noteDescription == "Updated via E2E")
+        #expect(updated?.transferDescription == "Updated via E2E")
         #expect(updated?.amount == -75.00)
         #expect(updated?.category == "Entertainment")
 
@@ -168,19 +168,19 @@ struct TransferListE2ETests {
         )
         try await supabase.createTransfer(transfer)
 
-        transfer.noteDescription = "Device A update"
+        transfer.transferDescription = "Device A update"
         transfer.updatedAt = Date()
         try await supabase.updateTransfer(transfer)
 
         try await Task.sleep(nanoseconds: 100_000_000)
 
-        transfer.noteDescription = "Device B update"
+        transfer.transferDescription = "Device B update"
         transfer.updatedAt = Date()
         try await supabase.updateTransfer(transfer)
 
         let cloudTransfers = try await supabase.fetchTransfers()
         let final = cloudTransfers.first(where: { $0.id == transferId })
-        #expect(final?.noteDescription == "Device B update")
+        #expect(final?.transferDescription == "Device B update")
 
         try await supabase.cleanupAllTestData()
     }
@@ -253,7 +253,7 @@ struct TransferListE2ETests {
         #expect(fetched != nil)
         #expect(fetched?.id == transferId)
         #expect(fetched?.amount == -123.45)
-        #expect(fetched?.noteDescription == testDescription)
+        #expect(fetched?.transferDescription == testDescription)
         #expect(fetched?.category == "Special Category")
 
         try await supabase.cleanupAllTestData()

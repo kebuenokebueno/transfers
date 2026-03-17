@@ -11,7 +11,7 @@ struct TransferListContent: View {
     let transfers: [TransferViewModel]          // ← ViewModel, no Entity
     var isLoading: Bool = false
     var lastError: String? = nil
-    var onTapNote: ((TransferViewModel) -> Void)? = nil
+    var onTapTransfer: ((TransferViewModel) -> Void)? = nil
     var onDeleteTransfer: ((TransferViewModel) -> Void)? = nil
     var onAddTransfer: (() -> Void)? = nil
     var onFetch: (() -> Void)? = nil
@@ -23,7 +23,7 @@ struct TransferListContent: View {
                 TransferRow(transfer: transfer)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        onTapNote?(transfer)
+                        onTapTransfer?(transfer)
                     }
                     .swipeActions(edge: .trailing) {
                         Button(role: .destructive) {

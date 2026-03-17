@@ -6,7 +6,7 @@
 import Foundation
 
 protocol AddTransferBusinessLogic {
-    func saveTransfer(request: AddTransferScene.SaveNote.Request) async
+    func saveTransfer(request: AddTransferScene.SaveTransfer.Request) async
 }
 
 @MainActor
@@ -19,7 +19,7 @@ class AddTransferInteractor: AddTransferBusinessLogic {
         self.transferWorker = transferWorker
     }
 
-    func saveTransfer(request: AddTransferScene.SaveNote.Request) async {
+    func saveTransfer(request: AddTransferScene.SaveTransfer.Request) async {
         let transfer = TransferEntity(
             id: UUID().uuidString,
             amount: request.isIncome ? request.amount : -request.amount,
@@ -29,7 +29,7 @@ class AddTransferInteractor: AddTransferBusinessLogic {
             syncStatus: .pending
         )
         await transferWorker.createTransfer(transfer)
-        let response = AddTransferScene.SaveNote.Response(success: true)
+        let response = AddTransferScene.SaveTransfer.Response(success: true)
         await MainActor.run { presenter?.presentSaveResult(response: response) }
     }
 }

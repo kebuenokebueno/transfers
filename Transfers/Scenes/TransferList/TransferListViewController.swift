@@ -12,14 +12,14 @@ class TransferListViewController: TransferListDisplayLogic {
     var router: TransferListRoutingLogic?
 
     // View State
-    var displayedNotes: [TransferViewModel] = []
+    var displayedTransfers: [TransferViewModel] = []
     var isLoading = false
     var errorMessage: String?
 
     // MARK: - Display (called by Presenter)
 
     func displayTransfers(viewModel: TransferScene.FetchTransfers.ViewModel) {
-        displayedNotes = viewModel.displayedNotes
+        displayedTransfers = viewModel.displayedTransfers
         isLoading = false
     }
 
@@ -42,7 +42,7 @@ class TransferListViewController: TransferListDisplayLogic {
 
     // MARK: - User Actions → Router (navigation)
 
-    func didSelectNote(transferId: String) {
+    func didSelectTransfer(transferId: String) {
         router?.routeToTransferDetail(transferId: transferId)
     }
 

@@ -7,7 +7,7 @@ import Foundation
 
 enum TransferDetailScene {
 
-    enum FetchNote {
+    enum FetchTransfer {
         struct Request {
             let transferId: String
         }

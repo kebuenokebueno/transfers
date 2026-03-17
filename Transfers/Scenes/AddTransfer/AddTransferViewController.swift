@@ -6,7 +6,7 @@
 import Foundation
 
 protocol AddTransferDisplayLogic: AnyObject {
-    func displaySaveResult(viewModel: AddTransferScene.SaveNote.ViewModel)
+    func displaySaveResult(viewModel: AddTransferScene.SaveTransfer.ViewModel)
 }
 
 protocol AddTransferRoutingLogic {
@@ -25,7 +25,7 @@ class AddTransferViewController: AddTransferDisplayLogic {
 
     // MARK: - Display (called by Presenter)
 
-    func displaySaveResult(viewModel: AddTransferScene.SaveNote.ViewModel) {
+    func displaySaveResult(viewModel: AddTransferScene.SaveTransfer.ViewModel) {
         isSaving = false
         if viewModel.success {
             router?.dismiss()

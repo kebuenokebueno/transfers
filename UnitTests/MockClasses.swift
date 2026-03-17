@@ -81,10 +81,10 @@ class MockSwiftDataService: SwiftDataServiceProtocol {
         transfers.removeAll(where: { $0.id == id })
     }
 
-    func searchNotes(query: String) throws -> [TransferEntity] {
+    func searchTransfers(query: String) throws -> [TransferEntity] {
         let q = query.lowercased()
         return transfers.filter {
-            $0.noteDescription.lowercased().contains(q) ||
+            $0.transferDescription.lowercased().contains(q) ||
             $0.category.lowercased().contains(q)
         }
     }
@@ -93,11 +93,11 @@ class MockSwiftDataService: SwiftDataServiceProtocol {
         return transfers.filter { $0.category == category }
     }
 
-    func fetchPendingNotes() throws -> [TransferEntity] {
+    func fetchPendingTransfers() throws -> [TransferEntity] {
         return transfers.filter { $0.syncStatus == "pending" }
     }
 
-    func seed(_ noteArray: [TransferEntity]) { transfers = noteArray }
+    func seed(_ transferArray: [TransferEntity]) { transfers = transferArray }
 
     func reset() {
         transfers = []
@@ -203,7 +203,7 @@ class MockTransferWorker: TransferWorkerProtocol {
                 return
             }
             existing.amount = updatedTransfer.amount
-            existing.noteDescription = updatedTransfer.noteDescription
+            existing.transferDescription = updatedTransfer.transferDescription
             existing.category = updatedTransfer.category
             existing.markForSync()
             try swiftDataService.updateTransfer(existing)
@@ -278,9 +278,9 @@ class MockTransferListViewController: TransferListDisplayLogic {
 
 class MockAddTransferPresenter: AddTransferPresentationLogic {
     var presentSaveResultCalled = false
-    var lastSaveResponse: AddTransferScene.SaveNote.Response?
+    var lastSaveResponse: AddTransferScene.SaveTransfer.Response?
 
-    func presentSaveResult(response: AddTransferScene.SaveNote.Response) {
+    func presentSaveResult(response: AddTransferScene.SaveTransfer.Response) {
         presentSaveResultCalled = true
         lastSaveResponse = response
     }
@@ -290,9 +290,9 @@ class MockAddTransferPresenter: AddTransferPresentationLogic {
 
 class MockAddTransferViewController: AddTransferDisplayLogic {
     var displaySaveResultCalled = false
-    var lastSaveViewModel: AddTransferScene.SaveNote.ViewModel?
+    var lastSaveViewModel: AddTransferScene.SaveTransfer.ViewModel?
 
-    func displaySaveResult(viewModel: AddTransferScene.SaveNote.ViewModel) {
+    func displaySaveResult(viewModel: AddTransferScene.SaveTransfer.ViewModel) {
         displaySaveResultCalled = true
         lastSaveViewModel = viewModel
     }
@@ -302,17 +302,17 @@ class MockAddTransferViewController: AddTransferDisplayLogic {
 
 class MockEditTransferPresenter: EditTransferPresentationLogic {
     var presentTransferCalled = false
-    var lastLoadResponse: EditTransferScene.LoadNote.Response?
+    var lastLoadResponse: EditTransferScene.LoadTransfer.Response?
 
     var presentSaveResultCalled = false
-    var lastSaveResponse: EditTransferScene.SaveNote.Response?
+    var lastSaveResponse: EditTransferScene.SaveTransfer.Response?
 
-    func presentTransfer(response: EditTransferScene.LoadNote.Response) {
+    func presentTransfer(response: EditTransferScene.LoadTransfer.Response) {
         presentTransferCalled = true
         lastLoadResponse = response
     }
 
-    func presentSaveResult(response: EditTransferScene.SaveNote.Response) {
+    func presentSaveResult(response: EditTransferScene.SaveTransfer.Response) {
         presentSaveResultCalled = true
         lastSaveResponse = response
     }
@@ -322,17 +322,17 @@ class MockEditTransferPresenter: EditTransferPresentationLogic {
 
 class MockEditTransferViewController: EditTransferDisplayLogic {
     var displayTransferCalled = false
-    var lastTransferViewModel: EditTransferScene.LoadNote.ViewModel?
+    var lastTransferViewModel: EditTransferScene.LoadTransfer.ViewModel?
 
     var displaySaveResultCalled = false
-    var lastSaveViewModel: EditTransferScene.SaveNote.ViewModel?
+    var lastSaveViewModel: EditTransferScene.SaveTransfer.ViewModel?
 
-    func displayTransfer(viewModel: EditTransferScene.LoadNote.ViewModel) {
+    func displayTransfer(viewModel: EditTransferScene.LoadTransfer.ViewModel) {
         displayTransferCalled = true
         lastTransferViewModel = viewModel
     }
 
-    func displaySaveResult(viewModel: EditTransferScene.SaveNote.ViewModel) {
+    func displaySaveResult(viewModel: EditTransferScene.SaveTransfer.ViewModel) {
         displaySaveResultCalled = true
         lastSaveViewModel = viewModel
     }
@@ -342,12 +342,12 @@ class MockEditTransferViewController: EditTransferDisplayLogic {
 
 class MockTransferDetailPresenter: TransferDetailPresentationLogic {
     var presentTransferCalled = false
-    var lastFetchResponse: TransferDetailScene.FetchNote.Response?
+    var lastFetchResponse: TransferDetailScene.FetchTransfer.Response?
 
     var presentDeleteResultCalled = false
     var lastDeleteResponse: TransferDetailScene.DeleteTransfer.Response?
 
-    func presentTransfer(response: TransferDetailScene.FetchNote.Response) {
+    func presentTransfer(response: TransferDetailScene.FetchTransfer.Response) {
         presentTransferCalled = true
         lastFetchResponse = response
     }
@@ -362,12 +362,12 @@ class MockTransferDetailPresenter: TransferDetailPresentationLogic {
 
 class MockTransferDetailViewController: TransferDetailDisplayLogic {
     var displayTransferCalled = false
-    var lastTransferViewModel: TransferDetailScene.FetchNote.ViewModel?
+    var lastTransferViewModel: TransferDetailScene.FetchTransfer.ViewModel?
 
     var displayDeleteResultCalled = false
     var lastDeleteViewModel: TransferDetailScene.DeleteTransfer.ViewModel?
 
-    func displayTransfer(viewModel: TransferDetailScene.FetchNote.ViewModel) {
+    func displayTransfer(viewModel: TransferDetailScene.FetchTransfer.ViewModel) {
         displayTransferCalled = true
         lastTransferViewModel = viewModel
     }
@@ -402,7 +402,7 @@ struct TestDataBuilder {
     static func createTransfers(count: Int) -> [TransferEntity] {
         (1...count).map { i in
             createTransfer(
-                id: "note_\(i)",
+                id: "transfer_\(i)",
                 amount: (i % 3 == 0) ? Double(i * 100) : -Double(i * 10),
                 description: "Transfer \(i)",
                 category: ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"][i % 6]
@@ -410,7 +410,7 @@ struct TestDataBuilder {
         }
     }
 
-    static func createMixedNotes() -> [TransferEntity] {
+    static func createMixedTransfers() -> [TransferEntity] {
         [
             createTransfer(id: "1", amount: -45.50,  description: "Grocery Store",  category: "Food"),
             createTransfer(id: "2", amount: -120.00, description: "Electric Bill",  category: "Utilities"),

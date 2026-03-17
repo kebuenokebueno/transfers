@@ -17,7 +17,7 @@ final class AccessibilityUITests: BaseUITest {
         
         // Assert - All interactive elements should have accessibility labels
         XCTAssertFalse(
-            noteListPage.navigationTitle.label.isEmpty,
+            transferListPage.navigationTitle.label.isEmpty,
             "Logout button should have accessibility label"
         )
     }
@@ -38,7 +38,7 @@ final class AccessibilityUITests: BaseUITest {
         
         // Assert - Screen should have accessibility label
         XCTAssertTrue(
-            noteListPage.navigationTitle.exists,
+            transferListPage.navigationTitle.exists,
             "Navigation should be accessible for VoiceOver"
         )
     }

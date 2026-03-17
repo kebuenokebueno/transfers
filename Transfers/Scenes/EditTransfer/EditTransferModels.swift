@@ -7,7 +7,7 @@ import Foundation
 
 enum EditTransferScene {
 
-    enum LoadNote {
+    enum LoadTransfer {
         struct Request {
             let transferId: String
         }
@@ -22,7 +22,7 @@ enum EditTransferScene {
         }
     }
 
-    enum SaveNote {
+    enum SaveTransfer {
         struct Request {
             let transferId: String
             let amount: Double

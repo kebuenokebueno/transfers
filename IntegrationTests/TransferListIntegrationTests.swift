@@ -34,13 +34,13 @@ struct TransferListIntegrationTests {
     @MainActor @Test("Integration: Fetch - transfers reach ViewController formatted")
     func integrationFetch() async {
         let (interactor, vc, _, local, _) = makeStack()
-        local.seed(TestDataBuilder.createMixedNotes())
+        local.seed(TestDataBuilder.createMixedTransfers())
         await interactor.fetchTransfers()
         #expect(vc.displayTransfersCalled == true)
-        #expect(vc.lastFetchViewModel?.displayedNotes.count == 5)
-        let grocery = vc.lastFetchViewModel?.displayedNotes.first(where: { $0.description == "Grocery Store" })
+        #expect(vc.lastFetchViewModel?.displayedTransfers.count == 5)
+        let grocery = vc.lastFetchViewModel?.displayedTransfers.first(where: { $0.description == "Grocery Store" })
         #expect(grocery?.isPositive == false)
-        let salary = vc.lastFetchViewModel?.displayedNotes.first(where: { $0.description == "Salary" })
+        let salary = vc.lastFetchViewModel?.displayedTransfers.first(where: { $0.description == "Salary" })
         #expect(salary?.isPositive == true)
     }
 
@@ -49,7 +49,7 @@ struct TransferListIntegrationTests {
         let (interactor, vc, _, _, _) = makeStack()
         await interactor.fetchTransfers()
         #expect(vc.displayTransfersCalled == true)
-        #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
+        #expect(vc.lastFetchViewModel?.displayedTransfers.isEmpty == true)
     }
 
     // MARK: - Delete then fetch
@@ -57,7 +57,7 @@ struct TransferListIntegrationTests {
     @MainActor @Test("Integration: Delete - transfer gone from stores and next fetch")
     func integrationDeleteThenFetch() async {
         let (interactor, vc, _, local, cloud) = makeStack()
-        let transfers = TestDataBuilder.createMixedNotes()
+        let transfers = TestDataBuilder.createMixedTransfers()
         local.seed(transfers)
         cloud.transfers = transfers
         await interactor.deleteTransfer(request: TransferScene.DeleteTransfer.Request(transferId: "2"))
@@ -66,20 +66,20 @@ struct TransferListIntegrationTests {
         #expect(local.transfers.contains(where: { $0.id == "2" }) == false)
         #expect(cloud.transfers.contains(where: { $0.id == "2" }) == false)
         await interactor.fetchTransfers()
-        #expect(vc.lastFetchViewModel?.displayedNotes.count == 4)
-        #expect(vc.lastFetchViewModel?.displayedNotes.contains(where: { $0.id == "2" }) == false)
+        #expect(vc.lastFetchViewModel?.displayedTransfers.count == 4)
+        #expect(vc.lastFetchViewModel?.displayedTransfers.contains(where: { $0.id == "2" }) == false)
     }
 
     @MainActor @Test("Integration: Delete all - list becomes empty")
     func integrationDeleteAll() async {
         let (interactor, vc, _, local, _) = makeStack()
-        let transfers = TestDataBuilder.createMixedNotes()
+        let transfers = TestDataBuilder.createMixedTransfers()
         local.seed(transfers)
         for transfer in transfers {
             await interactor.deleteTransfer(request: TransferScene.DeleteTransfer.Request(transferId: transfer.id))
         }
         await interactor.fetchTransfers()
-        #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
+        #expect(vc.lastFetchViewModel?.displayedTransfers.isEmpty == true)
     }
 
     // MARK: - Cloud failure paths
@@ -92,6 +92,6 @@ struct TransferListIntegrationTests {
         await interactor.deleteTransfer(request: TransferScene.DeleteTransfer.Request(transferId: "offline_d"))
         #expect(local.transfers.isEmpty)
         await interactor.fetchTransfers()
-        #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
+        #expect(vc.lastFetchViewModel?.displayedTransfers.isEmpty == true)
     }
 }

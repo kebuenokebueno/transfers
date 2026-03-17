@@ -31,20 +31,20 @@ struct EditTransferInteractorTests {
     @Test("Load transfer – returns correct transfer")
     func loadTransferSuccess() async {
         let (interactor, presenter, _, swiftData) = makeSUT()
-        swiftData.seed(TestDataBuilder.createMixedNotes())
+        swiftData.seed(TestDataBuilder.createMixedTransfers())
 
-        await interactor.loadTransfer(request: EditTransferScene.LoadNote.Request(transferId: "3"))
+        await interactor.loadTransfer(request: EditTransferScene.LoadTransfer.Request(transferId: "3"))
 
         #expect(presenter.presentTransferCalled == true)
         #expect(presenter.lastLoadResponse?.transfer?.id == "3")
-        #expect(presenter.lastLoadResponse?.transfer?.noteDescription == "Salary")
+        #expect(presenter.lastLoadResponse?.transfer?.transferDescription == "Salary")
     }
 
     @Test("Load transfer – missing id returns nil")
     func loadTransferMissing() async {
         let (interactor, presenter, _, _) = makeSUT()
 
-        await interactor.loadTransfer(request: EditTransferScene.LoadNote.Request(transferId: "missing"))
+        await interactor.loadTransfer(request: EditTransferScene.LoadTransfer.Request(transferId: "missing"))
 
         #expect(presenter.presentTransferCalled == true)
         #expect(presenter.lastLoadResponse?.transfer == nil)
@@ -58,7 +58,7 @@ struct EditTransferInteractorTests {
         let original = TestDataBuilder.createTransfer(id: "upd_1", amount: -50.00, description: "Old Name", category: "Food")
         swiftData.seed([original])
 
-        await interactor.saveTransfer(request: EditTransferScene.SaveNote.Request(
+        await interactor.saveTransfer(request: EditTransferScene.SaveTransfer.Request(
             transferId: "upd_1",
             amount: 99.99,
             description: "New Name",
@@ -70,7 +70,7 @@ struct EditTransferInteractorTests {
         #expect(presenter.lastSaveResponse?.success == true)
         #expect(worker.updateTransferCallCount == 1)
         let updated = swiftData.transfers.first(where: { $0.id == "upd_1" })
-        #expect(updated?.noteDescription == "New Name")
+        #expect(updated?.transferDescription == "New Name")
         #expect(updated?.category == "Entertainment")
         #expect(updated?.amount == -99.99)
     }
@@ -79,7 +79,7 @@ struct EditTransferInteractorTests {
     func saveTransferNotFound() async {
         let (interactor, presenter, _, _) = makeSUT()
 
-        await interactor.saveTransfer(request: EditTransferScene.SaveNote.Request(
+        await interactor.saveTransfer(request: EditTransferScene.SaveTransfer.Request(
             transferId: "ghost",
             amount: 10.00,
             description: "Ghost",
@@ -97,7 +97,7 @@ struct EditTransferInteractorTests {
         let original = TestDataBuilder.createTransfer(id: "sync_1", syncStatus: "synced")
         swiftData.seed([original])
 
-        await interactor.saveTransfer(request: EditTransferScene.SaveNote.Request(
+        await interactor.saveTransfer(request: EditTransferScene.SaveTransfer.Request(
             transferId: "sync_1",
             amount: 1.00,
             description: "Trigger sync",
@@ -115,7 +115,7 @@ struct EditTransferInteractorTests {
         interactor.presenter = nil
         swiftData.seed([TestDataBuilder.createTransfer(id: "x")])
 
-        await interactor.saveTransfer(request: EditTransferScene.SaveNote.Request(
+        await interactor.saveTransfer(request: EditTransferScene.SaveTransfer.Request(
             transferId: "x",
             amount: 5.00,
             description: "Test",

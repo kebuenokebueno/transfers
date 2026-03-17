@@ -7,7 +7,7 @@ import Foundation
 
 enum AddTransferScene {
 
-    enum SaveNote {
+    enum SaveTransfer {
         struct Request {
             let amount: Double
             let description: String

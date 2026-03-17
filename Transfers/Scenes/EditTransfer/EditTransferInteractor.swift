@@ -6,8 +6,8 @@
 import Foundation
 
 protocol EditTransferBusinessLogic {
-    func loadTransfer(request: EditTransferScene.LoadNote.Request) async
-    func saveTransfer(request: EditTransferScene.SaveNote.Request) async
+    func loadTransfer(request: EditTransferScene.LoadTransfer.Request) async
+    func saveTransfer(request: EditTransferScene.SaveTransfer.Request) async
 }
 
 @MainActor
@@ -23,23 +23,23 @@ class EditTransferInteractor: EditTransferBusinessLogic {
         self.swiftDataService = swiftDataService
     }
 
-    func loadTransfer(request: EditTransferScene.LoadNote.Request) async {
+    func loadTransfer(request: EditTransferScene.LoadTransfer.Request) async {
         let transfer = try? swiftDataService.fetchTransfer(id: request.transferId)
-        let response = EditTransferScene.LoadNote.Response(transfer: transfer)
+        let response = EditTransferScene.LoadTransfer.Response(transfer: transfer)
         await MainActor.run { presenter?.presentTransfer(response: response) }
     }
 
-    func saveTransfer(request: EditTransferScene.SaveNote.Request) async {
+    func saveTransfer(request: EditTransferScene.SaveTransfer.Request) async {
         guard let existing = try? swiftDataService.fetchTransfer(id: request.transferId) else {
-            let response = EditTransferScene.SaveNote.Response(success: false)
+            let response = EditTransferScene.SaveTransfer.Response(success: false)
             await MainActor.run { presenter?.presentSaveResult(response: response) }
             return
         }
         existing.amount = request.isPositive ? request.amount : -request.amount
-        existing.noteDescription = request.description
+        existing.transferDescription = request.description
         existing.category = request.category
         await transferWorker.updateTransfer(existing)
-        let response = EditTransferScene.SaveNote.Response(success: true)
+        let response = EditTransferScene.SaveTransfer.Response(success: true)
         await MainActor.run { presenter?.presentSaveResult(response: response) }
     }
 }

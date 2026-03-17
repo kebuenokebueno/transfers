@@ -81,25 +81,25 @@ class TransferWorker: TransferWorkerProtocol {
     func updateTransfer(_ updatedTransfer: TransferEntity) async {
         do {
             // Fetch existing transfer from SwiftData
-            guard let existingNote = try? swiftDataService.fetchTransfer(id: updatedTransfer.id) else {
+            guard let existingTransfer = try? swiftDataService.fetchTransfer(id: updatedTransfer.id) else {
                 print("⚠️ Transfer not found for update: \(updatedTransfer.id)")
                 lastError = "Transfer not found"
                 return
             }
             
             // Update properties
-            existingNote.amount = updatedTransfer.amount
-            existingNote.noteDescription = updatedTransfer.noteDescription
-            existingNote.category = updatedTransfer.category
-            existingNote.markForSync()
+            existingTransfer.amount = updatedTransfer.amount
+            existingTransfer.transferDescription = updatedTransfer.transferDescription
+            existingTransfer.category = updatedTransfer.category
+            existingTransfer.markForSync()
             
             // Save to SwiftData
-            try swiftDataService.updateTransfer(existingNote)
-            print("✅ Transfer updated locally: \(existingNote.id)")
+            try swiftDataService.updateTransfer(existingTransfer)
+            print("✅ Transfer updated locally: \(existingTransfer.id)")
             
             // Sync to Supabase in background
             Task {
-                await syncTransferToCloud(existingNote)
+                await syncTransferToCloud(existingTransfer)
             }
             
         } catch {
@@ -199,9 +199,9 @@ class TransferWorker: TransferWorkerProtocol {
     }
     
     /// Sync all pending transfers to cloud
-    func syncPendingNotes() async {
+    func syncPendingTransfers() async {
         do {
-            let pending = try swiftDataService.fetchPendingNotes()
+            let pending = try swiftDataService.fetchPendingTransfers()
             print("🔄 Syncing \(pending.count) pending transfers...")
             
             for transfer in pending {
@@ -216,8 +216,8 @@ class TransferWorker: TransferWorkerProtocol {
     
     // MARK: - 🔍 Search & Filter
     
-    func searchNotes(query: String) async throws -> [TransferEntity] {
-        return try swiftDataService.searchNotes(query: query)
+    func searchTransfers(query: String) async throws -> [TransferEntity] {
+        return try swiftDataService.searchTransfers(query: query)
     }
     
     func filterByCategory(category: String) async throws -> [TransferEntity] {

@@ -23,14 +23,14 @@ class TransferListRouter: TransferListRoutingLogic {
     // MARK: - Navigation + Data Transfer
 
     func routeToTransferDetail(transferId: String) {
-        router.navigate(to: .noteDetail(id: transferId))
+        router.navigate(to: .transferDetail(id: transferId))
     }
 
     func routeToAddTransfer() {
-        router.present(sheet: .addNote)
+        router.present(sheet: .addTransfer)
     }
 
     func routeToEditTransfer(transferId: String) {
-        router.navigate(to: .editNote(id: transferId))
+        router.navigate(to: .editTransfer(id: transferId))
     }
 }

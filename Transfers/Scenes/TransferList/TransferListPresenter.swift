@@ -15,18 +15,18 @@ class TransferListPresenter: TransferListPresentationLogic {
     weak var viewController: TransferListDisplayLogic?
 
     func presentTransfers(response: TransferScene.FetchTransfers.Response) {
-        let displayedNotes = response.transfers.map { transfer in
+        let displayedTransfers = response.transfers.map { transfer in
             TransferViewModel(
                 id: transfer.id,
                 amount: formatAmount(transfer.amount),
-                description: transfer.noteDescription,
+                description: transfer.transferDescription,
                 date: formatDate(transfer.date),
                 category: transfer.category,
                 isPositive: transfer.isPositive,
                 syncStatus: transfer.syncStatusEnum.rawValue.capitalized
             )
         }
-        let viewModel = TransferScene.FetchTransfers.ViewModel(displayedNotes: displayedNotes)
+        let viewModel = TransferScene.FetchTransfers.ViewModel(displayedTransfers: displayedTransfers)
         viewController?.displayTransfers(viewModel: viewModel)
     }
 

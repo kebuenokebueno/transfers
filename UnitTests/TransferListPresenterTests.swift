@@ -25,7 +25,7 @@ struct TransferListPresenterTests {
         let (presenter, vc) = makeSUT()
         let transfer = TestDataBuilder.createTransfer(id: "1", amount: -45.50, description: "Grocery Store", category: "Food")
         presenter.presentTransfers(response: TransferScene.FetchTransfers.Response(transfers: [transfer]))
-        let displayed = vc.lastFetchViewModel?.displayedNotes.first
+        let displayed = vc.lastFetchViewModel?.displayedTransfers.first
         #expect(vc.displayTransfersCalled == true)
         #expect(displayed?.amount.contains("45") == true)
         #expect(displayed?.amount.contains("-") == true)
@@ -37,7 +37,7 @@ struct TransferListPresenterTests {
         let (presenter, vc) = makeSUT()
         let transfer = TestDataBuilder.createTransfer(id: "2", amount: 2500.00, description: "Salary", category: "Income")
         presenter.presentTransfers(response: TransferScene.FetchTransfers.Response(transfers: [transfer]))
-        let displayed = vc.lastFetchViewModel?.displayedNotes.first
+        let displayed = vc.lastFetchViewModel?.displayedTransfers.first
         #expect(displayed?.isPositive == true)
         #expect(displayed?.amount.contains("+") == true)
         #expect(displayed?.category == "Income")
@@ -49,7 +49,7 @@ struct TransferListPresenterTests {
         let testDate = Calendar.current.date(from: DateComponents(year: 2026, month: 1, day: 25))!
         let transfer = TestDataBuilder.createTransfer(id: "1", amount: -10.0, date: testDate)
         presenter.presentTransfers(response: TransferScene.FetchTransfers.Response(transfers: [transfer]))
-        let displayed = vc.lastFetchViewModel?.displayedNotes.first
+        let displayed = vc.lastFetchViewModel?.displayedTransfers.first
         #expect(displayed?.date.contains("Jan") == true || displayed?.date.contains("2026") == true)
     }
 
@@ -58,7 +58,7 @@ struct TransferListPresenterTests {
         let (presenter, vc) = makeSUT()
         presenter.presentTransfers(response: TransferScene.FetchTransfers.Response(transfers: []))
         #expect(vc.displayTransfersCalled == true)
-        #expect(vc.lastFetchViewModel?.displayedNotes.isEmpty == true)
+        #expect(vc.lastFetchViewModel?.displayedTransfers.isEmpty == true)
     }
 
     @MainActor @Test("Present transfers - preserves order")
@@ -70,7 +70,7 @@ struct TransferListPresenterTests {
             TestDataBuilder.createTransfer(id: "C", description: "Third")
         ]
         presenter.presentTransfers(response: TransferScene.FetchTransfers.Response(transfers: transfers))
-        let displayed = vc.lastFetchViewModel?.displayedNotes ?? []
+        let displayed = vc.lastFetchViewModel?.displayedTransfers ?? []
         #expect(displayed.count == 3)
         #expect(displayed[0].id == "A")
         #expect(displayed[1].id == "B")
@@ -83,7 +83,7 @@ struct TransferListPresenterTests {
         presenter.presentTransfers(response: TransferScene.FetchTransfers.Response(transfers: [
             TestDataBuilder.createTransfer(id: "z", amount: 0.0)
         ]))
-        #expect(vc.lastFetchViewModel?.displayedNotes.first?.isPositive == true)
+        #expect(vc.lastFetchViewModel?.displayedTransfers.first?.isPositive == true)
     }
 
     @MainActor @Test("Present transfers - nil ViewController does not crash")
@@ -100,9 +100,9 @@ struct TransferListPresenterTests {
     func presentTransfersMultipleCalls() {
         let (presenter, vc) = makeSUT()
         presenter.presentTransfers(response: TransferScene.FetchTransfers.Response(transfers: [TestDataBuilder.createTransfer(id: "1")]))
-        presenter.presentTransfers(response: TransferScene.FetchTransfers.Response(transfers: TestDataBuilder.createMixedNotes()))
+        presenter.presentTransfers(response: TransferScene.FetchTransfers.Response(transfers: TestDataBuilder.createMixedTransfers()))
         #expect(vc.displayTransfersCallCount == 2)
-        #expect(vc.lastFetchViewModel?.displayedNotes.count == 5)
+        #expect(vc.lastFetchViewModel?.displayedTransfers.count == 5)
     }
 
     // MARK: - Present Delete Result

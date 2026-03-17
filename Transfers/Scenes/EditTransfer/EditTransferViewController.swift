@@ -26,7 +26,7 @@ class EditTransferViewController: EditTransferDisplayLogic {
 
     // MARK: - Display (called by Presenter)
 
-    func displayTransfer(viewModel: EditTransferScene.LoadNote.ViewModel) {
+    func displayTransfer(viewModel: EditTransferScene.LoadTransfer.ViewModel) {
         amount      = viewModel.amount
         description = viewModel.description
         category    = viewModel.category
@@ -34,7 +34,7 @@ class EditTransferViewController: EditTransferDisplayLogic {
         isLoading   = false
     }
 
-    func displaySaveResult(viewModel: EditTransferScene.SaveNote.ViewModel) {
+    func displaySaveResult(viewModel: EditTransferScene.SaveTransfer.ViewModel) {
         isSaving = false
         if viewModel.success {
             router?.dismiss()

@@ -20,7 +20,7 @@ class TransferDetailRouter: TransferDetailRoutingLogic {
     }
 
     func routeToEditTransfer(transferId: String) {
-        router.navigate(to: .editNote(id: transferId))
+        router.navigate(to: .editTransfer(id: transferId))
     }
 
     func dismiss() {
