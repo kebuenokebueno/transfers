@@ -33,7 +33,7 @@ class SupabaseService {
         print("📥 Fetching transfers from Supabase...")
         
         let response: [TransferEntity] = try await client
-            .from("transfers")
+            .from("notes")
             .select()
             .order("created_at", ascending: false)
             .execute()
@@ -50,7 +50,7 @@ class SupabaseService {
         print("💾 Creating transfer: \(transfer.id)")
         
         try await client
-            .from("transfers")
+            .from("notes")
             .insert(transfer)
             .execute()
         
@@ -62,7 +62,7 @@ class SupabaseService {
         print("✏️ Updating transfer: \(transfer.id)")
         
         try await client
-            .from("transfers")
+            .from("notes")
             .update(transfer)
             .eq("id", value: transfer.id)
             .execute()
@@ -75,7 +75,7 @@ class SupabaseService {
         print("🗑️ Deleting transfer: \(id)")
         
         try await client
-            .from("transfers")
+            .from("notes")
             .delete()
             .eq("id", value: id)
             .execute()
@@ -88,7 +88,7 @@ class SupabaseService {
         print("📥 Fetching transfer: \(id)")
         
         let response: [TransferEntity] = try await client
-            .from("transfers")
+            .from("notes")
             .select()
             .eq("id", value: id)
             .execute()
@@ -104,7 +104,7 @@ class SupabaseService {
         print("🔍 Searching transfers: \(query)")
         
         let response: [TransferEntity] = try await client
-            .from("transfers")
+            .from("notes")
             .select()
             .ilike("description", pattern: "%\(query)%")
             .order("created_at", ascending: false)
@@ -119,7 +119,7 @@ class SupabaseService {
         print("📂 Fetching transfers for category: \(category)")
         
         let response: [TransferEntity] = try await client
-            .from("transfers")
+            .from("notes")
             .select()
             .eq("category", value: category)
             .order("created_at", ascending: false)
@@ -134,7 +134,7 @@ class SupabaseService {
         print("📅 Fetching transfers from \(from) to \(to)")
         
         let response: [TransferEntity] = try await client
-            .from("transfers")
+            .from("notes")
             .select()
             .gte("date", value: from.ISO8601Format())
             .lte("date", value: to.ISO8601Format())
