@@ -1,35 +1,35 @@
 //
-//  NoteRow.swift
+//  TransferRow.swift
 //  Transfers
 //
 
 import SwiftUI
 
-struct NoteRow: View {
-    let note: NoteViewModel
+struct TransferRow: View {
+    let transfer: TransferViewModel
 
     var body: some View {
         HStack(spacing: 12) {
-            CategoryIcon(category: note.category)
+            CategoryIcon(category: transfer.category)
                 .frame(width: 44, height: 44)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(note.description)
+                Text(transfer.description)
                     .font(.headline)
 
                 HStack {
-                    Text(note.category)
+                    Text(transfer.category)
                         .font(.caption)
                         .foregroundColor(.secondary)
 
                     Text("•")
                         .foregroundColor(.secondary)
 
-                    Text(note.date)
+                    Text(transfer.date)
                         .font(.caption)
                         .foregroundColor(.secondary)
 
-                    if note.syncStatus == "Pending" {
+                    if transfer.syncStatus == "Pending" {
                         Image(systemName: "arrow.triangle.2.circlepath")
                             .font(.caption2)
                             .foregroundColor(.orange)
@@ -39,9 +39,9 @@ struct NoteRow: View {
 
             Spacer()
 
-            Text(note.amount)
+            Text(transfer.amount)
                 .font(.headline)
-                .foregroundColor(note.isPositive ? .green : .primary)
+                .foregroundColor(transfer.isPositive ? .green : .primary)
         }
         .padding(.vertical, 4)
     }

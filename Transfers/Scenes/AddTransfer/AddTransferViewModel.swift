@@ -1,19 +1,19 @@
 //
-//  AddNoteViewModel.swift
+//  AddTransferViewModel.swift
 //  Transfers
 //
-//  MVVM ViewModel for AddNote scene
+//  MVVM ViewModel for AddTransfer scene
 //
 
 import Foundation
 
 @MainActor
 @Observable
-final class AddNoteViewModel {
+final class AddTransferViewModel {
     
     // MARK: - Dependencies
     
-    private let noteWorker: NoteWorkerProtocol
+    private let transferWorker: TransferWorkerProtocol
     private let router: Router
     
     // MARK: - Published State
@@ -23,17 +23,17 @@ final class AddNoteViewModel {
     
     // MARK: - Init
     
-    init(noteWorker: NoteWorkerProtocol, router: Router) {
-        self.noteWorker = noteWorker
+    init(transferWorker: TransferWorkerProtocol, router: Router) {
+        self.transferWorker = transferWorker
         self.router = router
     }
     
     // MARK: - User Actions
     
-    func saveNote(amount: Double, description: String, category: String, isIncome: Bool) {
+    func saveTransfer(amount: Double, description: String, category: String, isIncome: Bool) {
         isSaving = true
         Task {
-            await performSaveNote(
+            await performSaveTransfer(
                 amount: amount,
                 description: description,
                 category: category,
@@ -48,13 +48,13 @@ final class AddNoteViewModel {
     
     // MARK: - Business Logic
     
-    private func performSaveNote(
+    private func performSaveTransfer(
         amount: Double,
         description: String,
         category: String,
         isIncome: Bool
     ) async {
-        let note = NoteEntity(
+        let transfer = TransferEntity(
             id: UUID().uuidString,
             amount: isIncome ? amount : -amount,
             description: description,
@@ -63,7 +63,7 @@ final class AddNoteViewModel {
             syncStatus: .pending
         )
         
-        await noteWorker.createNote(note)
+        await transferWorker.createTransfer(transfer)
         
         isSaving = false
         router.dismiss()

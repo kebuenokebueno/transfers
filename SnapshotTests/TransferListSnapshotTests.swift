@@ -6,16 +6,16 @@ import SwiftUI
 @testable import Transfers
 
 struct SnapshotTestData {
-    static func sampleNote(
+    static func sampleTransfer(
         id: String = "1",
         amount: Double = -45.50,
         description: String = "Grocery Store",
         category: String = "Food"
-    ) -> NoteViewModel {
+    ) -> TransferViewModel {
         let formatted = amount >= 0
             ? "+€\(String(format: "%.2f", amount))"
             : "-€\(String(format: "%.2f", abs(amount)))"
-        return NoteViewModel(
+        return TransferViewModel(
             id: id,
             amount: formatted,
             description: description,
@@ -26,21 +26,21 @@ struct SnapshotTestData {
         )
     }
 
-    static var sampleNotes: [NoteViewModel] {
+    static var sampleTransfers: [TransferViewModel] {
         [
-            sampleNote(id: "1", amount: -45.50,  description: "Grocery Store",  category: "Food"),
-            sampleNote(id: "2", amount: -120.00, description: "Electric Bill",  category: "Utilities"),
-            sampleNote(id: "3", amount: 2500.00, description: "Salary",         category: "Income"),
-            sampleNote(id: "4", amount: -30.00,  description: "Gas Station",    category: "Transport"),
-            sampleNote(id: "5", amount: 150.00,  description: "Freelance Work", category: "Income")
+            sampleTransfer(id: "1", amount: -45.50,  description: "Grocery Store",  category: "Food"),
+            sampleTransfer(id: "2", amount: -120.00, description: "Electric Bill",  category: "Utilities"),
+            sampleTransfer(id: "3", amount: 2500.00, description: "Salary",         category: "Income"),
+            sampleTransfer(id: "4", amount: -30.00,  description: "Gas Station",    category: "Transport"),
+            sampleTransfer(id: "5", amount: 150.00,  description: "Freelance Work", category: "Income")
         ]
     }
 }
 
-// MARK: - Note Row Snapshot Tests
+// MARK: - Transfer Row Snapshot Tests
 var recording = false
 
-final class NoteRowSnapshotTests: XCTestCase {
+final class TransferRowSnapshotTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
@@ -49,30 +49,30 @@ final class NoteRowSnapshotTests: XCTestCase {
     
     // MARK: - Basic States
     
-    func testNoteRow_Expense() {
+    func testTransferRow_Expense() {
         
-        let note = SnapshotTestData.sampleNote(amount: -45.50)
-        let view = NoteRow(note: note)
+        let transfer = SnapshotTestData.sampleTransfer(amount: -45.50)
+        let view = TransferRow(transfer: transfer)
             .frame(width: 375, height: 80)
             .padding()
         
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testNoteRow_Income() {
-        let note = SnapshotTestData.sampleNote(amount: 2500.00, description: "Salary", category: "Income")
-        let view = NoteRow(note: note)
+    func testTransferRow_Income() {
+        let transfer = SnapshotTestData.sampleTransfer(amount: 2500.00, description: "Salary", category: "Income")
+        let view = TransferRow(transfer: transfer)
             .frame(width: 375, height: 80)
             .padding()
         
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testNoteRow_LongDescription() {
-        let note = SnapshotTestData.sampleNote(
-            description: "Very Long Note Description That Should Wrap To Multiple Lines"
+    func testTransferRow_LongDescription() {
+        let transfer = SnapshotTestData.sampleTransfer(
+            description: "Very Long Transfer Description That Should Wrap To Multiple Lines"
         )
-        let view = NoteRow(note: note)
+        let view = TransferRow(transfer: transfer)
             .frame(width: 375, height: 100)
             .padding()
         
@@ -81,9 +81,9 @@ final class NoteRowSnapshotTests: XCTestCase {
     
     // MARK: - Dark Mode
     
-    func testNoteRow_DarkMode() {
-        let note = SnapshotTestData.sampleNote()
-        let view = NoteRow(note: note)
+    func testTransferRow_DarkMode() {
+        let transfer = SnapshotTestData.sampleTransfer()
+        let view = TransferRow(transfer: transfer)
             .frame(width: 375, height: 80)
             .padding()
             .preferredColorScheme(.dark)
@@ -91,9 +91,9 @@ final class NoteRowSnapshotTests: XCTestCase {
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testNoteRow_Income_DarkMode() {
-        let note = SnapshotTestData.sampleNote(amount: 2500.00)
-        let view = NoteRow(note: note)
+    func testTransferRow_Income_DarkMode() {
+        let transfer = SnapshotTestData.sampleTransfer(amount: 2500.00)
+        let view = TransferRow(transfer: transfer)
             .frame(width: 375, height: 80)
             .padding()
             .preferredColorScheme(.dark)
@@ -103,9 +103,9 @@ final class NoteRowSnapshotTests: XCTestCase {
     
     // MARK: - Dynamic Type
     
-    func testNoteRow_LargeText() {
-        let note = SnapshotTestData.sampleNote()
-        let view = NoteRow(note: note)
+    func testTransferRow_LargeText() {
+        let transfer = SnapshotTestData.sampleTransfer()
+        let view = TransferRow(transfer: transfer)
             .frame(width: 375, height: 120)
             .padding()
             .environment(\.dynamicTypeSize, .accessibility3)
@@ -113,9 +113,9 @@ final class NoteRowSnapshotTests: XCTestCase {
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testNoteRow_ExtraLargeText() {
-        let note = SnapshotTestData.sampleNote()
-        let view = NoteRow(note: note)
+    func testTransferRow_ExtraLargeText() {
+        let transfer = SnapshotTestData.sampleTransfer()
+        let view = TransferRow(transfer: transfer)
             .frame(width: 375, height: 150)
             .padding()
             .environment(\.dynamicTypeSize, .accessibility5)
@@ -125,16 +125,16 @@ final class NoteRowSnapshotTests: XCTestCase {
     
     // MARK: - All Categories
     
-    func testNoteRow_AllCategories() {
+    func testTransferRow_AllCategories() {
         let categories = ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"]
         
         for category in categories {
-            let note = SnapshotTestData.sampleNote(
+            let transfer = SnapshotTestData.sampleTransfer(
                 id: category,
-                description: "\(category) Note",
+                description: "\(category) Transfer",
                 category: category
             )
-            let view = NoteRow(note: note)
+            let view = TransferRow(transfer: transfer)
                 .frame(width: 375, height: 80)
                 .padding()
             
@@ -143,31 +143,31 @@ final class NoteRowSnapshotTests: XCTestCase {
     }
 }
 
-final class NoteListSnapshotTests: XCTestCase {
+final class TransferListSnapshotTests: XCTestCase {
     
     @MainActor
-    func testNoteList_Empty() {
-        let view = NoteListContent(notes: [])
+    func testTransferList_Empty() {
+        let view = TransferListContent(transfers: [])
             .frame(width: 375, height: 667)
         assertSnapshot(of: view, as: .image(layout: .device(config: .iPhone13)))
     }
     
-    func testNoteList_WithData() {
-        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+    func testTransferList_WithData() {
+        let view = TransferListContent(transfers: SnapshotTestData.sampleTransfers)
             .frame(width: 375, height: 667)
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testNoteList_DarkMode() {
-        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+    func testTransferList_DarkMode() {
+        let view = TransferListContent(transfers: SnapshotTestData.sampleTransfers)
             .frame(width: 375, height: 667)
             .preferredColorScheme(.dark)
         
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testNoteList_LargeText() {
-        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+    func testTransferList_LargeText() {
+        let view = TransferListContent(transfers: SnapshotTestData.sampleTransfers)
             .frame(width: 375, height: 667)
             .environment(\.dynamicTypeSize, .accessibility3)
         
@@ -179,26 +179,26 @@ final class NoteListSnapshotTests: XCTestCase {
 
 final class DeviceSpecificSnapshotTests: XCTestCase {
 
-    func testNoteList_iPhoneSE() {
-        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+    func testTransferList_iPhoneSE() {
+        let view = TransferListContent(transfers: SnapshotTestData.sampleTransfers)
             .frame(width: 320, height: 568)
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testNoteList_iPhone15() {
-        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+    func testTransferList_iPhone15() {
+        let view = TransferListContent(transfers: SnapshotTestData.sampleTransfers)
             .frame(width: 375, height: 812)
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testNoteList_iPhone15ProMax() {
-        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+    func testTransferList_iPhone15ProMax() {
+        let view = TransferListContent(transfers: SnapshotTestData.sampleTransfers)
             .frame(width: 430, height: 932)
         assertSnapshot(of: view, as: .image, record: recording)
     }
     
-    func testNoteList_iPadPro() {
-        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+    func testTransferList_iPadPro() {
+        let view = TransferListContent(transfers: SnapshotTestData.sampleTransfers)
             .frame(width: 1024, height: 1366)
         assertSnapshot(of: view, as: .image, record: recording)
     }
@@ -245,24 +245,24 @@ final class CategoryIconSnapshotTests: XCTestCase {
 
 final class RegressionSnapshotTests: XCTestCase {
 
-    // This test captures the entire note list screen
+    // This test captures the entire transfer list screen
     // If anything changes visually, this will catch it
-    func testFullScreen_NoteList() {
-        let view = NoteListContent(notes: SnapshotTestData.sampleNotes)
+    func testFullScreen_TransferList() {
+        let view = TransferListContent(transfers: SnapshotTestData.sampleTransfers)
             .frame(width: 375, height: 812)  // iPhone 15 size
         assertSnapshot(of: view, as: .image, named: "full_screen", record: recording)
     }
     
-    // Test with many notes (scrolling)
-    func testFullScreen_ManyNotes() {
-        let manyNotes: [NoteViewModel] = (1...20).map { i in
+    // Test with many transfers (scrolling)
+    func testFullScreen_ManyTransfers() {
+        let manyTransfers: [TransferViewModel] = (1...20).map { i in
             let amount = (i % 3 == 0) ? Double(i * 100) : -Double(i * 10)
-            return SnapshotTestData.sampleNote(id: "\(i)", amount: amount, description: "Note \(i)")
+            return SnapshotTestData.sampleTransfer(id: "\(i)", amount: amount, description: "Transfer \(i)")
         }
         
-        let view = NoteListContent(notes: manyNotes)
+        let view = TransferListContent(transfers: manyTransfers)
             .frame(width: 375, height: 812)
-        assertSnapshot(of: view, as: .image, named: "many_notes", record: recording)
+        assertSnapshot(of: view, as: .image, named: "many_transfers", record: recording)
     }
 }
 
@@ -272,8 +272,8 @@ final class PrecisionSnapshotTests: XCTestCase {
     
     // Test with pixel-perfect precision (default)
     func testPrecision_PixelPerfect() {
-        let note = SnapshotTestData.sampleNote()
-        let view = NoteRow(note: note)
+        let transfer = SnapshotTestData.sampleTransfer()
+        let view = TransferRow(transfer: transfer)
             .frame(width: 375, height: 80)
         
         assertSnapshot(of: view, as: .image(precision: 1.0), record: recording)
@@ -281,8 +281,8 @@ final class PrecisionSnapshotTests: XCTestCase {
     
     // Test with 99% precision (allows tiny variations)
     func testPrecision_99Percent() {
-        let note = SnapshotTestData.sampleNote()
-        let view = NoteRow(note: note)
+        let transfer = SnapshotTestData.sampleTransfer()
+        let view = TransferRow(transfer: transfer)
             .frame(width: 375, height: 80)
         
         assertSnapshot(of: view, as: .image(precision: 0.99), record: recording)

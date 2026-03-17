@@ -1,5 +1,5 @@
 //
-//  NoteListE2ETests.swift
+//  TransferListE2ETests.swift
 //  TransfersTests
 //
 
@@ -8,8 +8,8 @@ import Foundation
 import SwiftData
 @testable import Transfers
 
-@Suite("NoteList - E2E Tests", .tags(.e2e))
-struct NoteListE2ETests {
+@Suite("TransferList - E2E Tests", .tags(.e2e))
+struct TransferListE2ETests {
 
     // MARK: - Connection
 
@@ -24,33 +24,33 @@ struct NoteListE2ETests {
     // MARK: - Create
 
     @MainActor
-    @Test("E2E: Create note syncs to Supabase")
-    func e2eCreateNote() async throws {
+    @Test("E2E: Create transfer syncs to Supabase")
+    func e2eCreateTransfer() async throws {
         let supabase = TestSupabaseService()
         try await supabase.cleanupAllTestData()
 
         let container = try ModelContainer(
-            for: NoteEntity.self,
+            for: TransferEntity.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         let swiftDataService = SwiftDataService(modelContainer: container)
 
-        let note = NoteEntity(
+        let transfer = TransferEntity(
             id: "e2e_create_\(UUID().uuidString)",
             amount: -42.50,
-            description: "E2E Test Note",
+            description: "E2E Test Transfer",
             date: Date(),
             category: "Food"
         )
 
-        try swiftDataService.saveNote(note)
-        try await supabase.createNote(note)
+        try swiftDataService.saveTransfer(transfer)
+        try await supabase.createTransfer(transfer)
 
-        let cloudNotes = try await supabase.fetchNotes()
-        #expect(cloudNotes.contains(where: { $0.id == note.id }))
-        #expect(cloudNotes.first(where: { $0.id == note.id })?.noteDescription == "E2E Test Note")
+        let cloudTransfers = try await supabase.fetchTransfers()
+        #expect(cloudTransfers.contains(where: { $0.id == transfer.id }))
+        #expect(cloudTransfers.first(where: { $0.id == transfer.id })?.transferDescription == "E2E Test Transfer")
 
-        try await supabase.deleteNote(id: note.id)
+        try await supabase.deleteTransfer(id: transfer.id)
     }
 
     // MARK: - Full Sync Cycle
@@ -61,31 +61,31 @@ struct NoteListE2ETests {
         let supabase = TestSupabaseService()
         try await supabase.cleanupAllTestData()
 
-        let noteId = "e2e_sync_\(UUID().uuidString)"
-        let originalNote = NoteEntity(
-            id: noteId,
+        let transferId = "e2e_sync_\(UUID().uuidString)"
+        let originalTransfer = TransferEntity(
+            id: transferId,
             amount: -100.00,
             description: "Created on Device A",
             date: Date(),
             category: "Shopping"
         )
 
-        try await supabase.createNote(originalNote)
+        try await supabase.createTransfer(originalTransfer)
 
         let container = try ModelContainer(
-            for: NoteEntity.self,
+            for: TransferEntity.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         let swiftDataService = SwiftDataService(modelContainer: container)
 
-        let cloudNotes = try await supabase.fetchNotes()
-        for note in cloudNotes {
-            try swiftDataService.saveNote(note)
+        let cloudTransfers = try await supabase.fetchTransfers()
+        for transfer in cloudTransfers {
+            try swiftDataService.saveTransfer(transfer)
         }
 
-        let localNotes = try swiftDataService.fetchNotes()
-        #expect(localNotes.contains(where: { $0.id == noteId }))
-        #expect(localNotes.first(where: { $0.id == noteId })?.noteDescription == "Created on Device A")
+        let localTransfers = try swiftDataService.fetchTransfers()
+        #expect(localTransfers.contains(where: { $0.id == transferId }))
+        #expect(localTransfers.first(where: { $0.id == transferId })?.transferDescription == "Created on Device A")
 
         try await supabase.cleanupAllTestData()
     }
@@ -98,25 +98,25 @@ struct NoteListE2ETests {
         let supabase = TestSupabaseService()
         try await supabase.cleanupAllTestData()
 
-        let noteId = "e2e_update_\(UUID().uuidString)"
-        let note = NoteEntity(
-            id: noteId,
+        let transferId = "e2e_update_\(UUID().uuidString)"
+        let transfer = TransferEntity(
+            id: transferId,
             amount: -50.00,
             description: "Original",
             date: Date(),
             category: "Food"
         )
-        try await supabase.createNote(note)
+        try await supabase.createTransfer(transfer)
 
-        note.noteDescription = "Updated via E2E"
-        note.amount = -75.00
-        note.category = "Entertainment"
-        try await supabase.updateNote(note)
+        transfer.transferDescription = "Updated via E2E"
+        transfer.amount = -75.00
+        transfer.category = "Entertainment"
+        try await supabase.updateTransfer(transfer)
 
-        let cloudNotes = try await supabase.fetchNotes()
-        let updated = cloudNotes.first(where: { $0.id == noteId })
+        let cloudTransfers = try await supabase.fetchTransfers()
+        let updated = cloudTransfers.first(where: { $0.id == transferId })
         #expect(updated != nil)
-        #expect(updated?.noteDescription == "Updated via E2E")
+        #expect(updated?.transferDescription == "Updated via E2E")
         #expect(updated?.amount == -75.00)
         #expect(updated?.category == "Entertainment")
 
@@ -131,23 +131,23 @@ struct NoteListE2ETests {
         let supabase = TestSupabaseService()
         try await supabase.cleanupAllTestData()
 
-        let noteId = "e2e_delete_\(UUID().uuidString)"
-        let note = NoteEntity(
-            id: noteId,
+        let transferId = "e2e_delete_\(UUID().uuidString)"
+        let transfer = TransferEntity(
+            id: transferId,
             amount: -25.00,
             description: "To be deleted",
             date: Date(),
             category: "Other"
         )
-        try await supabase.createNote(note)
+        try await supabase.createTransfer(transfer)
 
-        var cloudNotes = try await supabase.fetchNotes()
-        #expect(cloudNotes.contains(where: { $0.id == noteId }))
+        var cloudTransfers = try await supabase.fetchTransfers()
+        #expect(cloudTransfers.contains(where: { $0.id == transferId }))
 
-        try await supabase.deleteNote(id: noteId)
+        try await supabase.deleteTransfer(id: transferId)
 
-        cloudNotes = try await supabase.fetchNotes()
-        #expect(!cloudNotes.contains(where: { $0.id == noteId }))
+        cloudTransfers = try await supabase.fetchTransfers()
+        #expect(!cloudTransfers.contains(where: { $0.id == transferId }))
     }
 
     // MARK: - Conflict Resolution
@@ -158,29 +158,29 @@ struct NoteListE2ETests {
         let supabase = TestSupabaseService()
         try await supabase.cleanupAllTestData()
 
-        let noteId = "e2e_conflict_\(UUID().uuidString)"
-        let note = NoteEntity(
-            id: noteId,
+        let transferId = "e2e_conflict_\(UUID().uuidString)"
+        let transfer = TransferEntity(
+            id: transferId,
             amount: -100.00,
             description: "Original",
             date: Date(),
             category: "Food"
         )
-        try await supabase.createNote(note)
+        try await supabase.createTransfer(transfer)
 
-        note.noteDescription = "Device A update"
-        note.updatedAt = Date()
-        try await supabase.updateNote(note)
+        transfer.transferDescription = "Device A update"
+        transfer.updatedAt = Date()
+        try await supabase.updateTransfer(transfer)
 
         try await Task.sleep(nanoseconds: 100_000_000)
 
-        note.noteDescription = "Device B update"
-        note.updatedAt = Date()
-        try await supabase.updateNote(note)
+        transfer.transferDescription = "Device B update"
+        transfer.updatedAt = Date()
+        try await supabase.updateTransfer(transfer)
 
-        let cloudNotes = try await supabase.fetchNotes()
-        let final = cloudNotes.first(where: { $0.id == noteId })
-        #expect(final?.noteDescription == "Device B update")
+        let cloudTransfers = try await supabase.fetchTransfers()
+        let final = cloudTransfers.first(where: { $0.id == transferId })
+        #expect(final?.transferDescription == "Device B update")
 
         try await supabase.cleanupAllTestData()
     }
@@ -193,24 +193,24 @@ struct NoteListE2ETests {
         let supabase = TestSupabaseService()
         try await supabase.cleanupAllTestData()
 
-        let notes = (1...10).map { i in
-            NoteEntity(
+        let transfers = (1...10).map { i in
+            TransferEntity(
                 id: "e2e_bulk_\(i)_\(UUID().uuidString)",
                 amount: Double(-i * 10),
-                description: "Bulk note \(i)",
+                description: "Bulk transfer \(i)",
                 date: Date(),
                 category: "Test"
             )
         }
 
-        for note in notes {
-            try await supabase.createNote(note)
+        for transfer in transfers {
+            try await supabase.createTransfer(transfer)
         }
 
-        let cloudNotes = try await supabase.fetchNotes()
-        #expect(cloudNotes.count >= 10)
-        for note in notes {
-            #expect(cloudNotes.contains(where: { $0.id == note.id }))
+        let cloudTransfers = try await supabase.fetchTransfers()
+        #expect(cloudTransfers.count >= 10)
+        for transfer in transfers {
+            #expect(cloudTransfers.contains(where: { $0.id == transfer.id }))
         }
 
         try await supabase.cleanupAllTestData()
@@ -223,8 +223,8 @@ struct NoteListE2ETests {
     func e2eEmptyDatabase() async throws {
         let supabase = TestSupabaseService()
         try await supabase.cleanupAllTestData()
-        let notes = try await supabase.fetchNotes()
-        #expect(notes.isEmpty)
+        let transfers = try await supabase.fetchTransfers()
+        #expect(transfers.isEmpty)
     }
 
     // MARK: - Data Integrity
@@ -235,25 +235,25 @@ struct NoteListE2ETests {
         let supabase = TestSupabaseService()
         try await supabase.cleanupAllTestData()
 
-        let noteId = "e2e_integrity_\(UUID().uuidString)"
+        let transferId = "e2e_integrity_\(UUID().uuidString)"
         let testDescription = "Integrity test with special chars: aeiou"
 
-        let original = NoteEntity(
-            id: noteId,
+        let original = TransferEntity(
+            id: transferId,
             amount: -123.45,
             description: testDescription,
             date: Date(),
             category: "Special Category"
         )
 
-        try await supabase.createNote(original)
+        try await supabase.createTransfer(original)
 
-        let cloudNotes = try await supabase.fetchNotes()
-        let fetched = cloudNotes.first(where: { $0.id == noteId })
+        let cloudTransfers = try await supabase.fetchTransfers()
+        let fetched = cloudTransfers.first(where: { $0.id == transferId })
         #expect(fetched != nil)
-        #expect(fetched?.id == noteId)
+        #expect(fetched?.id == transferId)
         #expect(fetched?.amount == -123.45)
-        #expect(fetched?.noteDescription == testDescription)
+        #expect(fetched?.transferDescription == testDescription)
         #expect(fetched?.category == "Special Category")
 
         try await supabase.cleanupAllTestData()

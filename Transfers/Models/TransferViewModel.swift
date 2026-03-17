@@ -8,7 +8,7 @@
 import Foundation
 
 
-struct NoteViewModel: Identifiable {
+struct TransferViewModel: Identifiable {
     let id: String
     let amount: String
     let description: String

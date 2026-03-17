@@ -1,5 +1,5 @@
 //
-//  EditNoteViewModelTests.swift
+//  EditTransferViewModelTests.swift
 //  TransfersTests
 //
 
@@ -8,65 +8,65 @@ import Foundation
 @testable import Transfers
 
 @MainActor
-@Suite("EditNote ViewModel Tests", .tags(.unit, .viewModel))
-struct EditNoteViewModelTests {
+@Suite("EditTransfer ViewModel Tests", .tags(.unit, .viewModel))
+struct EditTransferViewModelTests {
 
     private func makeSUT() -> (
-        viewModel: EditNoteViewModel,
-        worker: MockNoteWorker,
+        viewModel: EditTransferViewModel,
+        worker: MockTransferWorker,
         swiftData: MockSwiftDataService,
         router: MockRouter
     ) {
         let swiftData = MockSwiftDataService()
         let supabase = MockSupabaseService()
-        let worker = MockNoteWorker(swiftDataService: swiftData, supabaseService: supabase)
+        let worker = MockTransferWorker(swiftDataService: swiftData, supabaseService: supabase)
         let router = MockRouter()
-        let viewModel = EditNoteViewModel(
-            noteWorker: worker,
+        let viewModel = EditTransferViewModel(
+            TransferWorker: worker,
             swiftDataService: swiftData,
             router: router
         )
         return (viewModel, worker, swiftData, router)
     }
 
-    // MARK: - Load Note
+    // MARK: - Load Transfer
 
-    @Test("Load note - populates form fields")
-    func loadNoteSuccess() async throws {
+    @Test("Load Transfer - populates form fields")
+    func loadTransferSuccess() async throws {
         let (viewModel, _, swiftData, _) = makeSUT()
-        swiftData.seed([TestDataBuilder.createNote(
+        swiftData.seed([TestDataBuilder.createTransfer(
             id: "test_1",
             amount: -75.50,
-            description: "Test Note",
+            description: "Test Transfer",
             category: "Food"
         )])
         
-        viewModel.loadNote(noteId: "test_1")
+        viewModel.loadTransfer(TransferId: "test_1")
         try await Task.sleep(nanoseconds: 100_000_000)
         
         #expect(viewModel.amount == "75.5")
-        #expect(viewModel.description == "Test Note")
+        #expect(viewModel.description == "Test Transfer")
         #expect(viewModel.category == "Food")
         #expect(viewModel.isPositive == false)
         #expect(viewModel.isLoading == false)
     }
 
-    @Test("Load note - positive amount sets isPositive true")
-    func loadNotePositiveAmount() async throws {
+    @Test("Load Transfer - positive amount sets isPositive true")
+    func loadTransferPositiveAmount() async throws {
         let (viewModel, _, swiftData, _) = makeSUT()
-        swiftData.seed([TestDataBuilder.createNote(id: "1", amount: 100.0)])
+        swiftData.seed([TestDataBuilder.createTransfer(id: "1", amount: 100.0)])
         
-        viewModel.loadNote(noteId: "1")
+        viewModel.loadTransfer(TransferId: "1")
         try await Task.sleep(nanoseconds: 100_000_000)
         
         #expect(viewModel.isPositive == true)
     }
 
-    @Test("Load note - not found clears fields")
-    func loadNoteNotFound() async throws {
+    @Test("Load Transfer - not found clears fields")
+    func loadTransferNotFound() async throws {
         let (viewModel, _, _, _) = makeSUT()
         
-        viewModel.loadNote(noteId: "nonexistent")
+        viewModel.loadTransfer(TransferId: "nonexistent")
         try await Task.sleep(nanoseconds: 100_000_000)
         
         #expect(viewModel.amount == "")
@@ -74,52 +74,52 @@ struct EditNoteViewModelTests {
         #expect(viewModel.isLoading == false)
     }
 
-    // MARK: - Save Note
+    // MARK: - Save Transfer
 
-    @Test("Save note - updates note and navigates back")
-    func saveNoteSuccess() async throws {
+    @Test("Save Transfer - updates Transfer and navigates back")
+    func saveTransferSuccess() async throws {
         let (viewModel, worker, swiftData, router) = makeSUT()
-        swiftData.seed([TestDataBuilder.createNote(id: "test_1", amount: -50.0)])
+        swiftData.seed([TestDataBuilder.createTransfer(id: "test_1", amount: -50.0)])
         
         viewModel.amount = "75"
         viewModel.description = "Updated"
         viewModel.category = "Transport"
         viewModel.isPositive = false
         
-        viewModel.saveNote(noteId: "test_1")
+        viewModel.saveTransfer(TransferId: "test_1")
         try await Task.sleep(nanoseconds: 100_000_000)
         
-        #expect(worker.updateNoteCallCount == 1)
-        #expect(swiftData.notes.first?.amount == -75.0)
-        #expect(swiftData.notes.first?.noteDescription == "Updated")
+        #expect(worker.updateTransferCallCount == 1)
+        #expect(swiftData.Transfers.first?.amount == -75.0)
+        #expect(swiftData.Transfers.first?.TransferDescription == "Updated")
         #expect(router.navigateBackCallCount == 1)
     }
 
-    @Test("Save note - positive amount stored correctly")
-    func saveNotePositiveAmount() async throws {
+    @Test("Save Transfer - positive amount stored correctly")
+    func saveTransferPositiveAmount() async throws {
         let (viewModel, _, swiftData, _) = makeSUT()
-        swiftData.seed([TestDataBuilder.createNote(id: "1")])
+        swiftData.seed([TestDataBuilder.createTransfer(id: "1")])
         
         viewModel.amount = "100"
         viewModel.description = "Income"
         viewModel.category = "Income"
         viewModel.isPositive = true
         
-        viewModel.saveNote(noteId: "1")
+        viewModel.saveTransfer(TransferId: "1")
         try await Task.sleep(nanoseconds: 100_000_000)
         
-        #expect(swiftData.notes.first?.amount == 100.0)
+        #expect(swiftData.Transfers.first?.amount == 100.0)
     }
 
-    @Test("Save note - not found shows error")
-    func saveNoteNotFound() async throws {
+    @Test("Save Transfer - not found shows error")
+    func saveTransferNotFound() async throws {
         let (viewModel, _, _, router) = makeSUT()
         
         viewModel.amount = "50"
         viewModel.description = "Test"
         viewModel.category = "Food"
         
-        viewModel.saveNote(noteId: "nonexistent")
+        viewModel.saveTransfer(TransferId: "nonexistent")
         try await Task.sleep(nanoseconds: 100_000_000)
         
         #expect(viewModel.errorMessage != nil)
@@ -137,12 +137,12 @@ struct EditNoteViewModelTests {
     @Test("Save state - isSaving true during save")
     func savingState() {
         let (viewModel, _, swiftData, _) = makeSUT()
-        swiftData.seed([TestDataBuilder.createNote(id: "1")])
+        swiftData.seed([TestDataBuilder.createTransfer(id: "1")])
         viewModel.amount = "50"
         viewModel.description = "Test"
         viewModel.category = "Food"
         
-        viewModel.saveNote(noteId: "1")
+        viewModel.saveTransfer(TransferId: "1")
         
         #expect(viewModel.isSaving == true)
     }

@@ -19,25 +19,25 @@ enum UITestConfig {
 // MARK: - Page Object Pattern
 
 // Page Object for Transaction List Screen
-struct NoteListPage {
+struct TransferListPage {
     let app: XCUIApplication
     
     // MARK: - Elements
     
     var navigationTitle: XCUIElement {
-        app.staticTexts["Notes"]
+        app.staticTexts["Transfers"]
     }
     
     var refreshControl: XCUIElement {
         app.otherElements["refreshControl"]
     }
     
-    // Note Elements
-    func noteRow(withId id: String) -> XCUIElement {
-        app.otherElements["note_\(id)"]
+    // Transfer Elements
+    func transferRow(withId id: String) -> XCUIElement {
+        app.otherElements["transfer_\(id)"]
     }
     
-    func noteDescription(_ text: String) -> XCUIElement {
+    func transferDescription(_ text: String) -> XCUIElement {
         app.staticTexts[text]
     }
     
@@ -49,7 +49,7 @@ struct NoteListPage {
         app.staticTexts.matching(NSPredicate(format: "label CONTAINS '€'"))
     }
     
-    var allNoteDescriptions: XCUIElementQuery {
+    var allTransferDescriptions: XCUIElementQuery {
         app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'accusamus' OR label CONTAINS 'reprehenderit' OR label CONTAINS 'officia'"))
     }
     
@@ -68,7 +68,7 @@ struct NoteListPage {
     }
     
     func tapTransaction(withId id: String) {
-        noteRow(withId: id).tap()
+        transferRow(withId: id).tap()
     }
     
     // MARK: - Assertions
@@ -79,7 +79,7 @@ struct NoteListPage {
 }
 
 /// Page Object for Transaction Edit Screen
-struct NoteEditPage {
+struct TransferEditPage {
     let app: XCUIApplication
     
     // MARK: - Elements

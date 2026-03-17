@@ -1,29 +1,29 @@
 //
-//  NoteDetailView.swift
+//  TransferDetailView.swift
 //  Transfers
 //
 
 import SwiftUI
 
-struct NoteDetailView: View {
+struct TransferDetailView: View {
     @Environment(Router.self) private var router
-    @Environment(NoteWorker.self) private var noteWorker
+    @Environment(TransferWorker.self) private var transferWorker
     @Environment(SwiftDataService.self) private var swiftDataService
 
-    let noteId: String
+    let transferId: String
 
-    @State private var viewModel: NoteDetailViewModel?
+    @State private var viewModel: TransferDetailViewModel?
     @State private var showDeleteConfirmation = false
 
     var body: some View {
         ScrollView {
-            if let note = viewModel?.note {
+            if let transfer = viewModel?.transfer {
                 VStack(spacing: 24) {
-                    Text(note.amount)
+                    Text(transfer.amount)
                         .font(.system(size: 48, weight: .bold))
-                        .foregroundColor(note.isPositive ? .green : .primary)
+                        .foregroundColor(transfer.isPositive ? .green : .primary)
 
-                    Text(note.category)
+                    Text(transfer.category)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .background(Color.blue.opacity(0.2))
@@ -33,9 +33,9 @@ struct NoteDetailView: View {
                     Divider()
 
                     VStack(alignment: .leading, spacing: 16) {
-                        DetailRow(label: "Description", value: note.description)
-                        DetailRow(label: "Date",        value: note.date)
-                        DetailRow(label: "Sync Status", value: note.syncStatus)
+                        DetailRow(label: "Description", value: transfer.description)
+                        DetailRow(label: "Date",        value: transfer.date)
+                        DetailRow(label: "Sync Status", value: transfer.syncStatus)
                     }
                     .padding()
                     .background(Color(.systemGray6))
@@ -44,9 +44,9 @@ struct NoteDetailView: View {
                     Spacer()
 
                     Button {
-                        viewModel?.didTapEdit(noteId: note.id)
+                        viewModel?.didTapEdit(transferId: transfer.id)
                     } label: {
-                        Label("Edit Note", systemImage: "pencil")
+                        Label("Edit Transfer", systemImage: "pencil")
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
                     }
@@ -55,7 +55,7 @@ struct NoteDetailView: View {
                     Button(role: .destructive) {
                         showDeleteConfirmation = true
                     } label: {
-                        Label("Delete Note", systemImage: "trash")
+                        Label("Delete Transfer", systemImage: "trash")
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
                     }
@@ -64,22 +64,22 @@ struct NoteDetailView: View {
                 .padding()
             } else {
                 ContentUnavailableView(
-                    "Note Not Found",
-                    systemImage: "note.text",
-                    description: Text("This note may have been deleted")
+                    "Transfer Not Found",
+                    systemImage: "transfer.text",
+                    description: Text("This transfer may have been deleted")
                 )
             }
         }
-        .navigationTitle("Note Details")
+        .navigationTitle("Transfer Details")
         .navigationBarTitleDisplayMode(.inline)
-        // Reload when navigating back from EditNote
+        // Reload when navigating back from EditTransfer
         .task(id: router.path.count) {
             guard viewModel != nil else { return }
-            viewModel?.loadNote(noteId: noteId)
+            viewModel?.loadTransfer(transferId: transferId)
         }
-        .confirmationDialog("Delete Note", isPresented: $showDeleteConfirmation) {
+        .confirmationDialog("Delete Transfer", isPresented: $showDeleteConfirmation) {
             Button("Delete", role: .destructive) {
-                viewModel?.deleteNote(noteId: noteId)
+                viewModel?.deleteTransfer(transferId: transferId)
             }
             Button("Cancel", role: .cancel) { }
         } message: {
@@ -96,12 +96,12 @@ struct NoteDetailView: View {
     private func setup() {
         guard viewModel == nil else { return }
         
-        viewModel = NoteDetailViewModel(
-            noteWorker: noteWorker,
+        viewModel = TransferDetailViewModel(
+            transferWorker: transferWorker,
             swiftDataService: swiftDataService,
             router: router
         )
-        viewModel?.loadNote(noteId: noteId)
+        viewModel?.loadTransfer(transferId: transferId)
     }
 }
 

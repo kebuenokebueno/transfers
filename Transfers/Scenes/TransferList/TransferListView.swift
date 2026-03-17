@@ -1,48 +1,48 @@
 //
-//  NoteListView.swift
+//  TransferListView.swift
 //  Transfers
 //
 
 import SwiftUI
 import SwiftData
 
-struct NoteListView: View {
+struct TransferListView: View {
     @Environment(Router.self) private var router
-    @Environment(NoteWorker.self) private var noteWorker
+    @Environment(TransferWorker.self) private var transferWorker
     @Environment(SwiftDataService.self) private var swiftDataService
 
-    @State private var viewModel: NoteListViewModel?
+    @State private var viewModel: TransferListViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                NoteListContent(
-                    notes: viewModel.displayedNotes,
+                TransferListContent(
+                    transfers: viewModel.displayedTransfers,
                     isLoading: viewModel.isLoading,
                     lastError: viewModel.errorMessage,
-                    onTapNote: { note in
-                        viewModel.didSelectNote(noteId: note.id)
+                    onTapTransfer: { transfer in
+                        viewModel.didSelectTransfer(transferId: transfer.id)
                     },
-                    onDeleteNote: { note in
-                        viewModel.deleteNote(noteId: note.id)
+                    onDeleteTransfer: { transfer in
+                        viewModel.deleteTransfer(transferId: transfer.id)
                     },
-                    onAddNote: {
-                        viewModel.didTapAddNote()
+                    onAddTransfer: {
+                        viewModel.didTapAddTransfer()
                     },
                     onFetch: {
-                        viewModel.loadNotes()
+                        viewModel.loadTransfers()
                     },
                     onClearError: {
                         viewModel.errorMessage = nil
                     }
                 )
-                // Reload when AddNote sheet is dismissed
+                // Reload when AddTransfer sheet is dismissed
                 .task(id: router.presentedSheet == nil) {
-                    viewModel.loadNotes()
+                    viewModel.loadTransfers()
                 }
-                // Reload when navigating back from EditNote or NoteDetail
+                // Reload when navigating back from EditTransfer or TransferDetail
                 .task(id: router.path.count) {
-                    viewModel.loadNotes()
+                    viewModel.loadTransfers()
                 }
             } else {
                 ProgressView()
@@ -56,11 +56,11 @@ struct NoteListView: View {
     private func setup() {
         guard viewModel == nil else { return }
         
-        viewModel = NoteListViewModel(
-            noteWorker: noteWorker,
+        viewModel = TransferListViewModel(
+            transferWorker: transferWorker,
             swiftDataService: swiftDataService,
             router: router
         )
-        viewModel?.loadNotes()
+        viewModel?.loadTransfers()
     }
 }

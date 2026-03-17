@@ -17,7 +17,7 @@ final class AccessibilityUITests: BaseUITest {
         
         // Assert - All interactive elements should have accessibility labels
         XCTAssertFalse(
-            noteListPage.navigationTitle.label.isEmpty,
+            transferListPage.navigationTitle.label.isEmpty,
             "Logout button should have accessibility label"
         )
     }
@@ -31,14 +31,14 @@ final class AccessibilityUITests: BaseUITest {
     
     func testVoiceOverNavigationFlow() throws {
         // Enable VoiceOver for testing
-        // Note: This requires accessibility permissions
+        // Transfer: This requires accessibility permissions
         
         // Wait for load
         sleep(2)
         
         // Assert - Screen should have accessibility label
         XCTAssertTrue(
-            noteListPage.navigationTitle.exists,
+            transferListPage.navigationTitle.exists,
             "Navigation should be accessible for VoiceOver"
         )
     }

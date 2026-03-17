@@ -1,18 +1,18 @@
 //
-//  EditNoteView.swift
+//  EditTransferView.swift
 //  Transfers
 //
 
 import SwiftUI
 
-struct EditNoteView: View {
+struct EditTransferView: View {
     @Environment(Router.self) private var router
-    @Environment(NoteWorker.self) private var noteWorker
+    @Environment(TransferWorker.self) private var transferWorker
     @Environment(SwiftDataService.self) private var swiftDataService
 
-    let noteId: String
+    let transferId: String
 
-    @State private var viewModel: EditNoteViewModel?
+    @State private var viewModel: EditTransferViewModel?
 
     let categories = ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"]
 
@@ -42,12 +42,12 @@ struct EditNoteView: View {
                 ProgressView("Loading...")
             }
         }
-        .navigationTitle("Edit Note")
+        .navigationTitle("Edit Transfer")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
-                    viewModel?.saveNote(noteId: noteId)
+                    viewModel?.saveTransfer(transferId: transferId)
                 }
                 .disabled(
                     (viewModel?.amount.isEmpty ?? true) ||
@@ -69,11 +69,11 @@ struct EditNoteView: View {
     private func setup() {
         guard viewModel == nil else { return }
         
-        viewModel = EditNoteViewModel(
-            noteWorker: noteWorker,
+        viewModel = EditTransferViewModel(
+            transferWorker: transferWorker,
             swiftDataService: swiftDataService,
             router: router
         )
-        viewModel?.loadNote(noteId: noteId)
+        viewModel?.loadTransfer(transferId: transferId)
     }
 }

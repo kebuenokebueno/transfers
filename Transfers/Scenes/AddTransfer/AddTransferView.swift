@@ -1,15 +1,15 @@
 //
-//  AddNoteView.swift
+//  AddTransferView.swift
 //  Transfers
 //
 
 import SwiftUI
 
-struct AddNoteView: View {
+struct AddTransferView: View {
     @Environment(Router.self) private var router
-    @Environment(NoteWorker.self) private var noteWorker
+    @Environment(TransferWorker.self) private var transferWorker
 
-    @State private var viewModel: AddNoteViewModel?
+    @State private var viewModel: AddTransferViewModel?
     @State private var amount = ""
     @State private var description = ""
     @State private var category = "Food"
@@ -37,7 +37,7 @@ struct AddNoteView: View {
                     }
                 }
             }
-            .navigationTitle("Add Note")
+            .navigationTitle("Add Transfer")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -47,7 +47,7 @@ struct AddNoteView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         guard let value = Double(amount) else { return }
-                        viewModel?.saveNote(
+                        viewModel?.saveTransfer(
                             amount: value,
                             description: description,
                             category: category,
@@ -70,6 +70,6 @@ struct AddNoteView: View {
 
     private func setup() {
         guard viewModel == nil else { return }
-        viewModel = AddNoteViewModel(noteWorker: noteWorker, router: router)
+        viewModel = AddTransferViewModel(transferWorker: transferWorker, router: router)
     }
 }

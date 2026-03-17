@@ -1,19 +1,19 @@
 //
-//  EditNoteViewModel.swift
+//  EditTransferViewModel.swift
 //  Transfers
 //
-//  MVVM ViewModel for EditNote scene
+//  MVVM ViewModel for EditTransfer scene
 //
 
 import Foundation
 
 @MainActor
 @Observable
-final class EditNoteViewModel {
+final class EditTransferViewModel {
     
     // MARK: - Dependencies
     
-    private let noteWorker: NoteWorkerProtocol
+    private let transferWorker: TransferWorkerProtocol
     private let swiftDataService: SwiftDataServiceProtocol
     private let router: Router
     
@@ -33,29 +33,29 @@ final class EditNoteViewModel {
     // MARK: - Init
     
     init(
-        noteWorker: NoteWorkerProtocol,
+        transferWorker: TransferWorkerProtocol,
         swiftDataService: SwiftDataServiceProtocol,
         router: Router
     ) {
-        self.noteWorker = noteWorker
+        self.transferWorker = transferWorker
         self.swiftDataService = swiftDataService
         self.router = router
     }
     
     // MARK: - User Actions
     
-    func loadNote(noteId: String) {
+    func loadTransfer(transferId: String) {
         Task {
-            await fetchNote(noteId: noteId)
+            await fetchTransfer(transferId: transferId)
         }
     }
     
-    func saveNote(noteId: String) {
+    func saveTransfer(transferId: String) {
         guard let value = Double(amount) else { return }
         isSaving = true
         Task {
-            await performSaveNote(
-                noteId: noteId,
+            await performSaveTransfer(
+                transferId: transferId,
                 amount: value,
                 description: description,
                 category: category,
@@ -66,8 +66,8 @@ final class EditNoteViewModel {
     
     // MARK: - Business Logic
     
-    private func fetchNote(noteId: String) async {
-        guard let note = try? swiftDataService.fetchNote(id: noteId) else {
+    private func fetchTransfer(transferId: String) async {
+        guard let transfer = try? swiftDataService.fetchTransfer(id: transferId) else {
             amount = ""
             description = ""
             category = ""
@@ -75,31 +75,31 @@ final class EditNoteViewModel {
             return
         }
         
-        amount = String(abs(note.amount))
-        description = note.noteDescription
-        category = note.category
-        isPositive = note.isPositive
+        amount = String(abs(transfer.amount))
+        description = transfer.transferDescription
+        category = transfer.category
+        isPositive = transfer.isPositive
         isLoading = false
     }
     
-    private func performSaveNote(
-        noteId: String,
+    private func performSaveTransfer(
+        transferId: String,
         amount: Double,
         description: String,
         category: String,
         isPositive: Bool
     ) async {
-        guard let existing = try? swiftDataService.fetchNote(id: noteId) else {
+        guard let existing = try? swiftDataService.fetchTransfer(id: transferId) else {
             isSaving = false
-            errorMessage = "Failed to update note"
+            errorMessage = "Failed to update transfer"
             return
         }
         
         existing.amount = isPositive ? amount : -amount
-        existing.noteDescription = description
+        existing.transferDescription = description
         existing.category = category
         
-        await noteWorker.updateNote(existing)
+        await transferWorker.updateTransfer(existing)
         
         isSaving = false
         router.navigateBack()

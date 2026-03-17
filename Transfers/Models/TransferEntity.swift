@@ -3,10 +3,10 @@ import SwiftData
 
 
 @Model
-final public class NoteEntity {
+final public class TransferEntity {
     @Attribute(.unique) public var id: String
     public var amount: Double
-    public var noteDescription: String
+    public var transferDescription: String
     public var date: Date
     public var category: String
     public var thumbnailUrl: String?
@@ -38,7 +38,7 @@ final public class NoteEntity {
     ) {
         self.id = id
         self.amount = amount
-        self.noteDescription = description
+        self.transferDescription = description
         self.date = date
         self.category = category
         self.thumbnailUrl = thumbnailUrl
@@ -58,11 +58,11 @@ final public class NoteEntity {
 
 // MARK: - Codable Conformance for Supabase
 
-extension NoteEntity: Codable {
+extension TransferEntity: Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case amount
-        case noteDescription = "description"
+        case transferDescription = "description"
         case date
         case category
         case thumbnailUrl = "thumbnail_url"
@@ -76,7 +76,7 @@ extension NoteEntity: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(amount, forKey: .amount)
-        try container.encode(noteDescription, forKey: .noteDescription)
+        try container.encode(transferDescription, forKey: .transferDescription)
         try container.encode(date, forKey: .date)
         try container.encode(category, forKey: .category)
         try container.encodeIfPresent(thumbnailUrl, forKey: .thumbnailUrl)
@@ -89,7 +89,7 @@ extension NoteEntity: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let id = try container.decode(String.self, forKey: .id)
         let amount = try container.decode(Double.self, forKey: .amount)
-        let description = try container.decode(String.self, forKey: .noteDescription)
+        let description = try container.decode(String.self, forKey: .transferDescription)
         let date = try container.decode(Date.self, forKey: .date)
         let category = try container.decode(String.self, forKey: .category)
         let thumbnailUrl = try container.decodeIfPresent(String.self, forKey: .thumbnailUrl)
@@ -116,11 +116,11 @@ extension NoteEntity: Codable {
 
 // MARK: - Equatable
 
-extension NoteEntity: Equatable {
-    public static func == (lhs: NoteEntity, rhs: NoteEntity) -> Bool {
+extension TransferEntity: Equatable {
+    public static func == (lhs: TransferEntity, rhs: TransferEntity) -> Bool {
         lhs.id == rhs.id &&
         lhs.amount == rhs.amount &&
-        lhs.noteDescription == rhs.noteDescription &&
+        lhs.transferDescription == rhs.transferDescription &&
         lhs.date == rhs.date &&
         lhs.category == rhs.category &&
         lhs.thumbnailUrl == rhs.thumbnailUrl
@@ -129,7 +129,7 @@ extension NoteEntity: Equatable {
 
 // MARK: - Helper Methods
 
-public extension NoteEntity {
+public extension TransferEntity {
     
     /// Mark as needing sync
     func markForSync() {
@@ -152,7 +152,7 @@ public extension NoteEntity {
 
 // MARK: - Display Helpers
 
-extension NoteEntity {
+extension TransferEntity {
     /// Formatted amount string
     public var formattedAmount: String {
         let absAmount = abs(amount)

@@ -12,7 +12,7 @@ class TestSupabaseService {
     private let client: SupabaseClient
     private let tableName: String
 
-    init(tableName: String = "notes_test") {
+    init(tableName: String = "transfers_test") {
         self.tableName = tableName
         self.client = SupabaseClient(
             supabaseURL: URL(string: SupabaseConfig.supabaseTestURL)!,
@@ -22,8 +22,8 @@ class TestSupabaseService {
 
     // MARK: - CRUD
 
-    func fetchNotes() async throws -> [NoteEntity] {
-        let response: [NoteEntity] = try await client
+    func fetchTransfers() async throws -> [TransferEntity] {
+        let response: [TransferEntity] = try await client
             .from(tableName)
             .select()
             .order("created_at", ascending: false)
@@ -32,22 +32,22 @@ class TestSupabaseService {
         return response
     }
 
-    func createNote(_ note: NoteEntity) async throws {
+    func createTransfer(_ transfer: TransferEntity) async throws {
         try await client
             .from(tableName)
-            .insert(note)
+            .insert(transfer)
             .execute()
     }
 
-    func updateNote(_ note: NoteEntity) async throws {
+    func updateTransfer(_ transfer: TransferEntity) async throws {
         try await client
             .from(tableName)
-            .update(note)
-            .eq("id", value: note.id)
+            .update(transfer)
+            .eq("id", value: transfer.id)
             .execute()
     }
 
-    func deleteNote(id: String) async throws {
+    func deleteTransfer(id: String) async throws {
         try await client
             .from(tableName)
             .delete()
@@ -67,7 +67,7 @@ class TestSupabaseService {
 
     func testConnection() async -> Bool {
         do {
-            _ = try await fetchNotes()
+            _ = try await fetchTransfers()
             return true
         } catch {
             print("E2E: Supabase connection failed: \(error)")
