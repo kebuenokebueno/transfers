@@ -73,3 +73,10 @@ struct AddTransferView: View {
         viewModel = AddTransferViewModel(transferWorker: transferWorker, router: router)
     }
 }
+
+#Preview {
+    AddTransferView()
+        .environment(Router())
+        .environment(TransferWorker(swiftDataService: SwiftDataService(), supabaseService: SupabaseService()))
+
+}
