@@ -24,11 +24,7 @@ class Router {
             path.removeLast()
         }
     }
-    
-    func navigateToRoot() {
-        path.removeLast(path.count)
-    }
-    
+
     func present(sheet route: Route) {
         presentedSheet = route
     }
