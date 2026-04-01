@@ -6,14 +6,14 @@
 import Foundation
 import Testing
 import SwiftData
+import SwiftUI
 @testable import Transfers
 
 // MARK: - Tags
 
 extension Tag {
     @Tag static var unit: Self
-    @Tag static var interactor: Self
-    @Tag static var presenter: Self
+    @Tag static var viewModel: Self
     @Tag static var integration: Self
     @Tag static var performance: Self
     @Tag static var swiftdata: Self
@@ -230,151 +230,48 @@ class MockTransferWorker: TransferWorkerProtocol {
     }
 }
 
-// MARK: - Mock TransferList Presenter
+// MARK: - Mock Router
 
-class MockTransferListPresenter: TransferListPresentationLogic {
-    var presentTransfersCalled = false
-    var presentTransfersCallCount = 0
-    var lastFetchResponse: TransferScene.FetchTransfers.Response?
-
-    var presentDeleteResultCalled = false
-    var lastDeleteResponse: TransferScene.DeleteTransfer.Response?
-
-    func presentTransfers(response: TransferScene.FetchTransfers.Response) {
-        presentTransfersCalled = true
-        presentTransfersCallCount += 1
-        lastFetchResponse = response
+@MainActor
+class MockRouter: Router {
+    var navigateToCallCount = 0
+    var lastNavigatedRoute: Route?
+    var presentSheetCallCount = 0
+    var lastPresentedSheet: Route?
+    var dismissCallCount = 0
+    var navigateBackCallCount = 0
+    
+    override func navigate(to route: Route) {
+        navigateToCallCount += 1
+        lastNavigatedRoute = route
+        super.navigate(to: route)
     }
-
-    func presentDeleteResult(response: TransferScene.DeleteTransfer.Response) {
-        presentDeleteResultCalled = true
-        lastDeleteResponse = response
+    
+    override func present(sheet route: Route) {
+        presentSheetCallCount += 1
+        lastPresentedSheet = route
+        super.present(sheet: route)
     }
-}
-
-// MARK: - Mock TransferList ViewController
-
-class MockTransferListViewController: TransferListDisplayLogic {
-    var displayTransfersCalled = false
-    var displayTransfersCallCount = 0
-    var lastFetchViewModel: TransferScene.FetchTransfers.ViewModel?
-
-    var displayDeleteResultCalled = false
-    var lastDeleteViewModel: TransferScene.DeleteTransfer.ViewModel?
-
-    func displayTransfers(viewModel: TransferScene.FetchTransfers.ViewModel) {
-        displayTransfersCalled = true
-        displayTransfersCallCount += 1
-        lastFetchViewModel = viewModel
+    
+    override func dismiss() {
+        dismissCallCount += 1
+        super.dismiss()
     }
-
-    func displayDeleteResult(viewModel: TransferScene.DeleteTransfer.ViewModel) {
-        displayDeleteResultCalled = true
-        lastDeleteViewModel = viewModel
+    
+    override func navigateBack() {
+        navigateBackCallCount += 1
+        super.navigateBack()
     }
-}
-
-// MARK: - Mock AddTransfer Presenter
-
-class MockAddTransferPresenter: AddTransferPresentationLogic {
-    var presentSaveResultCalled = false
-    var lastSaveResponse: AddTransferScene.SaveTransfer.Response?
-
-    func presentSaveResult(response: AddTransferScene.SaveTransfer.Response) {
-        presentSaveResultCalled = true
-        lastSaveResponse = response
-    }
-}
-
-// MARK: - Mock AddTransfer ViewController
-
-class MockAddTransferViewController: AddTransferDisplayLogic {
-    var displaySaveResultCalled = false
-    var lastSaveViewModel: AddTransferScene.SaveTransfer.ViewModel?
-
-    func displaySaveResult(viewModel: AddTransferScene.SaveTransfer.ViewModel) {
-        displaySaveResultCalled = true
-        lastSaveViewModel = viewModel
-    }
-}
-
-// MARK: - Mock EditTransfer Presenter
-
-class MockEditTransferPresenter: EditTransferPresentationLogic {
-    var presentTransferCalled = false
-    var lastLoadResponse: EditTransferScene.LoadTransfer.Response?
-
-    var presentSaveResultCalled = false
-    var lastSaveResponse: EditTransferScene.SaveTransfer.Response?
-
-    func presentTransfer(response: EditTransferScene.LoadTransfer.Response) {
-        presentTransferCalled = true
-        lastLoadResponse = response
-    }
-
-    func presentSaveResult(response: EditTransferScene.SaveTransfer.Response) {
-        presentSaveResultCalled = true
-        lastSaveResponse = response
-    }
-}
-
-// MARK: - Mock EditTransfer ViewController
-
-class MockEditTransferViewController: EditTransferDisplayLogic {
-    var displayTransferCalled = false
-    var lastTransferViewModel: EditTransferScene.LoadTransfer.ViewModel?
-
-    var displaySaveResultCalled = false
-    var lastSaveViewModel: EditTransferScene.SaveTransfer.ViewModel?
-
-    func displayTransfer(viewModel: EditTransferScene.LoadTransfer.ViewModel) {
-        displayTransferCalled = true
-        lastTransferViewModel = viewModel
-    }
-
-    func displaySaveResult(viewModel: EditTransferScene.SaveTransfer.ViewModel) {
-        displaySaveResultCalled = true
-        lastSaveViewModel = viewModel
-    }
-}
-
-// MARK: - Mock TransferDetail Presenter
-
-class MockTransferDetailPresenter: TransferDetailPresentationLogic {
-    var presentTransferCalled = false
-    var lastFetchResponse: TransferDetailScene.FetchTransfer.Response?
-
-    var presentDeleteResultCalled = false
-    var lastDeleteResponse: TransferDetailScene.DeleteTransfer.Response?
-
-    func presentTransfer(response: TransferDetailScene.FetchTransfer.Response) {
-        presentTransferCalled = true
-        lastFetchResponse = response
-    }
-
-    func presentDeleteResult(response: TransferDetailScene.DeleteTransfer.Response) {
-        presentDeleteResultCalled = true
-        lastDeleteResponse = response
-    }
-}
-
-// MARK: - Mock TransferDetail ViewController
-
-class MockTransferDetailViewController: TransferDetailDisplayLogic {
-    var displayTransferCalled = false
-    var lastTransferViewModel: TransferDetailScene.FetchTransfer.ViewModel?
-
-    var displayDeleteResultCalled = false
-    var lastDeleteViewModel: TransferDetailScene.DeleteTransfer.ViewModel?
-
-    func displayTransfer(viewModel: TransferDetailScene.FetchTransfer.ViewModel) {
-        displayTransferCalled = true
-        lastTransferViewModel = viewModel
-    }
-
-    func displayDeleteResult(viewModel: TransferDetailScene.DeleteTransfer.ViewModel) {
-        displayDeleteResultCalled = true
-        lastDeleteViewModel = viewModel
+    
+    func reset() {
+        navigateToCallCount = 0
+        lastNavigatedRoute = nil
+        presentSheetCallCount = 0
+        lastPresentedSheet = nil
+        dismissCallCount = 0
+        navigateBackCallCount = 0
+        path = NavigationPath()
+        presentedSheet = nil
     }
 }
 
@@ -400,13 +297,18 @@ struct TestDataBuilder {
     }
 
     static func createTransfers(count: Int) -> [TransferEntity] {
-        (1...count).map { i in
-            createTransfer(
-                id: "transfer_\(i)",
-                amount: (i % 3 == 0) ? Double(i * 100) : -Double(i * 10),
-                description: "Transfer \(i)",
-                category: ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"][i % 6]
-            )
+        return (1...count).map { i in
+            let transferId = "transfer_\(i)"
+            let amount = (i % 3 == 0) ? Double(i * 100) : -Double(i * 10)
+            let description = "Transfer \(i)"
+            let categories = ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"]
+            let category = categories[i % 6]
+
+            return createTransfer(
+                id: transferId,
+                amount: amount,
+                description: description,
+                category: category)
         }
     }
 

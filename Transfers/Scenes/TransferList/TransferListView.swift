@@ -11,59 +11,56 @@ struct TransferListView: View {
     @Environment(TransferWorker.self) private var transferWorker
     @Environment(SwiftDataService.self) private var swiftDataService
 
-    @State private var viewController = TransferListViewController()
+    @State private var viewModel: TransferListViewModel?
 
     var body: some View {
-        TransferListContent(
-            transfers: viewController.displayedTransfers,
-            isLoading: viewController.isLoading,
-            lastError: viewController.errorMessage,
-            onTapTransfer: { transfer in
-                viewController.didSelectTransfer(transferId: transfer.id)
-            },
-            onDeleteTransfer: { transfer in
-                viewController.deleteTransfer(transferId: transfer.id)
-            },
-            onAddTransfer: {
-                viewController.didTapAddTransfer()
-            },
-            onFetch: {
-                viewController.loadTransfers()
-            },
-            onClearError: {
-                viewController.errorMessage = nil
+        Group {
+            if let viewModel {
+                TransferListContent(
+                    transfers: viewModel.displayedTransfers,
+                    isLoading: viewModel.isLoading,
+                    lastError: viewModel.errorMessage,
+                    onTapTransfer: { transfer in
+                        viewModel.didSelectTransfer(transferId: transfer.id)
+                    },
+                    onDeleteTransfer: { transfer in
+                        viewModel.deleteTransfer(transferId: transfer.id)
+                    },
+                    onAddTransfer: {
+                        viewModel.didTapAddTransfer()
+                    },
+                    onFetch: {
+                        viewModel.loadTransfers()
+                    },
+                    onClearError: {
+                        viewModel.errorMessage = nil
+                    }
+                )
+                // Reload when AddTransfer sheet is dismissed
+                .task(id: router.presentedSheet == nil) {
+                    viewModel.loadTransfers()
+                }
+                // Reload when navigating back from EditTransfer or TransferDetail
+                .task(id: router.path.count) {
+                    viewModel.loadTransfers()
+                }
+            } else {
+                ProgressView()
+                    .task { setup() }
             }
-        )
-        // Reload when AddTransfer sheet is dismissed
-        .task(id: router.presentedSheet == nil) {
-            guard viewController.interactor != nil else { return }
-            viewController.loadTransfers()
         }
-        // Reload when navigating back from EditTransfer or TransferDetail
-        .task(id: router.path.count) {
-            guard viewController.interactor != nil else { return }
-            viewController.loadTransfers()
-        }
-        .task { setup() }
     }
 
-    // MARK: - VIP Assembly
+    // MARK: - Setup
 
     private func setup() {
-        guard viewController.interactor == nil else { return }
-
-        let interactor = TransferListInteractor(
+        guard viewModel == nil else { return }
+        
+        viewModel = TransferListViewModel(
             transferWorker: transferWorker,
-            swiftDataService: swiftDataService
+            swiftDataService: swiftDataService,
+            router: router
         )
-        let presenter  = TransferListPresenter()
-        let transferRouter = TransferListRouter(router: router)
-
-        viewController.interactor    = interactor
-        viewController.router        = transferRouter
-        interactor.presenter         = presenter
-        presenter.viewController     = viewController
-
-        viewController.loadTransfers()
+        viewModel?.loadTransfers()
     }
 }

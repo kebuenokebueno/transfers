@@ -12,7 +12,7 @@ class TestSupabaseService {
     private let client: SupabaseClient
     private let tableName: String
 
-    init(tableName: String = "transfers_test") {
+    init(tableName: String = "notes_test") {
         self.tableName = tableName
         self.client = SupabaseClient(
             supabaseURL: URL(string: SupabaseConfig.supabaseTestURL)!,

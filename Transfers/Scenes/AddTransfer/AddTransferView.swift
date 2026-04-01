@@ -9,7 +9,7 @@ struct AddTransferView: View {
     @Environment(Router.self) private var router
     @Environment(TransferWorker.self) private var transferWorker
 
-    @State private var viewController = AddTransferViewController()
+    @State private var viewModel: AddTransferViewModel?
     @State private var amount = ""
     @State private var description = ""
     @State private var category = "Food"
@@ -41,43 +41,42 @@ struct AddTransferView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { router.dismiss() }
-                        .disabled(viewController.isSaving)
+                    Button("Cancel") { viewModel?.dismiss() }
+                        .disabled(viewModel?.isSaving ?? false)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         guard let value = Double(amount) else { return }
-                        viewController.saveTransfer(
+                        viewModel?.saveTransfer(
                             amount: value,
                             description: description,
                             category: category,
                             isIncome: isIncome
                         )
                     }
-                    .disabled(amount.isEmpty || description.isEmpty || viewController.isSaving)
+                    .disabled(amount.isEmpty || description.isEmpty || (viewModel?.isSaving ?? false))
                 }
             }
-            .disabled(viewController.isSaving)
-            .overlay { if viewController.isSaving { ProgressView("Saving...") } }
-            .alert("Error", isPresented: .constant(viewController.errorMessage != nil)) {
-                Button("OK") { viewController.errorMessage = nil }
+            .disabled(viewModel?.isSaving ?? false)
+            .overlay { if viewModel?.isSaving ?? false { ProgressView("Saving...") } }
+            .alert("Error", isPresented: .constant(viewModel?.errorMessage != nil)) {
+                Button("OK") { viewModel?.errorMessage = nil }
             } message: {
-                Text(viewController.errorMessage ?? "")
+                Text(viewModel?.errorMessage ?? "")
             }
         }
         .task { setup() }
     }
 
     private func setup() {
-        guard viewController.interactor == nil else { return }
-
-        let interactor = AddTransferInteractor(transferWorker: transferWorker)
-        let presenter  = AddTransferPresenter()
-        let transferRouter = AddTransferRouter(router: router)
-
-        viewController.interactor = interactor
-        viewController.router = transferRouter
-        interactor.presenter = presenter
-        presenter.viewController = viewController
+        guard viewModel == nil else { return }
+        viewModel = AddTransferViewModel(transferWorker: transferWorker, router: router)
     }
+}
+
+#Preview {
+    AddTransferView()
+        .environment(Router())
+        .environment(TransferWorker(swiftDataService: SwiftDataService(), supabaseService: SupabaseService()))
+
 }

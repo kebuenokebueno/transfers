@@ -12,12 +12,12 @@ struct TransferDetailView: View {
 
     let transferId: String
 
-    @State private var viewController = TransferDetailViewController()
+    @State private var viewModel: TransferDetailViewModel?
     @State private var showDeleteConfirmation = false
 
     var body: some View {
         ScrollView {
-            if let transfer = viewController.transfer {
+            if let transfer = viewModel?.transfer {
                 VStack(spacing: 24) {
                     Text(transfer.amount)
                         .font(.system(size: 48, weight: .bold))
@@ -44,7 +44,7 @@ struct TransferDetailView: View {
                     Spacer()
 
                     Button {
-                        viewController.didTapEdit(transferId: transfer.id)
+                        viewModel?.didTapEdit(transferId: transfer.id)
                     } label: {
                         Label("Edit Transfer", systemImage: "pencil")
                             .frame(maxWidth: .infinity)
@@ -74,41 +74,34 @@ struct TransferDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         // Reload when navigating back from EditTransfer
         .task(id: router.path.count) {
-            guard viewController.interactor != nil else { return }
-            viewController.loadTransfer(transferId: transferId)
+            guard viewModel != nil else { return }
+            viewModel?.loadTransfer(transferId: transferId)
         }
         .confirmationDialog("Delete Transfer", isPresented: $showDeleteConfirmation) {
             Button("Delete", role: .destructive) {
-                viewController.deleteTransfer(transferId: transferId)
+                viewModel?.deleteTransfer(transferId: transferId)
             }
             Button("Cancel", role: .cancel) { }
         } message: {
             Text("Are you sure? This cannot be undone.")
         }
-        .alert("Error", isPresented: .constant(viewController.errorMessage != nil)) {
-            Button("OK") { viewController.errorMessage = nil }
+        .alert("Error", isPresented: .constant(viewModel?.errorMessage != nil)) {
+            Button("OK") { viewModel?.errorMessage = nil }
         } message: {
-            Text(viewController.errorMessage ?? "")
+            Text(viewModel?.errorMessage ?? "")
         }
         .task { setup() }
     }
 
     private func setup() {
-        guard viewController.interactor == nil else { return }
-
-        let interactor = TransferDetailInteractor(
+        guard viewModel == nil else { return }
+        
+        viewModel = TransferDetailViewModel(
             transferWorker: transferWorker,
-            swiftDataService: swiftDataService
+            swiftDataService: swiftDataService,
+            router: router
         )
-        let presenter  = TransferDetailPresenter()
-        let transferRouter = TransferDetailRouter(router: router)
-
-        viewController.interactor    = interactor
-        viewController.router        = transferRouter
-        interactor.presenter         = presenter
-        presenter.viewController     = viewController
-
-        viewController.loadTransfer(transferId: transferId)
+        viewModel?.loadTransfer(transferId: transferId)
     }
 }
 
