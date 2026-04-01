@@ -297,13 +297,18 @@ struct TestDataBuilder {
     }
 
     static func createTransfers(count: Int) -> [TransferEntity] {
-        (1...count).map { i in
-            createTransfer(
-                id: "transfer_\(i)",
-                amount: (i % 3 == 0) ? Double(i * 100) : -Double(i * 10),
-                description: "Transfer \(i)",
-                category: ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"][i % 6]
-            )
+        return (1...count).map { i in
+            let transferId = "transfer_\(i)"
+            let amount = (i % 3 == 0) ? Double(i * 100) : -Double(i * 10)
+            let description = "Transfer \(i)"
+            let categories = ["Food", "Utilities", "Income", "Transport", "Entertainment", "Other"]
+            let category = categories[i % 6]
+
+            return createTransfer(
+                id: transferId,
+                amount: amount,
+                description: description,
+                category: category)
         }
     }
 
