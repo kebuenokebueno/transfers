@@ -18,7 +18,7 @@ enum UITestConfig {
 
 // MARK: - Page Object Pattern
 
-// Page Object for Transaction List Screen
+// Page Object for transfer List Screen
 struct TransferListPage {
     let app: XCUIApplication
     
@@ -67,10 +67,6 @@ struct TransferListPage {
         start.press(forDuration: 0, thenDragTo: finish)
     }
     
-    func tapTransaction(withId id: String) {
-        transferRow(withId: id).tap()
-    }
-    
     // MARK: - Assertions
     
     func verifyNavigationExists() -> Bool {
@@ -78,14 +74,14 @@ struct TransferListPage {
     }
 }
 
-/// Page Object for Transaction Edit Screen
+/// Page Object for Transfer Edit Screen
 struct TransferEditPage {
     let app: XCUIApplication
     
     // MARK: - Elements
     
     var navigationTitle: XCUIElement {
-        app.staticTexts["Edit Transaction Screen"]
+        app.staticTexts["Edit Transfer Screen"]
     }
     
     var descriptionField: XCUIElement {
