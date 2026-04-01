@@ -22,7 +22,7 @@ struct EditTransferViewModelTests {
         let worker = MockTransferWorker(swiftDataService: swiftData, supabaseService: supabase)
         let router = MockRouter()
         let viewModel = EditTransferViewModel(
-            TransferWorker: worker,
+            transferWorker: worker,
             swiftDataService: swiftData,
             router: router
         )
@@ -41,7 +41,7 @@ struct EditTransferViewModelTests {
             category: "Food"
         )])
         
-        viewModel.loadTransfer(TransferId: "test_1")
+        viewModel.loadTransfer(transferId: "test_1")
         try await Task.sleep(nanoseconds: 100_000_000)
         
         #expect(viewModel.amount == "75.5")
@@ -56,7 +56,7 @@ struct EditTransferViewModelTests {
         let (viewModel, _, swiftData, _) = makeSUT()
         swiftData.seed([TestDataBuilder.createTransfer(id: "1", amount: 100.0)])
         
-        viewModel.loadTransfer(TransferId: "1")
+        viewModel.loadTransfer(transferId: "1")
         try await Task.sleep(nanoseconds: 100_000_000)
         
         #expect(viewModel.isPositive == true)
@@ -66,7 +66,7 @@ struct EditTransferViewModelTests {
     func loadTransferNotFound() async throws {
         let (viewModel, _, _, _) = makeSUT()
         
-        viewModel.loadTransfer(TransferId: "nonexistent")
+        viewModel.loadTransfer(transferId: "nonexistent")
         try await Task.sleep(nanoseconds: 100_000_000)
         
         #expect(viewModel.amount == "")
@@ -86,12 +86,12 @@ struct EditTransferViewModelTests {
         viewModel.category = "Transport"
         viewModel.isPositive = false
         
-        viewModel.saveTransfer(TransferId: "test_1")
+        viewModel.saveTransfer(transferId: "test_1")
         try await Task.sleep(nanoseconds: 100_000_000)
         
         #expect(worker.updateTransferCallCount == 1)
-        #expect(swiftData.Transfers.first?.amount == -75.0)
-        #expect(swiftData.Transfers.first?.TransferDescription == "Updated")
+        #expect(swiftData.transfers.first?.amount == -75.0)
+        #expect(swiftData.transfers.first?.transferDescription == "Updated")
         #expect(router.navigateBackCallCount == 1)
     }
 
@@ -105,10 +105,10 @@ struct EditTransferViewModelTests {
         viewModel.category = "Income"
         viewModel.isPositive = true
         
-        viewModel.saveTransfer(TransferId: "1")
+        viewModel.saveTransfer(transferId: "1")
         try await Task.sleep(nanoseconds: 100_000_000)
         
-        #expect(swiftData.Transfers.first?.amount == 100.0)
+        #expect(swiftData.transfers.first?.amount == 100.0)
     }
 
     @Test("Save Transfer - not found shows error")
@@ -119,7 +119,7 @@ struct EditTransferViewModelTests {
         viewModel.description = "Test"
         viewModel.category = "Food"
         
-        viewModel.saveTransfer(TransferId: "nonexistent")
+        viewModel.saveTransfer(transferId: "nonexistent")
         try await Task.sleep(nanoseconds: 100_000_000)
         
         #expect(viewModel.errorMessage != nil)
@@ -142,7 +142,7 @@ struct EditTransferViewModelTests {
         viewModel.description = "Test"
         viewModel.category = "Food"
         
-        viewModel.saveTransfer(TransferId: "1")
+        viewModel.saveTransfer(transferId: "1")
         
         #expect(viewModel.isSaving == true)
     }
