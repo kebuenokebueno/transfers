@@ -7,7 +7,7 @@ A modern iOS banking application demonstrating best practices and industry-stand
 ## 📱 Overview
 
 Transfers is a banking app that allows users to manage money transfers with a focus on:
-- **Clean Architecture** - Maintainable and testable codebase using Clean Swift (VIP)
+- **Clean Architecture** - Maintainable and testable codebase using MVVM (Model-View-ViewModel)
 - **Modern iOS Development** - Latest Swift and SwiftUI features
 - **Comprehensive Testing** - Multiple testing strategies for reliability  
 - **Accessibility First** - Inclusive design for all users
@@ -33,43 +33,41 @@ Transfers is a banking app that allows users to manage money transfers with a fo
 
 ## 🏗️ Architecture
 
-**Clean Swift (VIP Pattern)**
+**MVVM (Model-View-ViewModel Pattern)**
 
-This project follows the Clean Swift architecture for maximum testability and separation of concerns:
+This project follows the MVVM architecture for maximum testability and separation of concerns:
 
 ```
 ┌─────────────┐
 │    View     │ ← SwiftUI Views
 │  (SwiftUI)  │
 └──────┬──────┘
-       │
+       │ observes
        ▼
 ┌──────────────┐
-│ ViewController│ ← @Observable, manages view state
-└──────┬────────┘
-       │
-       ▼
-┌─────────────┐
-│  Presenter  │ ← Formats data for display
+│  ViewModel  │ ← @Observable, manages state & business logic
+│             │
 └──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│ Interactor  │ ← Business logic
-└──────┬──────┘
-       │
+       │ uses
        ▼
 ┌─────────────┐
 │   Worker    │ ← Data operations (SwiftData + Supabase)
-└─────────────┘
+│             │
+└──────┬──────┘
+       │ uses
+       ▼
+┌──────────────────────────┐
+│  Services                │
+│  - SwiftDataService      │
+│  - SupabaseService       │
+└──────────────────────────┘
 ```
 
 **Key Components:**
 - **View** (SwiftUI) - User interface and user interaction
-- **ViewController** (@Observable) - View state management
-- **Presenter** - Presentation logic and data formatting
-- **Interactor** - Business logic and use cases
+- **ViewModel** (@Observable) - Business logic, presentation logic, and state management
 - **Worker** - Data access layer (SwiftData + Supabase)
+- **Services** - External service integrations (Supabase, SwiftData)
 - **Router** - Navigation between scenes
 
 ## 🛠️ Tech Stack
@@ -108,9 +106,10 @@ This project follows the Clean Swift architecture for maximum testability and se
 Comprehensive test coverage using **Swift Testing** framework (5 test suites):
 
 ### 1. Unit Tests (`UnitTests/`)
-- Business logic validation
-- Presenter formatting logic
-- Interactor use cases
+- ViewModel logic validation
+- Business logic testing
+- Presentation logic
+- Data formatting
 - Worker data operations
 - Mock-based isolation
 - **Target: 80%+ code coverage**
@@ -151,41 +150,27 @@ Transfers/
 │   ├── TransfersApp.swift              # App entry point
 │   ├── Secrets.swift                    # Supabase configuration
 │   │
-│   ├── Scenes/                          # Clean Swift VIP scenes
+│   ├── Scenes/                          # MVVM scenes
 │   │   ├── TransferList/                # Main list screen
 │   │   │   ├── TransferListView.swift
-│   │   │   ├── TransferListViewController.swift
-│   │   │   ├── TransferListPresenter.swift
-│   │   │   ├── TransferListInteractor.swift
-│   │   │   ├── TransferListRouter.swift
+│   │   │   ├── TransferListViewModel.swift
 │   │   │   └── TransferListContent.swift
 │   │   │
 │   │   ├── TransferDetail/              # Detail view screen
 │   │   │   ├── TransferDetailView.swift
-│   │   │   ├── TransferDetailViewController.swift
-│   │   │   ├── TransferDetailPresenter.swift
-│   │   │   ├── TransferDetailInteractor.swift
-│   │   │   ├── TransferDetailRouter.swift
-│   │   │   └── TransferDetailModels.swift
+│   │   │   └── TransferDetailViewModel.swift
 │   │   │
 │   │   ├── AddTransfer/                 # Create new transfer
 │   │   │   ├── AddTransferView.swift
-│   │   │   ├── AddTransferViewController.swift
-│   │   │   ├── AddTransferPresenter.swift
-│   │   │   ├── AddTransferInteractor.swift
-│   │   │   └── AddTransferModels.swift
+│   │   │   └── AddTransferViewModel.swift
 │   │   │
 │   │   └── EditTransfer/                # Edit existing transfer
 │   │       ├── EditTransferView.swift
-│   │       ├── EditTransferViewController.swift
-│   │       ├── EditTransferPresenter.swift
-│   │       ├── EditTransferInteractor.swift
-│   │       └── EditTransferModels.swift
+│   │       └── EditTransferViewModel.swift
 │   │
 │   ├── Models/                          # Data models
 │   │   ├── TransferEntity.swift         # SwiftData model
-│   │   ├── TransferViewModel.swift      # Presentation model
-│   │   └── TransferScene.swift          # Scene models
+│   │   └── TransferViewModel.swift      # Presentation model
 │   │
 │   ├── Workers/                         # Data layer
 │   │   └── TransferWorker.swift         # CRUD operations
@@ -418,7 +403,6 @@ SOFTWARE.
 - [Supabase](https://supabase.com) - Backend infrastructure
 - [Swift.org](https://swift.org) - Swift language
 - [Apple Developer](https://developer.apple.com) - SwiftUI, SwiftData, iOS frameworks
-- [Clean Swift](https://clean-swift.com) - Architecture pattern
 - [SnapshotTesting](https://github.com/pointfreeco/swift-snapshot-testing) - Snapshot testing library
 
 ## 📚 Resources
@@ -427,7 +411,6 @@ SOFTWARE.
 - [SwiftUI Documentation](https://developer.apple.com/documentation/swiftui)
 - [Swift Testing](https://developer.apple.com/documentation/testing)
 - [SwiftData Guide](https://developer.apple.com/documentation/swiftdata)
-- [Clean Swift Handbook](https://clean-swift.com/handbook/)
 - [Accessibility Guidelines](https://developer.apple.com/accessibility/)
 
 ---
